@@ -1,18 +1,18 @@
 # site settings
-title: Parth Patil
+title: Rishabh Ramteke
 subtitle: homepage
-email: parthvin@gmail.com
+email: rishabhramtekegsr@gmail.com
 description: I'm not a great programmer,<br/>I'm a just a good programmer with great habits.
-url: https://parthvpatil.github.io
+url: https://rishabhramteke.github.io
 baseurl: ''
 author:
 
-street_address: Room 3089, Hostel 18, IIT Bombay
+street_address: Room 381, Hostel 3, IIT Bombay
 city: Powai
 state: MH
 zip_code: 400076
 country: India
-phone: +91 9920385585
+phone: +91 9423437350
 
 # homepage tiles
 tiles-source: posts # accepts "posts" or "pages"
@@ -20,12 +20,12 @@ tiles-count: 4
 
 # social settings
 500px_url:
-facebook_url: https://www.facebook.com/parth.patil.77
-github_url: https://github.com/parth1811
+facebook_url: https://www.facebook.com/rishabh.ramteke.7699
+github_url: https://github.com/rishabhramteke
 gitlab_url:
 googleplus_url:
-instagram_url: https://www.instagram.com/the_stochastic_guy/
-linkedin_url: https://www.linkedin.com/in/parth-patil-256291117/
+instagram_url: https://www.instagram.com/parquinnien/
+linkedin_url: https://www.linkedin.com/in/rishabhramteke7699/
 pinterest_url:
 slack_url:
 twitter_url:
