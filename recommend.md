@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: page
 title: Recommendation Letters
 permalink: recommend
 image_show_on_page: false
