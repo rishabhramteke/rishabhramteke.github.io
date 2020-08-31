@@ -7,6 +7,4 @@ nav-menu: false
 show_tile: false
 ---
 
-<iframe src="{{ site.url }}/assets/files/Peter_Stuckey.pdf" width="100%" height="2100px"> </iframe>
-
-<iframe src="{{ site.url }}/assets/files/CMU-letter.pdf" width="100%" height="2100px"> </iframe>
+<a href="{{ site.url }}/assets/files/Peter_Stuckey.pdf"></a>
