@@ -1,7 +1,7 @@
 ---
 layout: home
 title: Home
-landing-title: 'Welcome to my homepage'
+landing-title: 'Welcome to the chapter of my Life'
 description: null
 image: null
 author: null
