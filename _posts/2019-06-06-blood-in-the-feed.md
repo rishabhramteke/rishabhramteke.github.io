@@ -2,6 +2,7 @@
 title: Blood In the Feed
 subtitle: The uneasy experience of predatory algorithms
 layout: blog
+permalink: blood
 ---
 
 Have you had the feeling of being prey inside an algorithmic system?
