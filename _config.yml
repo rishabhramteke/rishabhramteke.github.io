@@ -7,12 +7,12 @@ url: https://rishabhramteke.github.io/
 baseurl: ''
 author:
 
-street_address: Room 381, Hostel 3, IIT Bombay
-city: Powai
-state: MH
-zip_code: 400076
-country: India
-phone: +91 9423437350
+#street_address: Room 381, Hostel 3, IIT Bombay
+#city: Powai
+state: Tokyo
+#zip_code: 400076
+country: Japan #India
+phone: +81 7084648436
 
 # homepage tiles
 tiles-source: posts # accepts "posts" or "pages"
