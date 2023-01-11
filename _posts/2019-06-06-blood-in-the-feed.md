@@ -5,7 +5,7 @@ layout: blog
 permalink: blood
 ---
 
-Have you had the feeling of being prey inside an algorithmic system?
+Hi
 
  ([yes, I have a new watch](https://www.skagen.com/en-us/aaren-kulor-neon-green-silicone-41mm-watch-skw6556) - it's very on brand for my blog).
 
