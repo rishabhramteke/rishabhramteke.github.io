@@ -5,13 +5,13 @@ layout: blog
 permalink: blood
 ---
 
-Hi2
+Hi
 
  ([yes, I have a new watch](https://www.skagen.com/en-us/aaren-kulor-neon-green-silicone-41mm-watch-skw6556) - it's very on brand for my blog).
 
 
 <p><iframe class="ampframe" src="https://tomcritchlow.com/stories/blood-in-the-feed/" width="343px" height="572px"></iframe></p>
-<p><iframe class="ampframe" src="/_posts/2023-11-01-amptest.html" width="343px" height="572px"></iframe></p>
+{% link _posts/2023-11-01-amptest.html %}
 
 
 <style>
