@@ -37,17 +37,17 @@
     <!-- ## Writing the Story -->
     <!-- Stories are declared inside the `amp-story` tag. Story-level metadata is provided via attributes. (The first four attributes are mandatory; the final two are optional, but recommended.) Note that this metadata augments, but does not replace, [Structured Data](https://developers.google.com/search/docs/data-types/article#amp). -->
     <amp-story standalone
-      title="Stories in AMP - Hello World"
-      publisher="AMP Project"
-      publisher-logo-src="https://amp.dev/favicons/coast-228x228.png"
-      poster-portrait-src="https://amp.dev/static/samples/img/story_dog2_portrait.jpg"
-      poster-square-src="https://amp.dev/static/samples/img/story_dog2_square.jpg"
-      poster-landscape-src="https://amp.dev/static/samples/img/story_dog2_landscape.jpg">
+      title="{{page.cover.title}}"
+      publisher="{{ site.url }}"
+      publisher-logo-src="assets/images/blog.jpg"
+      poster-portrait-src="assets/images/blog.jpg"
+      poster-square-src="assets/images/blog.jpg"
+      poster-landscape-src="assets/images/blog.jpg">
 
       <!-- A story consists of one or more pages. Each page is declared by an `amp-story-page` element. Pages are designed by layering videos, images and text. Here we have a page that uses two layers. One layer filling the available space with an image and one text layer that shows a heading. -->
       <amp-story-page id="page-1">
         <amp-story-grid-layer template="fill">
-          <amp-img src="https://amp.dev/static/samples/img/story_dog2.jpg"
+          <amp-img src="assets/images/profile.jpg"
                    width="720" height="1280"
                    layout="responsive">
           </amp-img>
