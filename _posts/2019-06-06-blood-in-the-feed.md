@@ -11,7 +11,7 @@ Hi
 
 
 <p><iframe class="ampframe" src="https://tomcritchlow.com/stories/blood-in-the-feed/" width="343px" height="572px"></iframe></p>
-<p><iframe class="ampframe" src="2023-11-01-amptest.html" width="343px" height="572px"></iframe></p>
+<p><iframe class="ampframe" src="/_posts/2023-11-01-amptest.html" width="343px" height="572px"></iframe></p>
 
 
 <style>
