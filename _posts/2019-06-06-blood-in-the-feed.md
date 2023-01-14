@@ -9,9 +9,8 @@ Hi
 
  ([yes, I have a new watch](https://www.skagen.com/en-us/aaren-kulor-neon-green-silicone-41mm-watch-skw6556) - it's very on brand for my blog).
 
-<!-- <p><iframe class="ampframe" src="https://tomcritchlow.com/stories/blood-in-the-feed/" width="343px" height="572px"></iframe></p> -->  
+<p><iframe class="ampframe" src="https://rishabhramteke.github.io/amptest.html" width="343px" height="572px"></iframe></p>  
 
-[Link to a page]({{ site.baseurl }}{% link 2023-11-01-amptest.html %}
 
 
 
