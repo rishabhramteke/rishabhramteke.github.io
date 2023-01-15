@@ -9,7 +9,7 @@ Hi
 
  ([yes, I have a new watch](https://www.skagen.com/en-us/aaren-kulor-neon-green-silicone-41mm-watch-skw6556) - it's very on brand for my blog).
 
-<p><iframe class="ampframe" src="https://rishabhramteke.github.io/amptest.html" width="343px" height="572px"></iframe></p>  
+<p><iframe class="ampframe" src="https://rishabhramteke.github.io/erasmus-story.html" width="343px" height="572px"></iframe></p>  
 
 
 
