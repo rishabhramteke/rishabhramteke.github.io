@@ -47,19 +47,31 @@
       <!-- A story consists of one or more pages. Each page is declared by an `amp-story-page` element. Pages are designed by layering videos, images and text. Here we have a page that uses two layers. One layer filling the available space with an image and one text layer that shows a heading. -->
       <amp-story-page id="page-1">
         <amp-story-grid-layer template="fill">
-          <amp-img src="assets/images/profile.jpg"
+          <amp-img src="assets/images/Vienna-friends/scron1.jpg"
                    width="720" height="1280"
                    layout="responsive">
           </amp-img>
         </amp-story-grid-layer>
         <amp-story-grid-layer template="vertical">
-          <h1>Hello World</h1>
-          <p>This is an AMP Story.</p>
+          <h1>Eramus Family</h1>
+          <p>Vienna 2021.</p>
         </amp-story-grid-layer>
       </amp-story-page>
-
+      
+  <amp-story-page id="page2">
+        <amp-story-grid-layer template="vertical">
+          <amp-img src="assets/images/Vienna-friends/iceskating.jpg"
+                   width="720"
+                   height="640" layout="responsive"
+                   alt="..."></amp-img>
+          <amp-img src="assets/images/Vienna-friends/ski.jpg"
+                   width="720"
+                   height="640" layout="responsive"
+                   alt="..."></amp-img>
+        </amp-story-grid-layer>
+      </amp-story-page>
       <!-- Here we have a page consisting of a video which autoplays and loops. -->
-      <amp-story-page id="page-2">
+<!--       <amp-story-page id="page-2">
         <amp-story-grid-layer template="fill">
           <amp-video autoplay loop
                 width="720"
@@ -69,10 +81,10 @@
                 <source src="https://amp.dev/static/samples/video/story_video_dog.mp4" type="video/mp4">
           </amp-video>
         </amp-story-grid-layer>
-      </amp-story-page>
+      </amp-story-page> -->
 
       <!-- Pre-defined entry animations make it possible to create dynamic pages without videos. The length and initial delay can be customized using the `animate-in-duration` and `animate-in-delay` properties. The [animations sample](/documentation/examples/visual-effects/amp_story_animations/) shows all available animantions in action. -->
-      <amp-story-page id="animation-demo">
+<!--       <amp-story-page id="animation-demo">
         <amp-story-grid-layer template="fill">
           <amp-img src="https://amp.dev/static/samples/img/story_dog4.jpg"
                    animate-in="fly-in-top"
@@ -88,10 +100,10 @@
             Best walk ever!
           </h2>
         </amp-story-grid-layer>
-      </amp-story-page>
+      </amp-story-page> -->
 
       <!-- Stories can use predefined layouts to style the page. Here we're using the `thirds` template. For an overview about the available layouts take a look at the [layouts sample](/documentation/examples/style-layout/amp_story_layouts/). -->
-      <amp-story-page id="layout-demo">
+<!--       <amp-story-page id="layout-demo">
         <amp-story-grid-layer template="thirds">
           <amp-img grid-area="upper-third"
                    src="https://amp.dev/static/samples/img/story_thirds_1.jpg"
@@ -113,7 +125,7 @@
                    alt="...">
           </amp-img>
         </amp-story-grid-layer>
-      </amp-story-page>
+      </amp-story-page> -->
 
       <!-- A "bookend" panel containing links to other resources will appear on the last page of your story if you include an `amp-story-bookend` that references a [bookend JSON config](/static/samples/json/bookend.json). -->
       <amp-story-bookend src="/bookend.json" layout="nodisplay">
