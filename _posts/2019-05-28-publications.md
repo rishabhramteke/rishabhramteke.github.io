@@ -1,7 +1,7 @@
 ---
 layout: category
-title: Publications
-permalink: project
+title: My Publications
+permalink: publications
 image_show_on_page: false
 image: assets/images/publication.jpg
 nav-menu: true
