@@ -1,7 +1,7 @@
 ---
 layout: post
 title: First Blog Post
-image_show_on_page: true
+image_show_on_page: false
 image: assets/images/pic01.jpg
 category: blog
 ---
