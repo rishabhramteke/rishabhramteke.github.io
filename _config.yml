@@ -39,3 +39,4 @@ sass:
 
 pulgins:
   'jekyll-watch'
+  'jekyll-redirect-from'
