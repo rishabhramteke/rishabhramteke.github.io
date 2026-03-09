@@ -39,12 +39,13 @@ body {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 20px;
-  padding: 48px 44px 40px;
+  padding: 48px 44px 44px;
   box-shadow:
     0 0 0 1px rgba(94,106,210,0.12),
     0 32px 80px rgba(0,0,0,0.6),
     inset 0 1px 0 rgba(255,255,255,0.08);
   animation: card-in 0.7s cubic-bezier(0.22,1,0.36,1) both;
+  display: flex; flex-direction: column;
 }
 
 @keyframes card-in {
@@ -101,6 +102,7 @@ body {
   color: rgba(255,255,255,0.55);
   letter-spacing: 0.03em;
   margin-bottom: 20px;
+  align-self: flex-start;
 }
 
 /* Quest emoji */
@@ -129,33 +131,22 @@ body {
   font-size: 13px;
   color: rgba(255,255,255,0.38);
   line-height: 1.7;
-  margin-bottom: 32px;
-}
-
-/* Reward */
-.sq-reward {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12px;
-  color: rgba(255,255,255,0.3);
-  margin-bottom: 32px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-.sq-reward strong { color: rgba(255,255,255,0.6); }
-
-/* Buttons */
-.sq-actions { display: flex; gap: 12px; }
-
-#sq-reroll {
+  margin-bottom: 36px;
   flex: 1;
+}
+
+/* New Quest button — bottom, full width, centered text */
+#sq-reroll {
+  width: 100%;
   background: #5E6AD2;
   border: none; border-radius: 10px;
   color: #fff; font-family: 'Inter', sans-serif;
   font-size: 14px; font-weight: 600;
-  padding: 13px 20px;
+  padding: 14px 20px;
   cursor: pointer;
   transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
   letter-spacing: -0.01em;
+  text-align: center;
 }
 #sq-reroll:hover {
   background: #4f5bbf;
@@ -163,23 +154,6 @@ body {
   transform: translateY(-1px);
 }
 #sq-reroll:active { transform: translateY(0); }
-
-#sq-share {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  color: rgba(255,255,255,0.5);
-  font-family: 'Inter', sans-serif;
-  font-size: 13px; font-weight: 500;
-  padding: 13px 18px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-#sq-share:hover {
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-  border-color: rgba(255,255,255,0.2);
-}
 
 /* Back link */
 #sq-back {
@@ -191,19 +165,6 @@ body {
   transition: color 0.2s;
 }
 #sq-back:hover { color: rgba(255,255,255,0.75); }
-
-/* Copied toast */
-#sq-toast {
-  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-  background: rgba(94,106,210,0.15);
-  border: 1px solid rgba(94,106,210,0.35);
-  border-radius: 8px; padding: 10px 18px;
-  font-size: 13px; color: rgba(255,255,255,0.75);
-  font-family: 'Inter', sans-serif;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.25s;
-}
-#sq-toast.show { opacity: 1; }
 </style>
 
 <body>
@@ -223,51 +184,48 @@ body {
   <h2 class="sq-quest" id="sq-quest"></h2>
   <p class="sq-flavour" id="sq-flavour"></p>
 
-  <div class="sq-reward">
-    <span>🏆</span>
-    <span>Reward: <strong id="sq-reward"></strong></span>
-  </div>
-
-  <div class="sq-actions">
-    <button id="sq-reroll">🎲 &nbsp;New Quest</button>
-    <button id="sq-share">Copy &amp; Share</button>
-  </div>
+  <button id="sq-reroll">🎲 &nbsp;New Quest</button>
 </div>
-
-<div id="sq-toast">Copied to clipboard ✓</div>
 
 <script>
 var QUESTS = [
-  { emoji:'☕', cat:'Slow Living', diff:1, quest:'Find a café you\'ve never been to and sit alone for an hour — no phone, just a drink and a notebook.', flavour:'Watch the world go by. You\'ll be surprised what your brain does when you give it space.', reward:'Inner peace + a new favourite spot' },
-  { emoji:'🌅', cat:'Adventure', diff:1, quest:'Wake up before sunrise and walk to the nearest high point to watch the city wake up.', flavour:'The world looks completely different at 5am. It\'s worth losing one hour of sleep.', reward:'Golden hour clarity' },
-  { emoji:'🎲', cat:'Social', diff:2, quest:'Invite someone you\'ve been meaning to catch up with for months. No excuses this time.', flavour:'That person has probably been thinking the same thing. One of you has to send the message.', reward:'A good conversation you\'ll remember' },
-  { emoji:'🍜', cat:'Food', diff:1, quest:'Cook a dish from a country you\'ve never visited, from scratch, no shortcuts.', flavour:'Bonus points if the recipe is in another language and you have to Google translate it.', reward:'New recipe in your arsenal + a good story' },
-  { emoji:'📸', cat:'Creative', diff:2, quest:'Spend one hour in your city photographing only things that are the colour blue.', flavour:'Constraints are the best creative fuel. You\'ll start seeing the world differently within 10 minutes.', reward:'A photography series worth keeping' },
-  { emoji:'🚂', cat:'Adventure', diff:2, quest:'Get on a random train or bus and ride to the last stop. Explore for two hours, then come back.', flavour:'The destination doesn\'t matter. The point is to go somewhere with no plan and figure it out.', reward:'+50 spontaneity XP' },
-  { emoji:'📚', cat:'Learning', diff:1, quest:'Learn five phrases in a language you know nothing about and use one on a real person today.', flavour:'It doesn\'t matter if you botch it. People love when you try in their language.', reward:'A smile from a stranger' },
-  { emoji:'🌿', cat:'Outdoors', diff:1, quest:'Find a park you\'ve never sat in and spend 30 minutes doing absolutely nothing.', flavour:'Not scrolling, not listening to anything. Just existing. It\'s harder than it sounds.', reward:'Nervous system reset' },
-  { emoji:'🎨', cat:'Creative', diff:2, quest:'Buy a cheap sketchbook and draw your view from the window for 20 minutes. Any skill level counts.', flavour:'Art isn\'t about talent. It\'s about paying attention to what you see.', reward:'A new creative outlet' },
-  { emoji:'🏊', cat:'Adventure', diff:3, quest:'Find an open-water swimming spot and take the plunge — cold water and all.', flavour:'Cold water swimming is the fastest legal way to feel fully alive. Do it.', reward:'Bragging rights + an endorphin flood' },
-  { emoji:'🌮', cat:'Food', diff:1, quest:'Order something from a restaurant menu you\'ve never tried and have no idea what it is.', flavour:'Let the waiter describe it. If it sounds weird, that\'s a good sign.', reward:'Either a new favourite food or a great story' },
-  { emoji:'🎭', cat:'Social', diff:3, quest:'Go to a comedy show, open-mic night, or live jazz bar alone.', flavour:'Solo nights out teach you how to be comfortable in your own company. It\'s a superpower.', reward:'Confidence +20' },
-  { emoji:'🔭', cat:'Outdoors', diff:2, quest:'Find the darkest spot near your city tonight and stargaze for 30 minutes.', flavour:'No app, just eyes. Let them adjust for 10 minutes first. You\'ll be shocked what you see.', reward:'Existential perspective (the good kind)' },
-  { emoji:'✉️', cat:'Slow Living', diff:1, quest:'Write a physical letter to someone you care about and actually send it.', flavour:'Handwritten letters take effort, and people feel that. This will mean more than any text.', reward:'Warmed heart (theirs and yours)' },
-  { emoji:'🧗', cat:'Adventure', diff:3, quest:'Try a physical activity you\'ve always thought wasn\'t for you — climbing, martial arts, rowing.', flavour:'First classes are always free or cheap. The hardest part is booking it.', reward:'A new obsession (probably)' },
-  { emoji:'🎵', cat:'Creative', diff:1, quest:'Make a playlist of 10 songs that defined each year of the last decade of your life.', flavour:'It\'s basically an autobiography in 10 songs. Then share it with one person.', reward:'A time capsule you\'ll revisit forever' },
-  { emoji:'🏛️', cat:'Culture', diff:1, quest:'Visit a museum or gallery in your city that you\'ve never been to, even if it seems boring.', flavour:'The "boring" ones are often the most surprising. History museums especially.', reward:'Local bragging rights + actual knowledge' },
-  { emoji:'🌍', cat:'Adventure', diff:3, quest:'Book a one-way ticket somewhere within 4 hours\' travel time and figure out the return later.', flavour:'You\'ve done more complicated things at work on a Monday morning.', reward:'A story worth telling at every dinner party' },
-  { emoji:'🧘', cat:'Slow Living', diff:1, quest:'Do a 20-minute guided meditation. First time if possible. See what happens.', flavour:'If your brain won\'t stop, that\'s fine. That\'s the point. Just observe it.', reward:'Mental clarity + a skill that compounds' },
-  { emoji:'🍷', cat:'Social', diff:2, quest:'Host a dinner for 4 people with no plan — just cook whatever\'s in your fridge and improvise.', flavour:'The best dinner parties aren\'t the planned ones. The chaos is the fun.', reward:'A core memory for everyone there' },
-  { emoji:'🚴', cat:'Outdoors', diff:2, quest:'Rent a bike and cycle to a destination at least 10km away. Take the scenic route back.', flavour:'Everything looks better from a bike. Cities, villages, coastlines — all of it.', reward:'Sore legs + a dopamine spike' },
-  { emoji:'📖', cat:'Learning', diff:1, quest:'Read 50 pages of a book you\'ve had on your list for over 6 months tonight.', flavour:'You\'ll remember why you wanted to read it in the first place. Then you won\'t be able to stop.', reward:'Finally finishing something you started' },
-  { emoji:'🎬', cat:'Culture', diff:1, quest:'Watch a foreign-language film — no dubbed version — from a country you\'ve visited.', flavour:'You\'ll catch words you didn\'t know you learned. And the filmmaking is always better in the original.', reward:'A new director to obsess over' },
-  { emoji:'🌱', cat:'Slow Living', diff:1, quest:'Buy one plant and keep it alive for a month. Start there.', flavour:'It\'s surprisingly grounding to be responsible for something living. Even a cactus counts.', reward:'Greenery in your space + a sense of responsibility' },
-  { emoji:'🤝', cat:'Social', diff:2, quest:'Do something genuinely kind for a stranger today — pay for their coffee, help with directions, carry something.', flavour:'Random acts of kindness hit different when you do them with zero expectation of acknowledgment.', reward:'A mood boost that lasts all day' },
-  { emoji:'🎯', cat:'Learning', diff:2, quest:'Learn one new skill for 30 minutes a day for 7 days straight — pick something completely useless to your career.', flavour:'Juggling, lock-picking, bird ID, origami. The point is the learning, not the skill.', reward:'+1 interesting fact about yourself' },
-  { emoji:'🏖️', cat:'Adventure', diff:2, quest:'Take a day trip to the nearest body of water and stay until sunset.', flavour:'Water changes your brain chemistry. This is not a metaphor. Go sit near some.', reward:'Rest that actually feels like rest' },
-  { emoji:'🌆', cat:'Creative', diff:1, quest:'Walk a route in your city you\'ve never taken and narrate it like a travel documentary in your head.', flavour:'Suddenly the kebab shop on the corner has "a rich history dating back to 2009."', reward:'Renewed love for where you live' },
-  { emoji:'🎤', cat:'Social', diff:3, quest:'Go to a karaoke night and sing at least one song — alone or with others, doesn\'t matter.', flavour:'Confidence isn\'t about being good. It\'s about doing things badly and not caring.', reward:'A legendary night regardless of outcome' },
-  { emoji:'🧩', cat:'Slow Living', diff:1, quest:'Do a 500-piece puzzle over a weekend with no pressure to finish it fast.', flavour:'It\'s one of the most meditative things you can do with your hands. Old wisdom.', reward:'Patience +10, anxiety -10' },
+  // ── Social / tiny risks ──────────────────────────────────────────────────
+  { emoji:'💬', cat:'Social', diff:1, quest:'Compliment a stranger on something specific — their jacket, their dog, their laugh.', flavour:'Make it genuine, not generic. "Nice shoes" is fine. "That colour looks great on you" lands differently.' },
+  { emoji:'🙋', cat:'Social', diff:1, quest:'Strike up a conversation with someone waiting in the same queue as you.', flavour:'Comment on the wait, the weather, anything. You only need one sentence to get it started.' },
+  { emoji:'☕', cat:'Social', diff:1, quest:'Ask the barista how their day is actually going — and listen to the answer.', flavour:'They\'re trained to ask you. Flip it. Most people light up when someone asks them first.' },
+  { emoji:'📞', cat:'Social', diff:1, quest:'Call (not text) someone you haven\'t spoken to in over a year.', flavour:'No agenda. Just "hey, I was thinking about you." That\'s the whole script.' },
+  { emoji:'😄', cat:'Social', diff:1, quest:'Make eye contact and smile at five strangers today. Count them.', flavour:'It\'s small, it\'s free, and it shifts the whole energy of your day.' },
+  { emoji:'✉️', cat:'Social', diff:1, quest:'Send a voice note to a friend instead of a text message.', flavour:'Voice notes feel more human. Your tone, your laugh — they\'re all in there.' },
+  { emoji:'🤝', cat:'Social', diff:2, quest:'Introduce yourself to a neighbour you\'ve never properly met.', flavour:'You share a wall/hallway/street. You might as well know each other\'s names.' },
+  { emoji:'🎂', cat:'Social', diff:1, quest:'Remember someone\'s birthday coming up this week and actually call them on the day.', flavour:'Not a WhatsApp. A real call. "Happy birthday" from a voice hits different.' },
+  { emoji:'🫂', cat:'Social', diff:2, quest:'Tell someone in your life something you appreciate about them — out loud, not over text.', flavour:'Pick one thing, be specific. "I really appreciate how you always..." is a full sentence.' },
+  { emoji:'👥', cat:'Social', diff:2, quest:'Invite yourself to something. Ask a friend what they\'re doing this weekend and just join.', flavour:'People rarely say no when you ask directly. The awkward part only exists in your head.' },
+  { emoji:'🗣️', cat:'Social', diff:2, quest:'Start a conversation with someone at a café, gym, or park who\'s alone and looks approachable.', flavour:'One line is all you need. The rest follows if it\'s meant to.' },
+  { emoji:'🧑‍🍳', cat:'Social', diff:2, quest:'Cook something and drop it off for a friend or colleague unexpectedly.', flavour:'Food is one of the oldest ways humans say "I care about you." Use it.' },
+  { emoji:'💌', cat:'Social', diff:1, quest:'Write a genuine thank-you message to someone who helped you this year — even for something small.', flavour:'People do things and never hear back. Close that loop.' },
+  { emoji:'🎤', cat:'Social', diff:3, quest:'Share an opinion you\'d normally keep to yourself in a group conversation.', flavour:'Not aggressively — just honestly. Saying what you actually think is a skill that needs practice.' },
+  { emoji:'🆕', cat:'Social', diff:3, quest:'Go to a social event alone where you won\'t know most people.', flavour:'Arrive, get a drink, and find one person to talk to. That\'s the only goal.' },
+  { emoji:'🙏', cat:'Social', diff:2, quest:'Apologise to someone you\'ve been meaning to, but kept putting off.', flavour:'It doesn\'t have to be big. "Hey, I was a bit short with you last time — sorry about that." Done.' },
+  { emoji:'💡', cat:'Social', diff:2, quest:'Ask someone older than you for advice on something you\'re genuinely figuring out.', flavour:'People with experience love to share it. You get wisdom; they feel valued. Win-win.' },
+  { emoji:'🎁', cat:'Social', diff:1, quest:'Buy a small gift for someone with no occasion whatsoever.', flavour:'A book they\'d like, a chocolate bar, a postcard. The randomness is the point.' },
+  { emoji:'📖', cat:'Social', diff:1, quest:'Recommend a book, film, or album to someone and tell them exactly why you loved it.', flavour:'Sharing something you love is a form of vulnerability. It\'s also how people bond.' },
+  { emoji:'👋', cat:'Social', diff:1, quest:'Learn the name of someone you see regularly but have never properly introduced yourself to.', flavour:'The delivery person, the security guard, the person at the corner shop. Names matter.' },
+  { emoji:'🌍', cat:'Social', diff:2, quest:'Ask someone from a different country or culture to teach you one thing about where they\'re from.', flavour:'A dish, a tradition, a word. People love sharing their culture when asked with genuine curiosity.' },
+  { emoji:'🎯', cat:'Social', diff:3, quest:'Share something personal in a conversation today — something you\'d normally keep to yourself.', flavour:'Vulnerability isn\'t weakness. It\'s how people actually connect past the surface level.' },
+  { emoji:'🧩', cat:'Social', diff:2, quest:'Organise something small — a walk, a dinner, a movie night — and just send the invite without overthinking it.', flavour:'Stop waiting for someone else to plan it. You be the person who makes things happen.' },
+  { emoji:'🤲', cat:'Social', diff:1, quest:'Help someone with something today without being asked and without expecting anything back.', flavour:'Hold the door longer. Carry something. Google something for someone. Just quietly do it.' },
+  // ── Adventure / small risks ──────────────────────────────────────────────
+  { emoji:'🚌', cat:'Adventure', diff:2, quest:'Get on a bus you\'ve never taken, ride to the end of the line, and explore for an hour.', flavour:'No map, no plan. Just go and figure it out when you get there.' },
+  { emoji:'🌅', cat:'Adventure', diff:2, quest:'Wake up before sunrise and get outside to see it — even if it\'s just from your doorstep.', flavour:'The world at 5am belongs to almost no one. It\'s worth seeing at least once a season.' },
+  { emoji:'🍽️', cat:'Adventure', diff:1, quest:'Walk into a restaurant you\'ve never tried, sit at the bar if there is one, and order whatever the chef recommends.', flavour:'Take the option off your plate. Let someone else decide for once.' },
+  { emoji:'🎭', cat:'Adventure', diff:3, quest:'Go to a live event — music, comedy, theatre — alone and fully commit to enjoying it.', flavour:'Solo nights out are underrated. You pay attention differently when there\'s no one to perform for.' },
+  { emoji:'🏊', cat:'Adventure', diff:3, quest:'Find an open-water spot and get in, even if it\'s cold.', flavour:'Cold water swimming is the fastest legal way to feel fully alive. Just do it.' },
+  { emoji:'📸', cat:'Creative', diff:1, quest:'Spend 30 minutes photographing your neighbourhood like a tourist seeing it for the first time.', flavour:'You stop noticing what\'s around you. This forces you to look again.' },
+  { emoji:'🌿', cat:'Slow Living', diff:1, quest:'Find a park bench, sit for 20 minutes, and do nothing — no phone, no podcast.', flavour:'Doing nothing is a skill. And your nervous system is craving it.' },
+  { emoji:'🚴', cat:'Adventure', diff:2, quest:'Rent a bike and go somewhere you\'ve only ever passed by in a car or on public transport.', flavour:'Everything is slower and better from a bike. Take the long way back.' },
+  { emoji:'🧗', cat:'Adventure', diff:3, quest:'Try one physical activity you\'ve always assumed wasn\'t for you.', flavour:'One class, one session. The hardest part is booking it. After that, your body takes over.' },
+  { emoji:'🌮', cat:'Slow Living', diff:1, quest:'Cook a dish from a country you\'ve never visited, from scratch.', flavour:'Bonus if the recipe is in another language and you have to translate it.' },
+  { emoji:'🔭', cat:'Slow Living', diff:1, quest:'Go somewhere dark tonight and stargaze for 20 minutes without your phone.', flavour:'Let your eyes adjust for 10 minutes first. You\'ll be shocked by what you see.' },
 ];
 
 var current = null;
@@ -280,7 +238,6 @@ function getQuest() {
 
 function renderQuest(q) {
   current = q;
-  // restart card animation
   var card = document.getElementById('sq-card');
   card.style.animation = 'none';
   void card.offsetWidth;
@@ -289,7 +246,6 @@ function renderQuest(q) {
   document.getElementById('sq-emoji').textContent   = q.emoji;
   document.getElementById('sq-quest').textContent   = q.quest;
   document.getElementById('sq-flavour').textContent = q.flavour;
-  document.getElementById('sq-reward').textContent  = q.reward;
   document.getElementById('sq-category').textContent = q.cat;
 
   var dots = document.getElementById('sq-diff');
@@ -300,7 +256,6 @@ function renderQuest(q) {
     dots.appendChild(s);
   }
 
-  // re-trigger emoji animation
   var em = document.getElementById('sq-emoji');
   em.style.animation = 'none';
   void em.offsetWidth;
@@ -309,15 +264,6 @@ function renderQuest(q) {
 
 document.getElementById('sq-reroll').addEventListener('click', function() {
   renderQuest(getQuest());
-});
-
-document.getElementById('sq-share').addEventListener('click', function() {
-  var text = '⚔️ Side Quest: ' + current.quest + '\n\nReward: ' + current.reward + '\n\nrishabhramteke.github.io/side-quest';
-  navigator.clipboard.writeText(text).then(function() {
-    var t = document.getElementById('sq-toast');
-    t.classList.add('show');
-    setTimeout(function() { t.classList.remove('show'); }, 2200);
-  });
 });
 
 renderQuest(getQuest());
