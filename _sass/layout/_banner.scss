@@ -10,7 +10,7 @@
 		@include vendor('display', 'flex');
 		@include padding(4em, 0, (2em, 0, 0, 0));
 		background-color: _palette(bg);
-		@include vendor('background-image', 'url("../images/cover_fb.jpg")');
+		@include vendor('background-image', 'url("../images/cover.png")');
 		background-attachment: fixed;
 		background-position: center;
 		background-repeat: no-repeat;
