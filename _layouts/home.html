@@ -428,7 +428,7 @@
     for (var i = 0; i <= ARC_SEGS; i++) {
       var t = i / ARC_SEGS;
       var v = v0.clone().lerp(v1, t).normalize();
-      pts.push(v.multiplyScalar(R + 0.005 + 0.20 * Math.sin(Math.PI * t)));
+      pts.push(v.multiplyScalar(R + 0.008 + 0.28 * Math.sin(Math.PI * t)));
     }
     return pts;
   }
@@ -450,16 +450,21 @@
     arcGeoms.push(geo);
   }
 
-  /* Plane marker */
-  var planeMesh = new THREE.Mesh(
-    new THREE.SphereGeometry(0.026, 10, 10),
-    new THREE.MeshBasicMaterial({ color: 0xffffff })
-  );
-  var haloMesh = new THREE.Mesh(
-    new THREE.SphereGeometry(0.060, 10, 10),
-    new THREE.MeshBasicMaterial({ color: 0x5E6AD2, transparent: true, opacity: 0.28, side: THREE.BackSide })
-  );
-  planeMesh.add(haloMesh);
+  /* Plane marker — ✈ sprite, always faces camera */
+  var _pc = document.createElement('canvas');
+  _pc.width = 80; _pc.height = 80;
+  var _px = _pc.getContext('2d');
+  _px.font = '52px sans-serif';
+  _px.textAlign = 'center'; _px.textBaseline = 'middle';
+  _px.shadowColor = 'rgba(94,106,210,1)'; _px.shadowBlur = 18;
+  _px.fillStyle = '#ffffff';
+  _px.fillText('✈', 40, 44);
+  var planeMesh = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: new THREE.CanvasTexture(_pc),
+    transparent: true, depthTest: false
+  }));
+  planeMesh.scale.set(0.24, 0.24, 1);
+  planeMesh.renderOrder = 999;
   earthGroup.add(planeMesh);
 
   /* Update scene state for 0–100 progress */
