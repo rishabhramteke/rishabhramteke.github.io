@@ -608,6 +608,10 @@ document.querySelectorAll('.feat-tab').forEach(function (tab) {
     var panel = document.querySelector('.feat-panel[data-panel="' + idx + '"]');
     if (panel) panel.classList.add('active');
   });
+  tab.addEventListener('click', function () {
+    var link = tab.querySelector('.feat-tab-link');
+    if (link && link.href) window.location.href = link.href;
+  });
 });
 
 /* ── FLUID CANVAS ───────────────────────────────────────────── */
