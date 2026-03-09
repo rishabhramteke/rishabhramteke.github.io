@@ -112,7 +112,7 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
   var places = [
     { city: 'Nagpur',       flag: '🇮🇳', lat:  21.146, lng:  79.088 },
     { city: 'Mumbai',       flag: '🇮🇳', lat:  19.076, lng:  72.877 },
-    { city: 'Melbourne',    flag: '🇦🇺', lat: -37.814, lng: 144.946, photo: '/assets/images/unimelb.png', url: '/travel/melbourne' },
+    { city: 'Melbourne',    flag: '🇦🇺', lat: -37.814, lng: 144.946, photo: '/assets/images/profile.jpg', url: '/travel/melbourne' },
     { city: 'Tokyo',        flag: '🇯🇵', lat:  35.682, lng: 139.691 },
     { city: 'Doha',         flag: '🇶🇦', lat:  25.285, lng:  51.531 },
     { city: 'Reykjavik',    flag: '🇮🇸', lat:  64.135, lng: -21.895 },
@@ -137,16 +137,44 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
     { city: 'Santorini',    flag: '🇬🇷', lat:  36.393, lng:  25.461 },
   ];
 
+  /* Build a canvas texture for each flag emoji */
+  function makeFlagTexture(flag) {
+    var c = document.createElement('canvas');
+    c.width = 64; c.height = 64;
+    var ctx = c.getContext('2d');
+    /* White circle background */
+    ctx.beginPath();
+    ctx.arc(32, 32, 30, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.fill();
+    /* Flag emoji */
+    ctx.font = '28px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(flag, 32, 34);
+    return new THREE.CanvasTexture(c);
+  }
+
   var dotMeshes = [];
-  var dotGeo    = new THREE.SphereGeometry(0.022, 12, 12);
   places.forEach(function (p) {
     var pos = ll2v(p.lat, p.lng, R + 0.012);
-    var dot = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    dot.position.copy(pos); dot.userData = p;
-    globeGroup.add(dot); dotMeshes.push(dot);
+
+    /* Flag sprite */
+    var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: makeFlagTexture(p.flag),
+      transparent: true, depthTest: false
+    }));
+    sprite.scale.set(0.13, 0.13, 1);
+    sprite.position.copy(pos);
+    sprite.renderOrder = 1;
+    sprite.userData = p;
+    globeGroup.add(sprite);
+    dotMeshes.push(sprite);
+
+    /* Purple pulse ring */
     var ring = new THREE.Mesh(
-      new THREE.RingGeometry(0.030, 0.046, 28),
-      new THREE.MeshBasicMaterial({ color: 0x7B8FE8, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+      new THREE.RingGeometry(0.038, 0.052, 28),
+      new THREE.MeshBasicMaterial({ color: 0x7B8FE8, side: THREE.DoubleSide, transparent: true, opacity: 0.6 })
     );
     ring.position.copy(pos); ring.lookAt(0, 0, 0);
     globeGroup.add(ring);
