@@ -158,6 +158,13 @@
     rgba(11,11,15,0.18) 45%,
     rgba(11,11,15,0.0)  100%);
 }
+/* Panel 5 — mini globe */
+#mini-globe-wrap {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #0B0B0F;
+}
+#mini-globe-wrap canvas { display: block; }
 
 /* ─────────────────────────────────────────────────────────────
    FLUID DIVIDER
@@ -260,14 +267,14 @@
           <span class="feat-tab-num">03</span>
           <h3 class="feat-tab-title">My Projects</h3>
           <p class="feat-tab-desc">From geospatial data pipelines to Blender renders — a collection of things I've built and shipped.</p>
-          <a href="/projects" class="feat-tab-link">See all projects →</a>
+          <a href="/project" class="feat-tab-link">See all projects →</a>
         </div>
 
         <div class="feat-tab" data-tab="3">
           <span class="feat-tab-num">04</span>
           <h3 class="feat-tab-title">My Resume</h3>
           <p class="feat-tab-desc">Data engineer at TomTom, previously at TU Wien. MSc graduate with a love for large-scale systems.</p>
-          <a href="/resume" class="feat-tab-link">View resume →</a>
+          <a href="/cv" class="feat-tab-link">View resume →</a>
         </div>
 
         <div class="feat-tab" data-tab="4">
@@ -275,6 +282,13 @@
           <h3 class="feat-tab-title">My Publications</h3>
           <p class="feat-tab-desc">Research papers and academic work from my time at university and beyond.</p>
           <a href="/publications" class="feat-tab-link">View publications →</a>
+        </div>
+
+        <div class="feat-tab" data-tab="5">
+          <span class="feat-tab-num">06</span>
+          <h3 class="feat-tab-title">Travel Blogs</h3>
+          <p class="feat-tab-desc">Cities I've lived in, places I've wandered through — stories from the road.</p>
+          <a href="/blog" class="feat-tab-link">Read travel posts →</a>
         </div>
 
       </div>
@@ -311,6 +325,11 @@
           <div class="feat-panel" data-panel="4">
             <img class="fp-img" src="/assets/images/project.jpg" alt="My Publications" style="animation-delay:-16s">
             <div class="fp-img-overlay"></div>
+          </div>
+
+          <!-- Panel 5: Travel Blogs — mini globe -->
+          <div class="feat-panel" data-panel="5">
+            <div id="mini-globe-wrap"></div>
           </div>
 
         </div>
@@ -633,7 +652,7 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
   /* Scene & camera */
   var scene  = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 100);
-  camera.position.z = 2.6;
+  camera.position.z = 3.2;
 
   /* Single group so everything rotates together */
   var globeGroup = new THREE.Group();
@@ -650,15 +669,6 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
     function (t) { earthMat.map = t; earthMat.needsUpdate = true; }
   );
 
-  /* Soft blue atmosphere */
-  globeGroup.add(new THREE.Mesh(
-    new THREE.SphereGeometry(R * 1.10, 64, 64),
-    new THREE.MeshLambertMaterial({
-      color: 0x88BBEE, side: THREE.BackSide,
-      transparent: true, opacity: 0.32,
-      blending: THREE.AdditiveBlending, depthWrite: false
-    })
-  ));
 
   /* Lights — high ambient so the full colorful texture shows */
   scene.add(new THREE.AmbientLight(0xffffff, 1.8));
@@ -793,6 +803,104 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
     renderer.render(scene, camera);
   }
   animate();
+})();
+
+/* ── MINI GLOBE for Travel Blogs panel (lazy-init on first hover) ── */
+(function () {
+  var wrap = document.getElementById('mini-globe-wrap');
+  if (!wrap || typeof THREE === 'undefined') return;
+
+  var inited = false;
+  var miniRotY = -0.48, miniRaf;
+
+  function initMiniGlobe() {
+    if (inited) return;
+    inited = true;
+
+    var W = wrap.offsetWidth  || 480;
+    var H = wrap.offsetHeight || 400;
+
+    var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(W, H);
+    renderer.setClearColor(0x000000, 0);
+    wrap.appendChild(renderer.domElement);
+
+    var scene  = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
+    camera.position.z = 2.8;
+
+    var group  = new THREE.Group();
+    group.rotation.x = 0.42;
+    scene.add(group);
+
+    var R   = 1;
+    var mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    group.add(new THREE.Mesh(new THREE.SphereGeometry(R, 48, 48), mat));
+    new THREE.TextureLoader().load(
+      '//unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
+      function (t) { mat.map = t; mat.needsUpdate = true; }
+    );
+
+    scene.add(new THREE.AmbientLight(0xffffff, 1.8));
+    var sun = new THREE.DirectionalLight(0xffffff, 0.5);
+    sun.position.set(5, 3, 5);
+    scene.add(sun);
+
+    function ll2v(lat, lng, r) {
+      var phi = (90 - lat) * Math.PI / 180, theta = (lng + 180) * Math.PI / 180;
+      return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(theta), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(theta));
+    }
+
+    var pts = [
+      {lat:19.076,lng:72.877},{lat:18.520,lng:73.856},
+      {lat:52.377,lng:4.897}, {lat:48.208,lng:16.373},
+      {lat:48.856,lng:2.352}, {lat:52.520,lng:13.405},
+    ];
+    var dg = new THREE.SphereGeometry(0.02, 8, 8);
+    pts.forEach(function (p) {
+      var d = new THREE.Mesh(dg, new THREE.MeshBasicMaterial({ color: 0xffffff }));
+      d.position.copy(ll2v(p.lat, p.lng, R + 0.01));
+      group.add(d);
+      var ring = new THREE.Mesh(
+        new THREE.RingGeometry(0.028, 0.042, 20),
+        new THREE.MeshBasicMaterial({ color: 0x7B8FE8, side: THREE.DoubleSide, transparent: true, opacity: 0.7 })
+      );
+      ring.position.copy(d.position); ring.lookAt(0, 0, 0);
+      group.add(ring);
+    });
+    for (var i = 0; i < pts.length - 1; i++) {
+      var v0 = ll2v(pts[i].lat, pts[i].lng, 1).normalize();
+      var v1 = ll2v(pts[i+1].lat, pts[i+1].lng, 1).normalize();
+      var ap = [];
+      for (var j = 0; j <= 60; j++) {
+        var t = j / 60;
+        ap.push(v0.clone().lerp(v1, t).normalize().multiplyScalar(R + 0.01 + 0.09 * Math.sin(Math.PI * t)));
+      }
+      group.add(new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(ap),
+        new THREE.LineBasicMaterial({ color: 0x7B8FE8, transparent: true, opacity: 0.55 })
+      ));
+    }
+
+    function loop() {
+      miniRaf = requestAnimationFrame(loop);
+      miniRotY += 0.004;
+      group.rotation.y = miniRotY;
+      renderer.render(scene, camera);
+    }
+    loop();
+  }
+
+  /* Start when Travel Blogs tab becomes active, stop when it loses active */
+  var observer = new MutationObserver(function () {
+    var panel = document.querySelector('.feat-panel[data-panel="5"]');
+    if (panel && panel.classList.contains('active')) {
+      initMiniGlobe();
+    }
+  });
+  var panel5 = document.querySelector('.feat-panel[data-panel="5"]');
+  if (panel5) observer.observe(panel5, { attributes: true, attributeFilter: ['class'] });
 })();
 </script>
 
