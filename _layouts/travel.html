@@ -15,7 +15,7 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
 }
 
 .tp-header {
-  padding: 36px 60px 20px;
+  padding: 20px 60px 10px;
   flex-shrink: 0;
 }
 .tp-eyebrow {
@@ -80,7 +80,7 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
 
   var scene  = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 100);
-  camera.position.z = 3.2;
+  camera.position.set(0, 0.08, 3.2);
 
   var globeGroup = new THREE.Group();
   scene.add(globeGroup);
