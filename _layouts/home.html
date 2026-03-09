@@ -1,46 +1,650 @@
 <!DOCTYPE html>
-<!--
-	Forty by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html>
 
 {% include head.html %}
 
-<body>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   LOADING SCREEN
+───────────────────────────────────────────────────────────── */
+#ls {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #0B0B0F;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 36px;
+  transition: opacity 0.9s ease, visibility 0.9s ease;
+}
+#ls.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-    {% include header.html %}
+.ls-globe-wrap { perspective: 600px; }
+.ls-sphere {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(94,106,210,0.8);
+  position: relative;
+  transform-style: preserve-3d;
+  animation: ls-globe-spin 5s linear infinite;
+}
+@keyframes ls-globe-spin {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+.ls-equator {
+  position: absolute; left: -2px; right: -2px;
+  top: calc(50% - 1px); height: 1px;
+  background: rgba(94,106,210,0.4);
+}
+.ls-tropic1 {
+  position: absolute; left: 16px; right: 16px;
+  top: calc(28% - 1px); height: 1px;
+  background: rgba(94,106,210,0.2);
+}
+.ls-tropic2 {
+  position: absolute; left: 16px; right: 16px;
+  top: calc(72% - 1px); height: 1px;
+  background: rgba(94,106,210,0.2);
+}
+.ls-meridian {
+  position: absolute; inset: -2px;
+  border-radius: 50%;
+  border: 1px solid rgba(94,106,210,0.28);
+}
+.ls-m1 { transform: rotateY(60deg); }
+.ls-m2 { transform: rotateY(-60deg); }
 
-    <!-- Banner -->
-    <section id="banner" class="major">
-        <div class="inner">
-            <header class="major">
-                <h1>{{ page.landing-title }}</h1>
-            </header>
-            <div class="content">
-              <p style="text-transform: uppercase;">{{ site.description }}</p>
-                <ul class="actions">
-                    <li><a href="#one" class="button next scrolly">Explore</a></li>
-                </ul>
-            </div>
+.ls-info { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.ls-counter {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 13px; font-weight: 300;
+  color: rgba(255,255,255,0.35); letter-spacing: 0.08em;
+}
+#ls-num { color: rgba(255,255,255,0.85); font-weight: 500; font-size: 15px; }
+.ls-track {
+  width: 200px; height: 1px;
+  background: rgba(255,255,255,0.08); border-radius: 1px;
+}
+#ls-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(to right, #5E6AD2, #8B5CF6);
+  border-radius: 1px; transition: width 0.06s linear;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SHARED
+───────────────────────────────────────────────────────────── */
+.sect-eyebrow {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: #5E6AD2; margin-bottom: 16px;
+}
+.sect-title {
+  font-family: 'Inter', sans-serif !important;
+  font-size: clamp(30px, 4vw, 52px) !important;
+  font-weight: 700 !important; letter-spacing: -0.03em !important;
+  line-height: 1.1 !important; color: #fff !important;
+  margin-bottom: 0 !important; border: none !important;
+}
+.sect-title::after { display: none !important; }
+
+/* ─────────────────────────────────────────────────────────────
+   HOVER TABS
+───────────────────────────────────────────────────────────── */
+#feat-section {
+  background: #0B0B0F;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 100px 0;
+}
+.feat-wrap { max-width: 1100px; margin: 0 auto; padding: 0 60px; }
+.feat-header { margin-bottom: 64px; }
+
+.feat-body {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 56px; align-items: start;
+}
+.feat-tabs { display: flex; flex-direction: column; gap: 4px; }
+
+.feat-tab {
+  padding: 22px 24px; border-radius: 10px;
+  border: 1px solid transparent; cursor: pointer;
+  transition: background 0.22s ease, border-color 0.22s ease;
+}
+.feat-tab:hover  { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.07); }
+.feat-tab.active { background: rgba(94,106,210,0.07);  border-color: rgba(94,106,210,0.32); }
+
+.feat-tab-num {
+  display: block; font-family: 'Inter', sans-serif;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.2); margin-bottom: 8px; transition: color 0.22s;
+}
+.feat-tab.active .feat-tab-num { color: #5E6AD2; }
+
+.feat-tab-title {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 16px !important; font-weight: 600 !important;
+  color: rgba(255,255,255,0.4) !important; margin: 0 !important;
+  border: none !important; transition: color 0.22s;
+}
+.feat-tab-title::after { display: none !important; }
+.feat-tab:hover .feat-tab-title,
+.feat-tab.active .feat-tab-title { color: #fff !important; }
+
+.feat-tab-desc {
+  font-size: 13px; color: rgba(255,255,255,0.38); line-height: 1.7;
+  margin: 10px 0 14px; font-family: 'Inter', sans-serif;
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.3s ease;
+}
+.feat-tab.active .feat-tab-desc { max-height: 80px; opacity: 1; }
+
+.feat-tab-link {
+  font-size: 12px; color: #5E6AD2; text-decoration: none;
+  font-weight: 500; font-family: 'Inter', sans-serif;
+  opacity: 0; display: inline-block; transition: opacity 0.3s;
+}
+.feat-tab-link:hover { opacity: 0.65 !important; }
+.feat-tab.active .feat-tab-link { opacity: 1; }
+
+/* Visuals container */
+.feat-visuals {
+  position: sticky; top: 100px; height: 400px;
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08); background: #0e0e14;
+}
+.feat-panel {
+  position: absolute; inset: 0; opacity: 0;
+  transition: opacity 0.45s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.feat-panel.active { opacity: 1; }
+
+/* Panel 0 — Data pipeline */
+.fp0 { flex-direction: column; padding: 48px; overflow: hidden; }
+.fp0-bg {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(94,106,210,0.13) 0%, transparent 70%);
+}
+.fp-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.fp-pipeline { display: flex; align-items: center; width: 100%; position: relative; z-index: 1; }
+.fp-node {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5);
+  font-family: 'Inter', sans-serif; white-space: nowrap;
+}
+.fp-node-a {
+  border-color: rgba(94,106,210,0.6); color: #fff;
+  background: rgba(94,106,210,0.12);
+  animation: node-pulse 2.2s ease infinite;
+}
+.fp-node-hl { border-color: rgba(94,106,210,0.85); color: #7B8FE8; background: rgba(94,106,210,0.18); }
+@keyframes node-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(94,106,210,0); }
+  50%      { box-shadow: 0 0 0 8px rgba(94,106,210,0.08); }
+}
+.fp-arrow {
+  flex: 1; height: 1px;
+  background: linear-gradient(to right, rgba(94,106,210,0.5), rgba(94,106,210,0.2));
+  position: relative;
+}
+.fp-arrow::after {
+  content: ''; position: absolute; right: -1px; top: -3px;
+  width: 6px; height: 6px;
+  border-right: 1.5px solid rgba(94,106,210,0.6);
+  border-top: 1.5px solid rgba(94,106,210,0.6);
+  transform: rotate(45deg);
+}
+.fp-spark {
+  position: absolute; top: -3px; left: 0;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #5E6AD2; box-shadow: 0 0 6px #5E6AD2;
+  animation: spark 2s linear infinite;
+}
+@keyframes spark { from { left: 0; } to { left: 100%; } }
+
+/* Panel 1 — Geospatial */
+.fp1-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 45% 55%, rgba(139,92,246,0.1) 0%, transparent 65%);
+}
+.fp-mapgrid {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.fp-dot {
+  position: absolute; transform: translate(-50%,-50%);
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #5E6AD2; box-shadow: 0 0 10px rgba(94,106,210,0.7);
+}
+.fp-dot-p::before {
+  content: ''; position: absolute; inset: -7px;
+  border-radius: 50%; border: 1px solid rgba(94,106,210,0.4);
+  animation: dot-ring 2s ease infinite;
+}
+.fp-dot-p::after {
+  content: ''; position: absolute; inset: -14px;
+  border-radius: 50%; border: 1px solid rgba(94,106,210,0.15);
+  animation: dot-ring 2s ease 0.4s infinite;
+}
+@keyframes dot-ring { 0% { transform:scale(0.6);opacity:1; } 100% { transform:scale(1.8);opacity:0; } }
+
+/* Panel 2 — Travel */
+.fp2-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(94,106,210,0.1) 0%, transparent 65%);
+}
+.fp-mini-globe {
+  width: 140px; height: 140px; border-radius: 50%;
+  border: 1.5px solid rgba(94,106,210,0.6); position: relative;
+  animation: ls-globe-spin 8s linear infinite;
+  transform-style: preserve-3d;
+}
+.fp-mini-globe::before {
+  content: ''; position: absolute;
+  left: -2px; right: -2px; top: calc(50% - 1px); height: 1px;
+  background: rgba(94,106,210,0.35);
+}
+.fp-mini-globe::after {
+  content: ''; position: absolute; inset: -2px;
+  border-radius: 50%; border: 1px solid rgba(94,106,210,0.2);
+  transform: rotateY(65deg);
+}
+.fp-stats { display: flex; gap: 48px; }
+.fp-stat { text-align: center; }
+.fp-stat-n {
+  display: block; font-size: 36px; font-weight: 700;
+  color: #fff; letter-spacing: -0.04em; font-family: 'Inter', sans-serif;
+}
+.fp-stat-l { font-size: 11px; color: rgba(255,255,255,0.35); font-family: 'Inter', sans-serif; letter-spacing: 0.05em; }
+
+/* Panel 3 — Blender */
+.fp3-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(109,40,217,0.12) 0%, transparent 65%);
+}
+.fp-cube-wrap { perspective: 500px; }
+.fp-cube {
+  width: 100px; height: 100px; border: 1.5px solid rgba(94,106,210,0.7);
+  position: relative; transform-style: preserve-3d;
+  animation: cube-spin 6s linear infinite;
+}
+@keyframes cube-spin {
+  from { transform: rotateX(25deg) rotateY(0deg); }
+  to   { transform: rotateX(25deg) rotateY(360deg); }
+}
+.fp-cube::before {
+  content: ''; position: absolute; inset: -2px;
+  border: 1px solid rgba(94,106,210,0.3);
+  transform: translateZ(-28px) scale(0.82);
+}
+.fp-cube::after {
+  content: ''; position: absolute;
+  top: 50%; left: 50%; width: 125%; height: 125%;
+  transform: translate(-50%,-50%) rotateX(90deg);
+  border: 1px solid rgba(94,106,210,0.18); border-radius: 2px;
+}
+.fp-3d-label {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.2em;
+  text-transform: uppercase; color: rgba(255,255,255,0.25);
+  font-family: 'Inter', sans-serif;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FLUID DIVIDER
+───────────────────────────────────────────────────────────── */
+.fluid-divider {
+  height: 220px; position: relative;
+  background: #0B0B0F; overflow: hidden;
+}
+#fluid-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* ─────────────────────────────────────────────────────────────
+   WORLD GLOBE SECTION
+───────────────────────────────────────────────────────────── */
+#travel-section {
+  background: #0B0B0F;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 90px 0 0;
+}
+.travel-header { max-width: 1100px; margin: 0 auto; padding: 0 60px; }
+.travel-sub {
+  font-size: 13px; color: rgba(255,255,255,0.3);
+  margin-top: 12px; font-family: 'Inter', sans-serif;
+}
+#globe-container { width: 100%; height: 580px; cursor: grab; display: block; }
+#globe-container:active { cursor: grabbing; }
+
+/* ─────────────────────────────────────────────────────────────
+   SCROLL REVEAL
+───────────────────────────────────────────────────────────── */
+.js-reveal { opacity: 0; transform: translateY(36px); }
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .feat-body { grid-template-columns: 1fr; }
+  .feat-visuals { position: static; height: 280px; }
+  .feat-wrap, .travel-header { padding: 0 24px; }
+  #feat-section { padding: 64px 0; }
+  #travel-section { padding: 64px 0 0; }
+}
+</style>
+
+<body class="is-loading">
+
+<!-- ══════════════════════ LOADING SCREEN ═══════════════════ -->
+<div id="ls">
+  <div class="ls-globe-wrap">
+    <div class="ls-sphere">
+      <div class="ls-equator"></div>
+      <div class="ls-tropic1"></div>
+      <div class="ls-tropic2"></div>
+      <div class="ls-meridian ls-m1"></div>
+      <div class="ls-meridian ls-m2"></div>
+    </div>
+  </div>
+  <div class="ls-info">
+    <div class="ls-counter"><span id="ls-num">0</span>&nbsp;<span style="opacity:.4">%</span></div>
+    <div class="ls-track"><div id="ls-bar"></div></div>
+  </div>
+</div>
+
+{% include header.html %}
+
+<!-- Banner (unchanged) -->
+<section id="banner" class="major">
+  <div class="inner">
+    <header class="major">
+      <h1>{{ page.landing-title }}</h1>
+    </header>
+    <div class="content">
+      <p style="text-transform: uppercase;">{{ site.description }}</p>
+      <ul class="actions">
+        <li><a href="#one" class="button next scrolly">Explore</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ HOVER TABS ═══════════════════════ -->
+<section id="feat-section">
+  <div class="feat-wrap">
+
+    <div class="feat-header js-reveal">
+      <span class="sect-eyebrow">What I Do</span>
+      <h2 class="sect-title">Crafted with precision,<br>built to last.</h2>
+    </div>
+
+    <div class="feat-body">
+
+      <!-- Left: tabs -->
+      <div class="feat-tabs">
+
+        <div class="feat-tab active" data-tab="0">
+          <span class="feat-tab-num">01</span>
+          <h3 class="feat-tab-title">Data Engineering</h3>
+          <p class="feat-tab-desc">Building scalable pipelines and ETL systems on Azure Databricks — turning raw data into reliable, production-grade infrastructure.</p>
+          <a href="/projects" class="feat-tab-link">View projects →</a>
         </div>
-    </section>
 
-    <!-- Main -->
-    <div id="main">
+        <div class="feat-tab" data-tab="1">
+          <span class="feat-tab-num">02</span>
+          <h3 class="feat-tab-title">Geospatial & Maps</h3>
+          <p class="feat-tab-desc">Map data quality, elevation systems and geospatial pipelines at TomTom's Orbis platform.</p>
+          <a href="/projects" class="feat-tab-link">See the work →</a>
+        </div>
 
-        <!-- One -->
-        {% include tiles.html %}
+        <div class="feat-tab" data-tab="2">
+          <span class="feat-tab-num">03</span>
+          <h3 class="feat-tab-title">Travel & Exploration</h3>
+          <p class="feat-tab-desc">Exploring the world one city at a time — from Mumbai to Amsterdam, Vienna to wherever comes next.</p>
+          <a href="#travel-section" class="feat-tab-link">See the map →</a>
+        </div>
 
+        <div class="feat-tab" data-tab="3">
+          <span class="feat-tab-num">04</span>
+          <h3 class="feat-tab-title">Blender & 3D Art</h3>
+          <p class="feat-tab-desc">Creating 3D models and renders in Blender — where engineering precision meets creative exploration.</p>
+          <a href="/projects" class="feat-tab-link">View renders →</a>
+        </div>
+
+      </div>
+
+      <!-- Right: animated panels -->
+      <div class="feat-visuals js-reveal">
+
+        <!-- Panel 0: Data pipeline -->
+        <div class="feat-panel active" data-panel="0">
+          <div class="fp0-bg"></div>
+          <div class="fp-grid"></div>
+          <div class="fp-pipeline" style="position:relative;z-index:1;width:calc(100% - 96px);">
+            <div class="fp-node">Raw Data</div>
+            <div class="fp-arrow"><div class="fp-spark"></div></div>
+            <div class="fp-node fp-node-a">ETL</div>
+            <div class="fp-arrow"><div class="fp-spark" style="animation-delay:1s"></div></div>
+            <div class="fp-node">Databricks</div>
+            <div class="fp-arrow"><div class="fp-spark" style="animation-delay:0.5s"></div></div>
+            <div class="fp-node fp-node-hl">Insights</div>
+          </div>
+        </div>
+
+        <!-- Panel 1: Geospatial -->
+        <div class="feat-panel" data-panel="1">
+          <div class="fp1-bg"></div>
+          <div class="fp-mapgrid"></div>
+          <div class="fp-dot fp-dot-p" style="left:22%;top:33%"></div>
+          <div class="fp-dot" style="left:55%;top:26%"></div>
+          <div class="fp-dot fp-dot-p" style="left:72%;top:44%;"></div>
+          <div class="fp-dot" style="left:38%;top:62%"></div>
+          <div class="fp-dot fp-dot-p" style="left:63%;top:70%;"></div>
+          <div class="fp-dot" style="left:80%;top:57%"></div>
+        </div>
+
+        <!-- Panel 2: Travel -->
+        <div class="feat-panel" data-panel="2">
+          <div class="fp2-bg"></div>
+          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:30px;">
+            <div class="fp-mini-globe"></div>
+            <div class="fp-stats">
+              <div class="fp-stat"><span class="fp-stat-n">12+</span><span class="fp-stat-l">Countries</span></div>
+              <div class="fp-stat"><span class="fp-stat-n">3</span><span class="fp-stat-l">Continents</span></div>
+              <div class="fp-stat"><span class="fp-stat-n">∞</span><span class="fp-stat-l">More to go</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 3: Blender/3D -->
+        <div class="feat-panel" data-panel="3">
+          <div class="fp3-bg"></div>
+          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:28px;">
+            <div class="fp-cube-wrap"><div class="fp-cube"></div></div>
+            <div class="fp-3d-label">3D · Blender · Renders</div>
+          </div>
+        </div>
+
+      </div>
     </div>
+  </div>
+</section>
 
-    {% include contact.html %}
-	<div class="social">
-                    <script type="text/javascript" src="//rf.revolvermaps.com/0/0/6.js?i=56uavcyvlfu&amp;m=7&amp;c=e63100&amp;cr1=ffffff&amp;f=arial&amp;l=33&amp;bv=90&amp;lx=-420&amp;ly=420&amp;hi=20&amp;he=7&amp;hc=a8ddff&amp;rs=80" async="async"></script>
-    </div>
-    {% include footer.html %}
+<!-- ══════════════════════ FLUID DIVIDER ═════════════════════ -->
+<div class="fluid-divider">
+  <canvas id="fluid-canvas"></canvas>
+</div>
+
+<!-- ══════════════════════ WORLD GLOBE ══════════════════════ -->
+<section id="travel-section">
+  <div class="travel-header js-reveal">
+    <span class="sect-eyebrow">Places I've Been</span>
+    <h2 class="sect-title">The world,<br>one city at a time.</h2>
+    <p class="travel-sub">Drag to rotate &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Hover for city details</p>
+  </div>
+  <div id="globe-container"></div>
+</section>
+
+<!-- Main tiles (unchanged) -->
+<div id="main">
+  {% include tiles.html %}
+</div>
+
+{% include contact.html %}
+<div class="social">
+  <script type="text/javascript" src="//rf.revolvermaps.com/0/0/6.js?i=56uavcyvlfu&amp;m=7&amp;c=e63100&amp;cr1=ffffff&amp;f=arial&amp;l=33&amp;bv=90&amp;lx=-420&amp;ly=420&amp;hi=20&amp;he=7&amp;hc=a8ddff&amp;rs=80" async="async"></script>
+</div>
+{% include footer.html %}
+
+<!-- ══════════════════════ SCRIPTS ═══════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/globe.gl@2.31.0/dist/globe.gl.min.js"></script>
+
+<script>
+/* ── LOADING SCREEN ─────────────────────────────────────────── */
+(function () {
+  var num = document.getElementById('ls-num');
+  var bar = document.getElementById('ls-bar');
+  var ls  = document.getElementById('ls');
+  var count = 0;
+  var iv = setInterval(function () {
+    count = Math.min(count + Math.floor(Math.random() * 5) + 2, 100);
+    num.textContent = count;
+    bar.style.width = count + '%';
+    if (count >= 100) {
+      clearInterval(iv);
+      setTimeout(function () {
+        ls.classList.add('hidden');
+        setTimeout(function () { ls.remove(); }, 900);
+      }, 400);
+    }
+  }, 55);
+})();
+
+/* ── HOVER TABS ─────────────────────────────────────────────── */
+document.querySelectorAll('.feat-tab').forEach(function (tab) {
+  tab.addEventListener('mouseenter', function () {
+    var idx = tab.dataset.tab;
+    document.querySelectorAll('.feat-tab').forEach(function (t) { t.classList.remove('active'); });
+    document.querySelectorAll('.feat-panel').forEach(function (p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    var panel = document.querySelector('.feat-panel[data-panel="' + idx + '"]');
+    if (panel) panel.classList.add('active');
+  });
+});
+
+/* ── FLUID CANVAS ───────────────────────────────────────────── */
+(function () {
+  var canvas = document.getElementById('fluid-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W, H;
+  function resize() {
+    W = canvas.width  = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var blobs = [
+    { x: 0.15, y: 0.5,  r: 0.55, vx:  0.00025, vy:  0.00015, c: '94,106,210' },
+    { x: 0.55, y: 0.3,  r: 0.50, vx: -0.00020, vy:  0.00025, c: '139,92,246' },
+    { x: 0.80, y: 0.7,  r: 0.48, vx:  0.00018, vy: -0.00020, c: '67,56,202'  },
+    { x: 0.40, y: 0.8,  r: 0.45, vx: -0.00015, vy: -0.00018, c: '109,40,217' },
+  ];
+  var t = 0;
+  function draw() {
+    t++;
+    ctx.clearRect(0, 0, W, H);
+    blobs.forEach(function (b) {
+      b.x += b.vx + Math.sin(t * 0.003 + b.r) * 0.00008;
+      b.y += b.vy + Math.cos(t * 0.004 + b.r) * 0.00008;
+      if (b.x < 0) b.x = 1; if (b.x > 1) b.x = 0;
+      if (b.y < 0) b.y = 1; if (b.y > 1) b.y = 0;
+      var bx = b.x * W, by = b.y * H, br = b.r * Math.min(W, H) * 0.55;
+      var g = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+      g.addColorStop(0, 'rgba(' + b.c + ',0.14)');
+      g.addColorStop(1, 'rgba(' + b.c + ',0)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── SCROLL REVEALS ─────────────────────────────────────────── */
+gsap.registerPlugin(ScrollTrigger);
+gsap.utils.toArray('.js-reveal').forEach(function (el) {
+  gsap.from(el, {
+    opacity: 0, y: 40, duration: 0.9, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 85%' }
+  });
+});
+
+/* ── WORLD GLOBE ────────────────────────────────────────────── */
+// ✏️  Add every city you've visited here
+var myPlaces = [
+  { city: 'Mumbai',    country: 'India',       lat:  19.076, lng:  72.877 },
+  { city: 'Pune',      country: 'India',       lat:  18.520, lng:  73.856 },
+  { city: 'Amsterdam', country: 'Netherlands', lat:  52.377, lng:   4.897 },
+  { city: 'Vienna',    country: 'Austria',     lat:  48.208, lng:  16.373 },
+  { city: 'Paris',     country: 'France',      lat:  48.856, lng:   2.352 },
+  { city: 'Berlin',    country: 'Germany',     lat:  52.520, lng:  13.405 },
+];
+
+var myArcs = myPlaces.slice(0, -1).map(function (p, i) {
+  return { src: p, dst: myPlaces[i + 1] };
+});
+
+var globeEl = document.getElementById('globe-container');
+if (globeEl && typeof Globe !== 'undefined') {
+  var world = Globe()(globeEl);
+  world
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+    .backgroundColor('#0B0B0F00')
+    .showAtmosphere(true)
+    .atmosphereColor('#5E6AD2')
+    .atmosphereAltitude(0.14)
+    .pointsData(myPlaces)
+    .pointLat('lat').pointLng('lng')
+    .pointColor(function () { return '#7B8FE8'; })
+    .pointAltitude(0.04)
+    .pointRadius(0.45)
+    .pointLabel(function (d) {
+      return '<div style="font-family:Inter,sans-serif;font-size:12px;color:#fff;'
+           + 'background:rgba(11,11,15,0.92);padding:6px 12px;border-radius:7px;'
+           + 'border:1px solid rgba(94,106,210,0.45)">'
+           + '<strong>' + d.city + '</strong><br>'
+           + '<span style="color:rgba(255,255,255,0.45);font-size:11px">' + d.country + '</span></div>';
+    })
+    .arcsData(myArcs)
+    .arcStartLat(function (d) { return d.src.lat; })
+    .arcStartLng(function (d) { return d.src.lng; })
+    .arcEndLat(function (d) { return d.dst.lat; })
+    .arcEndLng(function (d) { return d.dst.lng; })
+    .arcColor(function () { return ['rgba(94,106,210,0.05)', 'rgba(94,106,210,0.8)']; })
+    .arcAltitude(0.28)
+    .arcStroke(0.5)
+    .arcDashLength(0.35)
+    .arcDashGap(0.18)
+    .arcDashAnimateTime(2200);
+
+  world.controls().autoRotate      = true;
+  world.controls().autoRotateSpeed = 0.35;
+  world.controls().enableZoom      = true;
+  world.pointOfView({ lat: 40, lng: 20, altitude: 2.2 }, 0);
+}
+</script>
 
 </body>
-
 </html>
