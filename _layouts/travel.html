@@ -171,13 +171,6 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
     globeGroup.add(sprite);
     dotMeshes.push(sprite);
 
-    /* Purple pulse ring */
-    var ring = new THREE.Mesh(
-      new THREE.RingGeometry(0.038, 0.052, 28),
-      new THREE.MeshBasicMaterial({ color: 0x7B8FE8, side: THREE.DoubleSide, transparent: true, opacity: 0.6 })
-    );
-    ring.position.copy(pos); ring.lookAt(0, 0, 0);
-    globeGroup.add(ring);
   });
 
   var ARC_SEGS = 80;
