@@ -13,17 +13,19 @@
 
 	#header {
 		@include vendor('display', 'flex');
-		background-color: _palette(bg-alt);
-		box-shadow: 0 0 0.25em 0 rgba(0,0,0,0.15);
+		background-color: rgba(11, 11, 15, 0.85);
+		-webkit-backdrop-filter: blur(12px);
+		backdrop-filter: blur(12px);
+		box-shadow: 0 0 0 1px _palette(border);
 		cursor: default;
-		font-weight: _font(weight-bold);
+		font-weight: 500;
 		height: 3.25em;
 		left: 0;
-		letter-spacing: _font(letter-spacing-alt);
+		letter-spacing: 0.01em;
 		line-height: 3.25em;
 		margin: 0;
 		position: fixed;
-		text-transform: uppercase;
+		text-transform: none;
 		top: 0;
 		width: 100%;
 		z-index: _misc(z-index-base);
@@ -31,33 +33,31 @@
 		.logo {
 			border: 0;
 			display: inline-block;
-			font-size: 0.8em;
+			font-size: 0.85em;
+			font-weight: 600;
+			letter-spacing: -0.01em;
 			height: inherit;
 			line-height: inherit;
 			padding: 0 1.5em;
 
 			strong {
 				@include vendor('transition', (
-					'background-color #{_duration(transition)} ease-in-out',
 					'color #{_duration(transition)} ease-in-out'
 				));
-				background-color: _palette(fg-bold);
-				color: _palette(bg);
+				color: _palette(fg-bold);
 				display: inline-block;
-				line-height: 1.65em;
-				margin-right: 0.325em;
-				padding: 0 0.125em 0 (_font(letter-spacing-alt) + 0.125em);
+				line-height: inherit;
+				margin-right: 0.2em;
+			}
+
+			span {
+				color: rgba(255,255,255,0.4);
+				font-weight: 300;
 			}
 
 			&:hover {
 				strong {
-					background-color: _palette(highlight);
-				}
-			}
-
-			&:active {
-				strong {
-					background-color: desaturate(darken(_palette(highlight), 15), 5);
+					color: _palette(highlight);
 				}
 			}
 		}
@@ -72,12 +72,18 @@
 			a {
 				border: 0;
 				display: block;
-				font-size: 0.8em;
+				font-size: 0.85em;
 				height: inherit;
 				line-height: inherit;
 				padding: 0 0.75em;
 				position: relative;
 				vertical-align: middle;
+				color: rgba(255,255,255,0.55);
+				@include vendor('transition', 'color #{_duration(transition)} ease-in-out');
+
+				&:hover {
+					color: _palette(fg);
+				}
 
 				&:last-child {
 					padding-right: 1.5em;
@@ -134,15 +140,10 @@
 			@include vendor('transition-delay', '0.75s');
 			@include vendor('animation', 'none');
 			background-color: transparent;
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
 			box-shadow: none;
 			position: absolute;
-
-			&.style1 { .logo { strong { color: _palette(accent1); } } }
-			&.style2 { .logo { strong { color: _palette(accent2); } } }
-			&.style3 { .logo { strong { color: _palette(accent3); } } }
-			&.style4 { .logo { strong { color: _palette(accent4); } } }
-			&.style5 { .logo { strong { color: _palette(accent5); } } }
-			&.style6 { .logo { strong { color: _palette(accent6); } } }
 		}
 
 		body.is-loading & {

@@ -1,47 +1,46 @@
 ///
-/// Forty by HTML5 UP
-/// html5up.net | @ajlkn
-/// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+/// Forty — Linear-inspired dark banner
 ///
 
 /* Banner */
 
 	#banner {
 		@include vendor('align-items', 'center');
-		@include vendor('background-image', 'url("../images/cover_fb.jpg")');
+		@include vendor('justify-content', 'center');
 		@include vendor('display', 'flex');
 		@include padding(4em, 0, (2em, 0, 0, 0));
-		background-attachment: fixed;
-		background-position: center;
-		background-repeat: no-repeat;
-		background-size: cover;
-		border-bottom: 0 !important;
+		background-color: _palette(bg);
+		background-image:
+			radial-gradient(ellipse 80% 60% at 50% 0%, rgba(94, 106, 210, 0.18) 0%, transparent 70%),
+			radial-gradient(ellipse 50% 40% at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+		border-bottom: 1px solid _palette(border) !important;
 		cursor: default;
 		height: 60vh;
 		margin-bottom: -3.25em;
-		max-height: 32em;
-		min-height: 22em;
+		max-height: 38em;
+		min-height: 26em;
 		position: relative;
 		top: -3.25em;
+		text-align: center;
 
-		&:after {
-			@include vendor('transition', 'opacity #{_duration(banner)} ease');
-			@include vendor('transition-delay', '0.75s');
-			@include vendor('pointer-events', 'none');
-			background-color: _palette(bg);
+		// Grain overlay
+		&:before {
 			content: '';
-			display: block;
-			height: 100%;
-			left: 0;
-			opacity: 0.85;
 			position: absolute;
-			top: 0;
-			width: 100%;
+			inset: 0;
+			background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+			background-size: 180px 180px;
+			opacity: 0.03;
+			pointer-events: none;
 			z-index: 1;
 		}
 
 		h1 {
-			font-size: 3.25em;
+			font-size: 3.5em;
+			font-weight: 700;
+			letter-spacing: -0.03em;
+			line-height: 1.1;
+			color: _palette(fg);
 		}
 
 		> .inner {
@@ -67,6 +66,7 @@
 
 					&:after {
 						max-width: 100%;
+						background-color: _palette(highlight);
 					}
 				}
 			}
@@ -74,6 +74,7 @@
 			.content {
 				@include vendor('display', 'flex');
 				@include vendor('align-items', 'center');
+				@include vendor('justify-content', 'center');
 				margin: 0 0 _size(element-margin) 0;
 
 				> * {
@@ -86,36 +87,22 @@
 				}
 
 				p {
-					font-size: 0.7em;
-					font-weight: _font(weight-bold);
-					letter-spacing: _font(letter-spacing-alt);
-					text-transform: uppercase;
+					font-size: 0.85em;
+					font-weight: 400;
+					letter-spacing: 0.01em;
+					text-transform: none;
+					color: rgba(255,255,255,0.5);
 				}
 			}
 		}
 
 		&.major {
-			height: 75vh;
-			min-height: 30em;
-			max-height: 50em;
-
-			&.alt {
-				  opacity: 0.75;
-			}
+			height: 82vh;
+			min-height: 34em;
+			max-height: 56em;
 		}
 
-		&.style1 { &:after { background-color: _palette(accent1); } }
-		&.style2 { &:after { background-color: _palette(accent2); } }
-		&.style3 { &:after { background-color: _palette(accent3); } }
-		&.style4 { &:after { background-color: _palette(accent4); } }
-		&.style5 { &:after { background-color: _palette(accent5); } }
-		&.style6 { &:after { background-color: _palette(accent6); } }
-
 		body.is-loading & {
-			&:after {
-				opacity: 1.0;
-			}
-
 			> .inner {
 				@include vendor('filter', 'blur(0.125em)');
 				@include vendor('transform', 'translateX(-0.5em)');
@@ -136,7 +123,7 @@
 			top: -2.75em;
 
 			h1 {
-				font-size: 2em;
+				font-size: 2.2em;
 			}
 
 			> .inner {
@@ -159,16 +146,6 @@
 
 		@include breakpoint(xsmall) {
 			@include padding(4em, 0, (2em, 0, 0, 0));
-
-			> .inner {
-				.content {
-					p {
-						br {
-							display: none;
-						}
-					}
-				}
-			}
 
 			&.major {
 				@include padding(6em, 0, (2em, 0, 0, 0));

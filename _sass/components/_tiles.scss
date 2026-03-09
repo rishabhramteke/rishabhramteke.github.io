@@ -16,18 +16,21 @@
 		}
 
 		article {
-			@include vendor('align-items', 'center');
+			@include vendor('align-items', 'flex-end');
 			@include vendor('display', 'flex');
 			@include vendor('transition', (
-				'transform 0.25s ease',
-				'opacity 0.25s ease',
+				'transform 0.3s ease',
+				'opacity 0.3s ease',
+				'box-shadow 0.3s ease',
 				'filter 1s ease',
 				'-webkit-filter 1s ease'
 			));
 			@include padding(4em, 4em);
+			background-color: _palette(bg-alt);
 			background-position: center;
 			background-repeat: no-repeat;
 			background-size: cover;
+			border: 1px solid _palette(border);
 			cursor: default;
 			height: 40vh;
 			max-height: 40em;
@@ -46,7 +49,9 @@
 			}
 
 			h3 {
-				font-size: 1.75em;
+				font-size: 1.5em;
+				font-weight: 600;
+				letter-spacing: -0.02em;
 
 				a {
 					&:hover {
@@ -66,20 +71,21 @@
 			}
 
 			&:before {
-				@include vendor('transition', 'opacity 0.5s ease');
+				@include vendor('transition', 'opacity 0.4s ease');
 				bottom: 0;
 				content: '';
 				display: block;
 				height: 100%;
 				left: 0;
-				opacity: 0.65;
+				opacity: 0.8;
 				position: absolute;
 				width: 100%;
 				z-index: 2;
+				background: linear-gradient(to top, rgba(11,11,15,0.95) 0%, rgba(11,11,15,0.4) 60%, transparent 100%);
 			}
 
 			&:after {
-				background-color: transparentize(_palette(bg), 0.75);
+				background-color: rgba(11,11,15,0.45);
 				content: '';
 				display: block;
 				height: 100%;
@@ -91,8 +97,12 @@
 			}
 
 			&:hover {
+				@include vendor('transform', 'scale(1.01)');
+				box-shadow: 0 0 0 1px _palette(highlight), 0 8px 40px rgba(94,106,210,0.2);
+				z-index: 1;
+
 				&:before {
-					opacity: 0;
+					opacity: 0.5;
 				}
 			}
 
@@ -107,41 +117,6 @@
 				flex: 1 auto;
 			}
 
-			&:nth-child(6n - 5) {
-				&:before {
-					background-color: _palette(accent3);
-				}
-			}
-
-			&:nth-child(6n - 4) {
-				&:before {
-					background-color: _palette(accent2);
-				}
-			}
-
-			&:nth-child(6n - 3) {
-				&:before {
-					background-color: _palette(accent5);
-				}
-			}
-
-			&:nth-child(6n - 2) {
-				&:before {
-					background-color: _palette(accent4);
-				}
-			}
-
-			&:nth-child(6n - 1) {
-				&:before {
-					background-color: _palette(accent5);
-				}
-			}
-
-			&:nth-child(6n) {
-				&:before {
-					background-color: _palette(accent6);
-				}
-			}
 		}
 
 		@include breakpoint(large) {
