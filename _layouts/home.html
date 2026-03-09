@@ -423,14 +423,6 @@ body.cursor-drag  #cur-ring { width: 28px; height: 28px; }
   var earthMesh = new THREE.Mesh(earthGeo, earthMat);
   earthGroup.add(earthMesh);
 
-  /* Atmosphere glow */
-  var atmGeo = new THREE.SphereGeometry(R * 1.14, 64, 64);
-  var atmMat = new THREE.MeshLambertMaterial({
-    color: new THREE.Color(0x5E6AD2), side: THREE.BackSide,
-    transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false
-  });
-  earthGroup.add(new THREE.Mesh(atmGeo, atmMat));
-
   /* Lights */
   scene.add(new THREE.AmbientLight(0xffffff, 0.35));
   var sun = new THREE.DirectionalLight(0xffffff, 1.2);
