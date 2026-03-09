@@ -364,11 +364,12 @@
 
   /* Earth group — everything rotates together */
   var earthGroup = new THREE.Group();
-  /* Orient globe so India/South-Asia faces the camera at start
-     theta = (lng+180)*PI/180 for Mumbai (lng≈73) ≈ 4.41 rad
-     initial rotation.y = theta - PI/2 ≈ 2.84 */
-  earthGroup.rotation.y = 2.84;
   scene.add(earthGroup);
+
+  /* Smooth rotation tracking — globe follows the plane instead of spinning at constant speed */
+  var smoothRotY = 2.84;  /* start facing India (Mumbai lng≈73°) */
+  var targetRotY = 2.84;
+  earthGroup.rotation.y = smoothRotY;
 
   /* Earth sphere */
   var R       = 1;
@@ -494,20 +495,29 @@
       }
     }
     if (prog < 100) {
-      var si   = Math.min(Math.floor(prog / 25), cities.length - 2);
-      var ptI  = Math.round(Math.max((prog - si * 25) / 25, 0) * ARC_SEGS);
-      planeMesh.position.copy(allArcPts[si][Math.min(ptI, ARC_SEGS)]);
+      var si      = Math.min(Math.floor(prog / 25), cities.length - 2);
+      var ptI     = Math.round(Math.max((prog - si * 25) / 25, 0) * ARC_SEGS);
+      var planePos = allArcPts[si][Math.min(ptI, ARC_SEGS)];
+      planeMesh.position.copy(planePos);
       planeMesh.visible = true;
+
+      /* Rotate globe to keep plane facing camera — take the shortest angular path */
+      var angle = Math.atan2(-planePos.x, planePos.z);
+      var diff  = angle - smoothRotY;
+      while (diff >  Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      targetRotY = smoothRotY + diff;
     } else {
       planeMesh.visible = false;
     }
   }
 
-  /* Render loop */
+  /* Render loop — globe eases toward target rotation each frame */
   var rafId;
   function animate() {
     rafId = requestAnimationFrame(animate);
-    earthGroup.rotation.y += 0.0015;
+    smoothRotY += (targetRotY - smoothRotY) * 0.028;
+    earthGroup.rotation.y = smoothRotY;
     renderer.render(scene, camera);
   }
   animate();
