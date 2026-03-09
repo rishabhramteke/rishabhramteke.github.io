@@ -15,7 +15,7 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
 }
 
 .tp-header {
-  padding: 20px 60px 10px;
+  padding: 12px 60px 6px;
   flex-shrink: 0;
 }
 .tp-eyebrow {
@@ -59,7 +59,7 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
   <div class="tp-header">
     <span class="tp-eyebrow">Places I've Been</span>
     <h1 class="tp-title">The world,<br>one city at a time.</h1>
-    <p class="tp-sub">Drag to rotate &nbsp;·&nbsp; Hover for city details</p>
+    <p class="tp-sub">Drag to rotate &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Hover for city details</p>
   </div>
   <div id="globe-travel"></div>
 </div>
@@ -80,7 +80,8 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
 
   var scene  = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 100);
-  camera.position.set(0, 0.08, 3.2);
+  var camZ = 4.8;  /* start fully zoomed out */
+  camera.position.set(0, 0.08, camZ);
 
   var globeGroup = new THREE.Group();
   scene.add(globeGroup);
@@ -261,6 +262,28 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
   renderer.domElement.addEventListener('pointerup',    function () { isDragging = false; renderer.domElement.style.cursor = 'grab'; });
   renderer.domElement.addEventListener('pointerleave', function () { isDragging = false; renderer.domElement.style.cursor = 'grab'; });
 
+  /* Scroll / wheel zoom */
+  var targetCamZ = camZ;
+  renderer.domElement.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    targetCamZ = Math.max(1.6, Math.min(7.0, targetCamZ + e.deltaY * 0.004));
+  }, { passive: false });
+
+  /* Pinch zoom on touch */
+  var lastPinchDist = null;
+  renderer.domElement.addEventListener('touchstart', function (e) {
+    if (e.touches.length === 2) lastPinchDist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY);
+  }, { passive: true });
+  renderer.domElement.addEventListener('touchmove', function (e) {
+    if (e.touches.length !== 2 || lastPinchDist === null) return;
+    var d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
+                       e.touches[0].clientY - e.touches[1].clientY);
+    targetCamZ = Math.max(1.6, Math.min(7.0, targetCamZ - (d - lastPinchDist) * 0.012));
+    lastPinchDist = d;
+  }, { passive: true });
+
   window.addEventListener('resize', function () {
     W = container.offsetWidth; H = container.offsetHeight || 500;
     camera.aspect = W / H; camera.updateProjectionMatrix(); renderer.setSize(W, H);
@@ -274,6 +297,9 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
     }
     rotY += velY; rotX = Math.max(-1.1, Math.min(1.1, rotX + velX));
     globeGroup.rotation.set(rotX, rotY, 0);
+    /* smooth zoom */
+    camZ += (targetCamZ - camZ) * 0.10;
+    camera.position.setZ(camZ);
     renderer.render(scene, camera);
   }
   animate();
