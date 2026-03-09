@@ -317,6 +317,9 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
     camera.aspect = W / H; camera.updateProjectionMatrix(); renderer.setSize(W, H);
   });
 
+  var _wp = new THREE.Vector3();
+  var _cp = new THREE.Vector3();
+
   function animate() {
     requestAnimationFrame(animate);
     if (!isDragging) {
@@ -325,9 +328,25 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
     }
     rotY += velY; rotX = Math.max(-1.1, Math.min(1.1, rotX + velX));
     globeGroup.rotation.set(rotX, rotY, 0);
+
     /* smooth zoom */
     camZ += (targetCamZ - camZ) * 0.10;
     camera.position.setZ(camZ);
+    camera.getWorldPosition(_cp);
+
+    /* per-sprite: scale with zoom + hide when on back hemisphere */
+    var baseScale = 0.028 * camZ; /* shrinks as you zoom in */
+    dotMeshes.forEach(function (s) {
+      s.getWorldPosition(_wp);
+      /* dot product: positive = facing camera, negative = behind globe */
+      var facing = _wp.dot(_cp);
+      /* fade out smoothly around the limb (threshold slightly > 0 so they vanish before edge) */
+      var opacity = Math.max(0, Math.min(1, (facing - 0.08) * 18));
+      s.material.opacity = opacity;
+      s.visible = opacity > 0.01;
+      s.scale.setScalar(baseScale);
+    });
+
     renderer.render(scene, camera);
   }
   animate();
