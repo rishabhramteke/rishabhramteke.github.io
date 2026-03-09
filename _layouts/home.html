@@ -745,20 +745,45 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
    MAGNETIC BUTTONS
 ══════════════════════════════════════════════════════════════ */
 (function () {
+  /* Tab links — standard on-hover magnetic */
   var STRENGTH = 0.38;
-  document.querySelectorAll('.button, .feat-tab-link').forEach(function (el) {
+  document.querySelectorAll('.feat-tab-link').forEach(function (el) {
     el.classList.add('mag-btn');
     el.addEventListener('mousemove', function (e) {
       var r  = el.getBoundingClientRect();
       var cx = r.left + r.width  / 2;
       var cy = r.top  + r.height / 2;
-      var dx = (e.clientX - cx) * STRENGTH;
-      var dy = (e.clientY - cy) * STRENGTH;
-      gsap.to(el, { x: dx, y: dy, duration: 0.4, ease: 'power2.out', overwrite: true });
+      gsap.to(el, { x: (e.clientX - cx) * STRENGTH, y: (e.clientY - cy) * STRENGTH,
+        duration: 0.4, ease: 'power2.out', overwrite: true });
     });
     el.addEventListener('mouseleave', function () {
       gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1,0.4)', overwrite: true });
     });
+  });
+
+  /* Explore button — proximity-based pull with 2× range */
+  var btn = document.querySelector('a.button.next');
+  if (!btn) return;
+  btn.classList.add('mag-btn');
+  var PULL = 0.55;   /* pull strength */
+
+  document.addEventListener('mousemove', function (e) {
+    var r   = btn.getBoundingClientRect();
+    var cx  = r.left + r.width  / 2;
+    var cy  = r.top  + r.height / 2;
+    var dx  = e.clientX - cx;
+    var dy  = e.clientY - cy;
+    /* activation radius = 2× the button's larger half-dimension */
+    var radius = Math.max(r.width, r.height) * 2;
+    var dist   = Math.sqrt(dx * dx + dy * dy);
+    if (dist < radius) {
+      /* scale pull by how close the cursor is (stronger when closer) */
+      var factor = (1 - dist / radius) * PULL;
+      gsap.to(btn, { x: dx * factor, y: dy * factor,
+        duration: 0.4, ease: 'power2.out', overwrite: true });
+    } else {
+      gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1,0.4)', overwrite: true });
+    }
   });
 })();
 
