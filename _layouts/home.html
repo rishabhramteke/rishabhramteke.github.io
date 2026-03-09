@@ -144,7 +144,7 @@ body.cursor-drag  #cur-ring { width: 28px; height: 28px; }
 
 /* Visuals container */
 .feat-visuals {
-  position: sticky; top: 100px; height: 400px;
+  position: sticky; top: 100px; height: 520px;
   border-radius: 14px; overflow: hidden;
   border: 1px solid rgba(255,255,255,0.08); background: #0e0e14;
   transform-style: preserve-3d; will-change: transform;
@@ -718,26 +718,48 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
 })();
 
 /* ══════════════════════════════════════════════════════════════
-   3D TILT on feat-visuals panel
+   3D TILT + MAGNETIC PULL on feat-visuals panel
 ══════════════════════════════════════════════════════════════ */
 (function () {
-  var panel = document.querySelector('.feat-visuals');
-  if (!panel) return;
-  var MAX = 10;
+  var panel   = document.querySelector('.feat-visuals');
+  var section = document.getElementById('feat-section');
+  if (!panel || !section) return;
+  var TILT_MAX = 10;
+  var MAG_PULL = 0.10;
+  var MAG_MAX  = 32;
 
+  /* 3D tilt — only while cursor is over the panel */
   panel.addEventListener('mousemove', function (e) {
-    var r = panel.getBoundingClientRect();
+    var r  = panel.getBoundingClientRect();
     var nx = ((e.clientX - r.left) / r.width  - 0.5) * 2;
     var ny = ((e.clientY - r.top)  / r.height - 0.5) * 2;
     gsap.to(panel, {
-      rotationY:  nx * MAX,
-      rotationX: -ny * MAX,
+      rotationY: nx * TILT_MAX, rotationX: -ny * TILT_MAX,
       transformPerspective: 900,
-      duration: 0.55, ease: 'power2.out', overwrite: true
+      duration: 0.55, ease: 'power2.out', overwrite: 'auto'
     });
   });
   panel.addEventListener('mouseleave', function () {
-    gsap.to(panel, { rotationY: 0, rotationX: 0, duration: 0.9, ease: 'elastic.out(1,0.5)', overwrite: true });
+    gsap.to(panel, { rotationY: 0, rotationX: 0, duration: 0.9, ease: 'elastic.out(1,0.5)', overwrite: 'auto' });
+  });
+
+  /* Magnetic pull — global, active while section is in viewport */
+  document.addEventListener('mousemove', function (e) {
+    var sr = section.getBoundingClientRect();
+    if (sr.bottom < 0 || sr.top > window.innerHeight) {
+      gsap.to(panel, { x: 0, y: 0, duration: 0.9, ease: 'elastic.out(1,0.4)', overwrite: 'auto' });
+      return;
+    }
+    var pr  = panel.getBoundingClientRect();
+    var cx  = pr.left + pr.width  / 2;
+    var cy  = pr.top  + pr.height / 2;
+    var dx  = e.clientX - cx;
+    var dy  = e.clientY - cy;
+    var tx  = Math.max(-MAG_MAX, Math.min(MAG_MAX, dx * MAG_PULL));
+    /* Clamp upward movement: don't let panel top go above section top + 20px buffer */
+    var maxUp = Math.max(0, pr.top - sr.top - 20);
+    var ty    = Math.max(-maxUp, Math.min(MAG_MAX, dy * MAG_PULL));
+    gsap.to(panel, { x: tx, y: ty, duration: 0.6, ease: 'power2.out', overwrite: 'auto' });
   });
 })();
 
