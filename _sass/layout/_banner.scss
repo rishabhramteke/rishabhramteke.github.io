@@ -10,9 +10,11 @@
 		@include vendor('display', 'flex');
 		@include padding(4em, 0, (2em, 0, 0, 0));
 		background-color: _palette(bg);
-		background-image:
-			radial-gradient(ellipse 80% 60% at 50% 0%, rgba(94, 106, 210, 0.18) 0%, transparent 70%),
-			radial-gradient(ellipse 50% 40% at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+		@include vendor('background-image', 'url("../images/cover_fb.jpg")');
+		background-attachment: fixed;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
 		border-bottom: 1px solid _palette(border) !important;
 		cursor: default;
 		height: 60vh;
@@ -22,6 +24,22 @@
 		position: relative;
 		top: -3.25em;
 		text-align: center;
+
+		// Dark overlay over the photo
+		&:after {
+			@include vendor('transition', 'opacity #{_duration(banner)} ease');
+			@include vendor('transition-delay', '0.75s');
+			@include vendor('pointer-events', 'none');
+			background-color: rgba(11, 11, 15, 0.82);
+			content: '';
+			display: block;
+			height: 100%;
+			left: 0;
+			position: absolute;
+			top: 0;
+			width: 100%;
+			z-index: 1;
+		}
 
 		// Grain overlay
 		&:before {
