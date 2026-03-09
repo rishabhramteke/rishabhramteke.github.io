@@ -139,20 +139,28 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
 
   /* Build a canvas texture for each flag emoji */
   function makeFlagTexture(flag) {
+    var s = 256;
     var c = document.createElement('canvas');
-    c.width = 64; c.height = 64;
+    c.width = s; c.height = s;
     var ctx = c.getContext('2d');
-    /* White circle background */
+    /* White circle background with subtle border */
     ctx.beginPath();
-    ctx.arc(32, 32, 30, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.arc(s/2, s/2, s/2 - 4, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
     ctx.fill();
-    /* Flag emoji */
-    ctx.font = '28px serif';
+    ctx.strokeStyle = 'rgba(200,200,220,0.5)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    /* Flag emoji — large for crisp rendering */
+    ctx.font = (s * 0.52) + 'px serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(flag, 32, 34);
-    return new THREE.CanvasTexture(c);
+    ctx.fillText(flag, s/2, s/2 + s * 0.04);
+    var tex = new THREE.CanvasTexture(c);
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.generateMipmaps = true;
+    return tex;
   }
 
   var dotMeshes = [];
