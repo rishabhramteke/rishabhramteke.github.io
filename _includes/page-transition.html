@@ -1,0 +1,28 @@
+<div id="pg-trans" style="
+  position:fixed;inset:0;z-index:999997;
+  background:#0B0B0F;
+  opacity:1;
+  pointer-events:none;
+  transition:opacity 0.45s cubic-bezier(0.4,0,0.2,1);
+"></div>
+
+<script>
+(function(){
+  var el = document.getElementById('pg-trans');
+  if (!el) return;
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){ el.style.opacity = '0'; });
+  });
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('a');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href) return;
+    if (a.target === '_blank') return;
+    if (/^(https?:\/\/(?!rishabhramteke\.github\.io)|mailto:|tel:|javascript:|#)/.test(href)) return;
+    e.preventDefault();
+    el.style.opacity = '1';
+    setTimeout(function(){ window.location.href = href; }, 460);
+  });
+})();
+</script>
