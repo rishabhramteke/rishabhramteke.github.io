@@ -181,8 +181,7 @@
   font-size: 13px; color: rgba(255,255,255,0.3);
   margin-top: 12px; font-family: 'Inter', sans-serif;
 }
-#globe-container { width: 100%; height: 580px; cursor: grab; display: block; }
-#globe-container:active { cursor: grabbing; }
+#globe-container { width: 100%; height: 540px; overflow: hidden; display: block; }
 
 /* ─────────────────────────────────────────────────────────────
    SCROLL REVEAL
@@ -345,7 +344,6 @@
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://unpkg.com/globe.gl@2.31.0/dist/globe.gl.min.js"></script>
 
 <script>
 /* ── LOADING SCREEN — Three.js 3D Earth globe ───────────────── */
@@ -618,60 +616,184 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
   });
 });
 
-/* ── WORLD GLOBE ────────────────────────────────────────────── */
-// ✏️  Add every city you've visited here
-var myPlaces = [
-  { city: 'Mumbai',    country: 'India',       lat:  19.076, lng:  72.877 },
-  { city: 'Pune',      country: 'India',       lat:  18.520, lng:  73.856 },
-  { city: 'Amsterdam', country: 'Netherlands', lat:  52.377, lng:   4.897 },
-  { city: 'Vienna',    country: 'Austria',     lat:  48.208, lng:  16.373 },
-  { city: 'Paris',     country: 'France',      lat:  48.856, lng:   2.352 },
-  { city: 'Berlin',    country: 'Germany',     lat:  52.520, lng:  13.405 },
-];
+/* ── WORLD GLOBE (Three.js, drag-only, cartoonish Blue Marble) ── */
+(function () {
+  var container = document.getElementById('globe-container');
+  if (!container || typeof THREE === 'undefined') return;
 
-var myArcs = myPlaces.slice(0, -1).map(function (p, i) {
-  return { src: p, dst: myPlaces[i + 1] };
-});
+  var W = container.offsetWidth, H = container.offsetHeight || 540;
 
-var globeEl = document.getElementById('globe-container');
-if (globeEl && typeof Globe !== 'undefined') {
-  var world = Globe()(globeEl);
-  world
-    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-    .backgroundColor('#0B0B0F00')
-    .showAtmosphere(true)
-    .atmosphereColor('#5E6AD2')
-    .atmosphereAltitude(0.14)
-    .pointsData(myPlaces)
-    .pointLat('lat').pointLng('lng')
-    .pointColor(function () { return '#7B8FE8'; })
-    .pointAltitude(0.04)
-    .pointRadius(0.45)
-    .pointLabel(function (d) {
-      return '<div style="font-family:Inter,sans-serif;font-size:12px;color:#fff;'
-           + 'background:rgba(11,11,15,0.92);padding:6px 12px;border-radius:7px;'
-           + 'border:1px solid rgba(94,106,210,0.45)">'
-           + '<strong>' + d.city + '</strong><br>'
-           + '<span style="color:rgba(255,255,255,0.45);font-size:11px">' + d.country + '</span></div>';
+  /* Renderer */
+  var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x000000, 0);
+  container.appendChild(renderer.domElement);
+
+  /* Scene & camera */
+  var scene  = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 100);
+  camera.position.z = 2.6;
+
+  /* Single group so everything rotates together */
+  var globeGroup = new THREE.Group();
+  scene.add(globeGroup);
+
+  /* Earth sphere — Lambert for a clean, non-photorealistic look */
+  var R       = 1;
+  var earthMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  globeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(R, 64, 64), earthMat));
+
+  /* Blue Marble texture — vivid NASA color image */
+  new THREE.TextureLoader().load(
+    '//unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
+    function (t) { earthMat.map = t; earthMat.needsUpdate = true; }
+  );
+
+  /* Soft blue atmosphere */
+  globeGroup.add(new THREE.Mesh(
+    new THREE.SphereGeometry(R * 1.10, 64, 64),
+    new THREE.MeshLambertMaterial({
+      color: 0x88BBEE, side: THREE.BackSide,
+      transparent: true, opacity: 0.32,
+      blending: THREE.AdditiveBlending, depthWrite: false
     })
-    .arcsData(myArcs)
-    .arcStartLat(function (d) { return d.src.lat; })
-    .arcStartLng(function (d) { return d.src.lng; })
-    .arcEndLat(function (d) { return d.dst.lat; })
-    .arcEndLng(function (d) { return d.dst.lng; })
-    .arcColor(function () { return ['rgba(94,106,210,0.05)', 'rgba(94,106,210,0.8)']; })
-    .arcAltitude(0.28)
-    .arcStroke(0.5)
-    .arcDashLength(0.35)
-    .arcDashGap(0.18)
-    .arcDashAnimateTime(2200);
+  ));
 
-  world.controls().autoRotate      = true;
-  world.controls().autoRotateSpeed = 0.35;
-  world.controls().enableZoom      = true;
-  world.pointOfView({ lat: 40, lng: 20, altitude: 2.2 }, 0);
-}
+  /* Lights — high ambient so the full colorful texture shows */
+  scene.add(new THREE.AmbientLight(0xffffff, 1.8));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.5);
+  sun.position.set(5, 3, 5);
+  scene.add(sun);
+
+  /* Lat/lng → Vector3 */
+  function ll2v(lat, lng, r) {
+    var phi = (90 - lat) * Math.PI / 180, theta = (lng + 180) * Math.PI / 180;
+    return new THREE.Vector3(
+      -r * Math.sin(phi) * Math.cos(theta),
+       r * Math.cos(phi),
+       r * Math.sin(phi) * Math.sin(theta)
+    );
+  }
+
+  /* Cities */
+  var places = [
+    { city: 'Mumbai',    country: 'India',       lat:  19.076, lng:  72.877 },
+    { city: 'Pune',      country: 'India',       lat:  18.520, lng:  73.856 },
+    { city: 'Amsterdam', country: 'Netherlands', lat:  52.377, lng:   4.897 },
+    { city: 'Vienna',    country: 'Austria',     lat:  48.208, lng:  16.373 },
+    { city: 'Paris',     country: 'France',      lat:  48.856, lng:   2.352 },
+    { city: 'Berlin',    country: 'Germany',     lat:  52.520, lng:  13.405 },
+  ];
+
+  /* Dots + rings */
+  var dotMeshes = [];
+  var dotGeo    = new THREE.SphereGeometry(0.022, 12, 12);
+  places.forEach(function (p) {
+    var pos = ll2v(p.lat, p.lng, R + 0.012);
+    var dot = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
+    dot.position.copy(pos);
+    dot.userData = p;
+    globeGroup.add(dot);
+    dotMeshes.push(dot);
+
+    var ring = new THREE.Mesh(
+      new THREE.RingGeometry(0.030, 0.046, 28),
+      new THREE.MeshBasicMaterial({ color: 0x7B8FE8, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+    );
+    ring.position.copy(pos);
+    ring.lookAt(0, 0, 0);
+    globeGroup.add(ring);
+  });
+
+  /* Great-circle arcs */
+  var ARC_SEGS = 80;
+  function addArc(pa, pb) {
+    var v0 = ll2v(pa.lat, pa.lng, 1).normalize();
+    var v1 = ll2v(pb.lat, pb.lng, 1).normalize();
+    var pts = [];
+    for (var i = 0; i <= ARC_SEGS; i++) {
+      var t = i / ARC_SEGS;
+      pts.push(v0.clone().lerp(v1, t).normalize().multiplyScalar(R + 0.015 + 0.1 * Math.sin(Math.PI * t)));
+    }
+    globeGroup.add(new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(pts),
+      new THREE.LineBasicMaterial({ color: 0x7B8FE8, transparent: true, opacity: 0.55 })
+    ));
+  }
+  for (var i = 0; i < places.length - 1; i++) addArc(places[i], places[i + 1]);
+
+  /* Tooltip */
+  var tip = document.createElement('div');
+  tip.style.cssText = 'position:fixed;background:rgba(11,11,15,0.92);color:#fff;' +
+    'font-family:Inter,sans-serif;font-size:13px;padding:8px 14px;border-radius:8px;' +
+    'border:1px solid rgba(94,106,210,0.4);pointer-events:none;display:none;z-index:9999;white-space:nowrap;';
+  document.body.appendChild(tip);
+
+  var rc = new THREE.Raycaster(), mouse2 = new THREE.Vector2();
+  renderer.domElement.addEventListener('pointermove', function (e) {
+    if (isDragging) { tip.style.display = 'none'; return; }
+    var rect = renderer.domElement.getBoundingClientRect();
+    mouse2.set(((e.clientX - rect.left) / rect.width) * 2 - 1,
+              -((e.clientY - rect.top)  / rect.height) * 2 + 1);
+    rc.setFromCamera(mouse2, camera);
+    var hits = rc.intersectObjects(dotMeshes);
+    if (hits.length) {
+      var d = hits[0].object.userData;
+      tip.innerHTML = '<strong>' + d.city + '</strong><span style="color:rgba(255,255,255,0.45);margin-left:8px;font-size:11px">' + d.country + '</span>';
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top  = (e.clientY - 8)  + 'px';
+      renderer.domElement.style.cursor = 'pointer';
+    } else {
+      tip.style.display = 'none';
+      renderer.domElement.style.cursor = 'grab';
+    }
+  });
+  renderer.domElement.addEventListener('pointerleave', function () { tip.style.display = 'none'; });
+
+  /* Drag rotation — NO zoom, NO scroll capture */
+  var isDragging = false, lastPX = 0, lastPY = 0;
+  var rotX = 0.42, rotY = -0.48;   /* start showing Europe/India */
+  var velX = 0, velY = 0.0018;     /* gentle initial auto-rotation */
+
+  renderer.domElement.style.cursor = 'grab';
+
+  renderer.domElement.addEventListener('pointerdown', function (e) {
+    isDragging = true; lastPX = e.clientX; lastPY = e.clientY;
+    velX = 0; velY = 0;
+    renderer.domElement.style.cursor = 'grabbing';
+    renderer.domElement.setPointerCapture(e.pointerId);
+  });
+  renderer.domElement.addEventListener('pointermove', function (e) {
+    if (!isDragging) return;
+    velY = (e.clientX - lastPX) * 0.005;
+    velX = (e.clientY - lastPY) * 0.005;
+    rotY += velY; rotX = Math.max(-1.1, Math.min(1.1, rotX + velX));
+    lastPX = e.clientX; lastPY = e.clientY;
+  });
+  renderer.domElement.addEventListener('pointerup',    function () { isDragging = false; renderer.domElement.style.cursor = 'grab'; });
+  renderer.domElement.addEventListener('pointerleave', function () { isDragging = false; renderer.domElement.style.cursor = 'grab'; });
+
+  /* Resize */
+  window.addEventListener('resize', function () {
+    W = container.offsetWidth; H = container.offsetHeight || 540;
+    camera.aspect = W / H; camera.updateProjectionMatrix(); renderer.setSize(W, H);
+  });
+
+  /* Render loop */
+  function animate() {
+    requestAnimationFrame(animate);
+    if (!isDragging) {
+      velY += (0.0018 - velY) * 0.008;  /* ease toward auto-rotation speed */
+      velX *= 0.88;                      /* friction on vertical momentum */
+    }
+    rotY += velY; rotX = Math.max(-1.1, Math.min(1.1, rotX + velX));
+    globeGroup.rotation.set(rotX, rotY, 0);
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
 </script>
 
 </body>
