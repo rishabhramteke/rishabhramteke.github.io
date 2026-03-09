@@ -1,19 +1,13 @@
 # site settings
 title: Rishabh Ramteke
 subtitle: homepage
-email: rishabhramtekegsr@gmail.com
 description: You only live once, but if you do it right, once is enough - Mae West
-#People worry that computers will get too smart and take over the world, but the real problem is that they're too stupid and they've already taken over the world.
 url: https://rishabhramteke.github.io/
 baseurl: ''
 author:
 
-#street_address: Room 381, Hostel 3, IIT Bombay
-#city: Powai
-state: Tokyo
-#zip_code: 400076
-country: Japan #India
-phone: +81 7084648436
+city: Amsterdam
+country: Netherlands
 
 # homepage tiles
 tiles-source: posts # accepts "posts" or "pages"
