@@ -17,8 +17,8 @@
 #ls.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
 #ls-canvas {
-  width: min(700px, 92vw); height: auto;
-  display: block;
+  width: min(440px, 88vw); height: min(440px, 88vw);
+  display: block; border-radius: 50%;
 }
 .ls-info {
   display: flex; flex-direction: column; align-items: center; gap: 14px;
@@ -508,19 +508,71 @@
 {% include footer.html %}
 
 <!-- ══════════════════════ SCRIPTS ═══════════════════════════ -->
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/globe.gl@2.31.0/dist/globe.gl.min.js"></script>
 
 <script>
-/* ── LOADING SCREEN — flight map ────────────────────────────── */
+/* ── LOADING SCREEN — Three.js 3D Earth globe ───────────────── */
 (function () {
   var canvas = document.getElementById('ls-canvas');
-  var ctx    = canvas.getContext('2d');
-  var W = 700, H = 360;
-  canvas.width = W; canvas.height = H;
+  var size   = Math.min(440, Math.floor(window.innerWidth * 0.88));
+  canvas.width  = size;
+  canvas.height = size;
 
-  /* Cities in flight order */
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(size, size);
+  renderer.setClearColor(0x000000, 0);
+
+  var scene  = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0, 2.8);
+
+  /* Earth group — everything rotates together */
+  var earthGroup = new THREE.Group();
+  scene.add(earthGroup);
+
+  /* Earth sphere */
+  var R       = 1;
+  var earthGeo = new THREE.SphereGeometry(R, 64, 64);
+  var earthMat = new THREE.MeshPhongMaterial({ shininess: 5, specular: new THREE.Color(0x111111) });
+  var earthMesh = new THREE.Mesh(earthGeo, earthMat);
+  earthGroup.add(earthMesh);
+
+  /* Atmosphere glow */
+  var atmGeo = new THREE.SphereGeometry(R * 1.14, 64, 64);
+  var atmMat = new THREE.MeshLambertMaterial({
+    color: new THREE.Color(0x5E6AD2), side: THREE.BackSide,
+    transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  earthGroup.add(new THREE.Mesh(atmGeo, atmMat));
+
+  /* Lights */
+  scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+  var sun = new THREE.DirectionalLight(0xffffff, 1.2);
+  sun.position.set(5, 3, 5);
+  scene.add(sun);
+
+  /* Load Earth night texture */
+  var loader = new THREE.TextureLoader();
+  loader.crossOrigin = 'anonymous';
+  loader.load('https://unpkg.com/three-globe/example/img/earth-night.jpg',
+    function (tex) { earthMat.map = tex; earthMat.needsUpdate = true; });
+
+  /* Lat/lng → 3D position */
+  function ll2v(lat, lng, r) {
+    var phi   = (90 - lat)  * Math.PI / 180;
+    var theta = (lng + 180) * Math.PI / 180;
+    return new THREE.Vector3(
+      -r * Math.sin(phi) * Math.cos(theta),
+       r * Math.cos(phi),
+       r * Math.sin(phi) * Math.sin(theta)
+    );
+  }
+
+  /* Flight cities */
   var cities = [
     { name: 'Mumbai',    lat:  19.076, lng:  72.877 },
     { name: 'Melbourne', lat: -37.814, lng: 144.946 },
@@ -529,166 +581,116 @@
     { name: 'Amsterdam', lat:  52.377, lng:   4.897 },
   ];
 
-  /* Equirectangular projection */
-  function toXY(lat, lng) {
-    return { x: (lng + 180) / 360 * W, y: (90 - lat) / 180 * H };
-  }
-  var pts = cities.map(function (c) {
-    var xy = toXY(c.lat, c.lng);
-    return { name: c.name, x: xy.x, y: xy.y };
+  /* City dots */
+  var dotGeo  = new THREE.SphereGeometry(0.018, 10, 10);
+  var dotMats = cities.map(function () {
+    return new THREE.MeshBasicMaterial({ color: 0x5E6AD2, transparent: true, opacity: 0.3 });
+  });
+  cities.forEach(function (c, i) {
+    var m = new THREE.Mesh(dotGeo, dotMats[i]);
+    m.position.copy(ll2v(c.lat, c.lng, R + 0.005));
+    earthGroup.add(m);
   });
 
-  /* Bezier control point — always curves northward (upward) */
-  function ctrlPt(p0, p1) {
-    var mx = (p0.x + p1.x) / 2;
-    var my = (p0.y + p1.y) / 2;
-    var dist = Math.hypot(p1.x - p0.x, p1.y - p0.y);
-    return { x: mx, y: my - dist * 0.28 };
+  /* Great circle arc points */
+  var ARC_SEGS = 80;
+  function arcPts(c0, c1) {
+    var v0 = ll2v(c0.lat, c0.lng, 1).normalize();
+    var v1 = ll2v(c1.lat, c1.lng, 1).normalize();
+    var pts = [];
+    for (var i = 0; i <= ARC_SEGS; i++) {
+      var t = i / ARC_SEGS;
+      var v = v0.clone().lerp(v1, t).normalize();
+      pts.push(v.multiplyScalar(R + 0.005 + 0.20 * Math.sin(Math.PI * t)));
+    }
+    return pts;
   }
 
-  /* Point on quadratic bezier at t */
-  function bezPt(p0, cp, p1, t) {
-    var u = 1 - t;
-    return { x: u*u*p0.x + 2*u*t*cp.x + t*t*p1.x,
-             y: u*u*p0.y + 2*u*t*cp.y + t*t*p1.y };
+  /* Build one BufferGeometry line per segment */
+  var allArcPts = [];
+  var arcGeoms  = [];
+  for (var i = 0; i < cities.length - 1; i++) {
+    var pts = arcPts(cities[i], cities[i + 1]);
+    allArcPts.push(pts);
+    var pos = new Float32Array((ARC_SEGS + 1) * 3);
+    for (var j = 0; j <= ARC_SEGS; j++) {
+      pos[j * 3] = pts[j].x; pos[j * 3 + 1] = pts[j].y; pos[j * 3 + 2] = pts[j].z;
+    }
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setDrawRange(0, 0);
+    earthGroup.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x7B8FE8, transparent: true, opacity: 0.75 })));
+    arcGeoms.push(geo);
   }
 
-  /* Tangent angle at t */
-  function bezAngle(p0, cp, p1, t) {
-    var u = 1 - t;
-    return Math.atan2(2*u*(cp.y-p0.y) + 2*t*(p1.y-cp.y),
-                      2*u*(cp.x-p0.x) + 2*t*(p1.x-cp.x));
-  }
+  /* Plane marker */
+  var planeMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.026, 10, 10),
+    new THREE.MeshBasicMaterial({ color: 0xffffff })
+  );
+  var haloMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.060, 10, 10),
+    new THREE.MeshBasicMaterial({ color: 0x5E6AD2, transparent: true, opacity: 0.28, side: THREE.BackSide })
+  );
+  planeMesh.add(haloMesh);
+  earthGroup.add(planeMesh);
 
-  /* Precompute control points */
-  var cps = [];
-  for (var i = 0; i < pts.length - 1; i++) cps.push(ctrlPt(pts[i], pts[i+1]));
-
-  /* ── Draw frame at given progress (0-100) ── */
-  function draw(prog) {
-    ctx.clearRect(0, 0, W, H);
-
-    /* Background */
-    ctx.fillStyle = '#0B0B0F';
-    ctx.fillRect(0, 0, W, H);
-
-    /* Grid (lat/lng lines every 30°) */
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 0.5;
-    ctx.setLineDash([]);
-    for (var lng = -180; lng <= 180; lng += 30) {
-      var gx = (lng + 180) / 360 * W;
-      ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
-    }
-    for (var lat = -90; lat <= 90; lat += 30) {
-      var gy = (90 - lat) / 180 * H;
-      ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
-    }
-
-    /* Arcs */
-    for (var i = 0; i < cps.length; i++) {
-      var segPct   = i * 25;           /* 0, 25, 50, 75        */
-      var p0 = pts[i], p1 = pts[i+1], cp = cps[i];
-      var isPast    = prog >= (i+1) * 25;
-      var isCurrent = prog >= segPct && prog < (i+1) * 25;
-      var t         = isCurrent ? (prog - segPct) / 25 : 1;
-
-      /* Full arc — dim / dashed for future */
-      ctx.beginPath();
-      ctx.moveTo(p0.x, p0.y);
-      ctx.quadraticCurveTo(cp.x, cp.y, p1.x, p1.y);
-      ctx.strokeStyle = 'rgba(255,255,255,0.07)';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 6]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      /* Completed portion — bright solid */
-      if (isPast || isCurrent) {
-        ctx.beginPath();
-        var steps = 60;
-        var maxT  = isPast ? 1 : t;
-        var first = bezPt(p0, cp, p1, 0);
-        ctx.moveTo(first.x, first.y);
-        for (var s = 1; s <= Math.ceil(steps * maxT); s++) {
-          var sp = bezPt(p0, cp, p1, Math.min(s / steps, maxT));
-          ctx.lineTo(sp.x, sp.y);
-        }
-        ctx.strokeStyle = isPast ? 'rgba(94,106,210,0.7)' : 'rgba(94,106,210,0.55)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      }
-    }
-
-    /* City dots + labels */
-    for (var i = 0; i < pts.length; i++) {
-      var pt      = pts[i];
+  /* Update scene state for 0–100 progress */
+  function updateProgress(prog) {
+    cities.forEach(function (_, i) {
       var reached = prog >= i * 25;
-      var isCur   = Math.floor(prog / 25) === i && prog < 100;
-
-      if (reached) {
-        /* Glow halo */
-        var grd = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, 14);
-        grd.addColorStop(0, isCur ? 'rgba(94,106,210,0.35)' : 'rgba(94,106,210,0.18)');
-        grd.addColorStop(1, 'rgba(94,106,210,0)');
-        ctx.fillStyle = grd;
-        ctx.beginPath(); ctx.arc(pt.x, pt.y, 14, 0, Math.PI*2); ctx.fill();
+      dotMats[i].color.set(reached ? 0xffffff : 0x5E6AD2);
+      dotMats[i].opacity = reached ? 1 : 0.3;
+    });
+    for (var i = 0; i < arcGeoms.length; i++) {
+      var s = i * 25, e = (i + 1) * 25;
+      if (prog <= s) {
+        arcGeoms[i].setDrawRange(0, 0);
+      } else if (prog >= e) {
+        arcGeoms[i].setDrawRange(0, ARC_SEGS + 1);
+      } else {
+        arcGeoms[i].setDrawRange(0, Math.ceil(((prog - s) / 25) * ARC_SEGS) + 1);
       }
-
-      /* Dot */
-      ctx.beginPath();
-      ctx.arc(pt.x, pt.y, reached ? 4 : 2.5, 0, Math.PI*2);
-      ctx.fillStyle = reached ? (isCur ? '#fff' : '#7B8FE8') : 'rgba(255,255,255,0.18)';
-      ctx.fill();
-
-      /* Label */
-      ctx.font = (reached ? '500' : '300') + ' 11px Inter, sans-serif';
-      ctx.fillStyle = reached ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.22)';
-      ctx.fillText(pt.name, pt.x + 8, pt.y - 6);
     }
-
-    /* Plane ✈ */
     if (prog < 100) {
-      var segIdx  = Math.min(Math.floor(prog / 25), cps.length - 1);
-      var segT    = Math.max((prog - segIdx * 25) / 25, 0.01);
-      var p0 = pts[segIdx], p1 = pts[segIdx+1], cp = cps[segIdx];
-      var pos     = bezPt(p0, cp, p1, segT);
-      var angle   = bezAngle(p0, cp, p1, segT);
-
-      /* Glow behind plane */
-      var pg = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, 12);
-      pg.addColorStop(0, 'rgba(94,106,210,0.5)');
-      pg.addColorStop(1, 'rgba(94,106,210,0)');
-      ctx.fillStyle = pg;
-      ctx.beginPath(); ctx.arc(pos.x, pos.y, 12, 0, Math.PI*2); ctx.fill();
-
-      ctx.save();
-      ctx.translate(pos.x, pos.y);
-      ctx.rotate(angle);
-      ctx.font = '15px sans-serif';
-      ctx.fillText('✈', -8, 5);
-      ctx.restore();
+      var si   = Math.min(Math.floor(prog / 25), cities.length - 2);
+      var ptI  = Math.round(Math.max((prog - si * 25) / 25, 0) * ARC_SEGS);
+      planeMesh.position.copy(allArcPts[si][Math.min(ptI, ARC_SEGS)]);
+      planeMesh.visible = true;
+    } else {
+      planeMesh.visible = false;
     }
   }
 
-  /* ── Counter + animation ── */
-  var num   = document.getElementById('ls-num');
-  var bar   = document.getElementById('ls-bar');
-  var ls    = document.getElementById('ls');
-  var count = 0;
-  draw(0);
+  /* Render loop */
+  var rafId;
+  function animate() {
+    rafId = requestAnimationFrame(animate);
+    earthGroup.rotation.y += 0.0015;
+    renderer.render(scene, camera);
+  }
+  animate();
+  updateProgress(0);
 
+  /* Counter */
+  var numEl = document.getElementById('ls-num');
+  var barEl = document.getElementById('ls-bar');
+  var lsEl  = document.getElementById('ls');
+  var count = 0;
   var iv = setInterval(function () {
-    count = Math.min(count + Math.floor(Math.random() * 4) + 2, 100);
-    num.textContent = count;
-    bar.style.width = count + '%';
-    draw(count);
+    count = Math.min(count + Math.floor(Math.random() * 3) + 2, 100);
+    numEl.textContent = count;
+    barEl.style.width = count + '%';
+    updateProgress(count);
     if (count >= 100) {
       clearInterval(iv);
-      /* Linger for a moment so Amsterdam lights up clearly */
       setTimeout(function () {
-        ls.classList.add('hidden');
-        setTimeout(function () { ls.remove(); }, 900);
+        lsEl.classList.add('hidden');
+        setTimeout(function () {
+          cancelAnimationFrame(rafId);
+          renderer.dispose();
+          lsEl.remove();
+        }, 900);
       }, 700);
     }
   }, 55);
