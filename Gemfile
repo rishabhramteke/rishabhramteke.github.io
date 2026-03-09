@@ -1,12 +1,12 @@
 source 'https://rubygems.org'
 
-gem 'jekyll', '3.8.4'
+gem 'github-pages', group: :jekyll_plugins
 
 group :jekyll_plugins do
-  gem 'jekyll-feed', '0.11.0'
-  gem 'jekyll-paginate', '1.1.0'
-  gem 'jekyll-seo-tag', '2.5.0'
-  gem 'jekyll-sitemap', '1.2.0'
-  gem "jekyll-remote-theme"
+  gem 'jekyll-feed'
+  gem 'jekyll-paginate'
+  gem 'jekyll-seo-tag'
+  gem 'jekyll-sitemap'
+  gem 'jekyll-remote-theme'
   gem 'jekyll-redirect-from'
 end
