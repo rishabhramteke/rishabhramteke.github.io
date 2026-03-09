@@ -123,35 +123,38 @@
   border-radius: 14px; overflow: hidden;
   border: 1px solid rgba(255,255,255,0.08); background: #0e0e14;
 }
+/* Relative wrapper so absolutely-positioned panels have a reliable containing block */
+.feat-panels-wrap {
+  position: relative; width: 100%; height: 100%;
+}
 .feat-panel {
-  position: absolute; inset: 0; opacity: 0;
-  transition: opacity 0.45s ease;
-  display: flex; align-items: center; justify-content: center;
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0;
+  transition: opacity 0.45s ease; overflow: hidden;
 }
 .feat-panel.active { opacity: 1; }
 
 /* ── Panel image + fluid drift ── */
 .fp-img {
-  position: absolute; inset: 0;
-  background-size: cover; background-position: center;
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
   transform: scale(1.12);
   animation: fp-drift 16s ease-in-out infinite alternate;
   will-change: transform;
 }
 @keyframes fp-drift {
   0%   { transform: scale(1.12) translate(0px,    0px);  }
-  20%  { transform: scale(1.14) translate(-9px,   5px);  }
-  40%  { transform: scale(1.13) translate(7px,   -8px);  }
-  60%  { transform: scale(1.15) translate(-5px,   10px); }
-  80%  { transform: scale(1.13) translate(10px,  -4px);  }
-  100% { transform: scale(1.12) translate(-7px,   6px);  }
+  20%  { transform: scale(1.14) translate(-10px,  6px);  }
+  40%  { transform: scale(1.13) translate(8px,   -9px);  }
+  60%  { transform: scale(1.15) translate(-6px,   11px); }
+  80%  { transform: scale(1.13) translate(11px,  -5px);  }
+  100% { transform: scale(1.12) translate(-8px,   7px);  }
 }
 .fp-img-overlay {
-  position: absolute; inset: 0; z-index: 1;
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;
   background: linear-gradient(to top,
-    rgba(11,11,15,0.82) 0%,
-    rgba(11,11,15,0.38) 55%,
-    rgba(11,11,15,0.15) 100%);
+    rgba(11,11,15,0.65) 0%,
+    rgba(11,11,15,0.18) 45%,
+    rgba(11,11,15,0.0)  100%);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -277,37 +280,39 @@
 
       <!-- Right: animated panels -->
       <div class="feat-visuals js-reveal">
+        <div class="feat-panels-wrap">
 
-        <!-- Panel 0: About Me -->
-        <div class="feat-panel active" data-panel="0">
-          <div class="fp-img" style="background-image:url('/assets/images/profile.jpg');animation-delay:0s"></div>
-          <div class="fp-img-overlay"></div>
+          <!-- Panel 0: About Me -->
+          <div class="feat-panel active" data-panel="0">
+            <img class="fp-img" src="/assets/images/profile.jpg" alt="About Me" style="animation-delay:0s">
+            <div class="fp-img-overlay"></div>
+          </div>
+
+          <!-- Panel 1: Blog -->
+          <div class="feat-panel" data-panel="1">
+            <img class="fp-img" src="/assets/images/blog.jpg" alt="My Blog" style="animation-delay:-4s">
+            <div class="fp-img-overlay"></div>
+          </div>
+
+          <!-- Panel 2: Projects -->
+          <div class="feat-panel" data-panel="2">
+            <img class="fp-img" src="/assets/images/Project1.jpg" alt="My Projects" style="animation-delay:-8s">
+            <div class="fp-img-overlay"></div>
+          </div>
+
+          <!-- Panel 3: Resume -->
+          <div class="feat-panel" data-panel="3">
+            <img class="fp-img" src="/assets/images/resume.jpg" alt="My Resume" style="animation-delay:-12s">
+            <div class="fp-img-overlay"></div>
+          </div>
+
+          <!-- Panel 4: Publications -->
+          <div class="feat-panel" data-panel="4">
+            <img class="fp-img" src="/assets/images/project.jpg" alt="My Publications" style="animation-delay:-16s">
+            <div class="fp-img-overlay"></div>
+          </div>
+
         </div>
-
-        <!-- Panel 1: Blog -->
-        <div class="feat-panel" data-panel="1">
-          <div class="fp-img" style="background-image:url('/assets/images/blog.jpg');animation-delay:-4s"></div>
-          <div class="fp-img-overlay"></div>
-        </div>
-
-        <!-- Panel 2: Projects -->
-        <div class="feat-panel" data-panel="2">
-          <div class="fp-img" style="background-image:url('/assets/images/Project1.jpg');animation-delay:-8s"></div>
-          <div class="fp-img-overlay"></div>
-        </div>
-
-        <!-- Panel 3: Resume -->
-        <div class="feat-panel" data-panel="3">
-          <div class="fp-img" style="background-image:url('/assets/images/resume.jpg');animation-delay:-12s"></div>
-          <div class="fp-img-overlay"></div>
-        </div>
-
-        <!-- Panel 4: Publications -->
-        <div class="feat-panel" data-panel="4">
-          <div class="fp-img" style="background-image:url('/assets/images/project.jpg');animation-delay:-16s"></div>
-          <div class="fp-img-overlay"></div>
-        </div>
-
       </div>
     </div>
   </div>
@@ -359,6 +364,10 @@
 
   /* Earth group — everything rotates together */
   var earthGroup = new THREE.Group();
+  /* Orient globe so India/South-Asia faces the camera at start
+     theta = (lng+180)*PI/180 for Mumbai (lng≈73) ≈ 4.41 rad
+     initial rotation.y = theta - PI/2 ≈ 2.84 */
+  earthGroup.rotation.y = 2.84;
   scene.add(earthGroup);
 
   /* Earth sphere */
