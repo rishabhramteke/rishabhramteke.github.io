@@ -109,12 +109,12 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
   }
 
   var places = [
-    { city: 'Mumbai',    country: 'India',       lat:  19.076, lng:  72.877 },
-    { city: 'Pune',      country: 'India',       lat:  18.520, lng:  73.856 },
-    { city: 'Amsterdam', country: 'Netherlands', lat:  52.377, lng:   4.897 },
-    { city: 'Vienna',    country: 'Austria',     lat:  48.208, lng:  16.373 },
-    { city: 'Paris',     country: 'France',      lat:  48.856, lng:   2.352 },
-    { city: 'Berlin',    country: 'Germany',     lat:  52.520, lng:  13.405 },
+    { city: 'Mumbai',    flag: '🇮🇳', lat:  19.076, lng:  72.877 },
+    { city: 'Pune',      flag: '🇮🇳', lat:  18.520, lng:  73.856 },
+    { city: 'Amsterdam', flag: '🇳🇱', lat:  52.377, lng:   4.897 },
+    { city: 'Vienna',    flag: '🇦🇹', lat:  48.208, lng:  16.373 },
+    { city: 'Paris',     flag: '🇫🇷', lat:  48.856, lng:   2.352 },
+    { city: 'Berlin',    flag: '🇩🇪', lat:  52.520, lng:  13.405 },
   ];
 
   var dotMeshes = [];
@@ -166,7 +166,7 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
     if (hits.length) {
       var d = hits[0].object.userData;
       tip.innerHTML = '<strong>' + d.city + '</strong>' +
-        '<span style="color:rgba(255,255,255,0.45);margin-left:8px;font-size:11px">' + d.country + '</span>';
+        '<span style="margin-left:8px;font-size:15px">' + d.flag + '</span>';
       tip.style.display = 'block';
       tip.style.left = (e.clientX + 14) + 'px';
       tip.style.top  = (e.clientY - 8)  + 'px';
