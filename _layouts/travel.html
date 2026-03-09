@@ -193,8 +193,8 @@ body { margin: 0; background: #0B0B0F; overflow: hidden; }
   });
   renderer.domElement.addEventListener('pointermove', function (e) {
     if (!isDragging) return;
-    velY = (e.clientX - lastPX) * 0.005;
-    velX = (e.clientY - lastPY) * 0.005;
+    velY = (e.clientX - lastPX) * 0.012;
+    velX = (e.clientY - lastPY) * 0.012;
     rotY += velY; rotX = Math.max(-1.1, Math.min(1.1, rotX + velX));
     lastPX = e.clientX; lastPY = e.clientY;
   });
