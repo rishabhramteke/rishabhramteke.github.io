@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+{% include head.html %}
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; overflow: hidden; font-family: 'Inter', -apple-system, sans-serif; }
+
+/* ── STORY VIEWER ── */
+#sv {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #000;
+}
+
+/* Side dimmed areas on wide screens */
+#sv-bg-l, #sv-bg-r {
+  position: absolute; top: 0; bottom: 0; width: calc((100% - min(100vw, 520px)) / 2);
+  background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10;
+}
+#sv-bg-l { left: 0; }
+#sv-bg-r { right: 0; }
+#sv-bg-l button, #sv-bg-r button {
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; border-radius: 50%; width: 44px; height: 44px;
+  font-size: 18px; cursor: pointer; transition: background 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+#sv-bg-l button:hover, #sv-bg-r button:hover { background: rgba(255,255,255,0.25); }
+
+/* Story card */
+#sv-card {
+  position: relative;
+  width: min(100vw, 520px);
+  height: 100vh;
+  overflow: hidden;
+  background: #111;
+}
+
+/* Slides */
+.sv-slide {
+  position: absolute; inset: 0;
+  opacity: 0; transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.sv-slide.active { opacity: 1; pointer-events: auto; }
+
+.sv-slide img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+
+/* Gradient overlays */
+.sv-slide::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 180px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%);
+  z-index: 2; pointer-events: none;
+}
+.sv-slide::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 220px;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+  z-index: 2; pointer-events: none;
+}
+
+/* Caption */
+.sv-caption {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 3; padding: 28px 24px 36px;
+  color: #fff;
+}
+.sv-caption-title {
+  font-size: 17px; font-weight: 600; margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+.sv-caption-text {
+  font-size: 13px; color: rgba(255,255,255,0.72);
+  line-height: 1.6;
+}
+
+/* ── TOP BAR ── */
+#sv-top {
+  position: absolute; top: 0; left: 0; right: 0;
+  z-index: 10; padding: 14px 12px 0;
+}
+
+/* Progress bars */
+#sv-bars {
+  display: flex; gap: 4px; margin-bottom: 14px;
+}
+.sv-bar {
+  flex: 1; height: 2.5px; border-radius: 2px;
+  background: rgba(255,255,255,0.3); overflow: hidden;
+}
+.sv-bar-fill {
+  height: 100%; width: 0%; background: #fff;
+  border-radius: 2px;
+}
+.sv-bar.done .sv-bar-fill { width: 100%; }
+.sv-bar.active .sv-bar-fill {
+  animation: bar-progress var(--dur, 5s) linear forwards;
+}
+@keyframes bar-progress { from { width: 0% } to { width: 100% } }
+
+/* Header row */
+#sv-header {
+  display: flex; align-items: center; gap: 12px;
+}
+#sv-back {
+  background: none; border: none; color: #fff;
+  font-size: 20px; cursor: pointer; opacity: 0.85;
+  padding: 4px; line-height: 1; flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+#sv-back:hover { opacity: 1; }
+#sv-city {
+  display: flex; align-items: center; gap: 8px;
+}
+#sv-city-flag { font-size: 22px; }
+#sv-city-name {
+  font-size: 15px; font-weight: 600; color: #fff;
+  letter-spacing: -0.01em;
+}
+#sv-counter {
+  margin-left: auto;
+  font-size: 12px; color: rgba(255,255,255,0.55);
+}
+
+/* ── TAP ZONES ── */
+#sv-tap-l, #sv-tap-r {
+  position: absolute; top: 0; bottom: 0; width: 35%;
+  z-index: 5; cursor: pointer;
+}
+#sv-tap-l { left: 0; }
+#sv-tap-r { right: 0; }
+
+/* ── PAUSE INDICATOR ── */
+#sv-pause-dot {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 22px; z-index: 8;
+  opacity: 0; transition: opacity 0.2s; pointer-events: none;
+}
+#sv-card.paused #sv-pause-dot { opacity: 1; }
+
+@media (max-width: 520px) {
+  #sv-bg-l, #sv-bg-r { display: none; }
+}
+</style>
+
+<body>
+
+<div id="sv">
+  <!-- side nav buttons (wide screens) -->
+  <div id="sv-bg-l"><button id="btn-prev" aria-label="Previous">&#8592;</button></div>
+  <div id="sv-bg-r"><button id="btn-next" aria-label="Next">&#8594;</button></div>
+
+  <div id="sv-card">
+
+    <!-- top: progress bars + header -->
+    <div id="sv-top">
+      <div id="sv-bars"></div>
+      <div id="sv-header">
+        <button id="sv-back" aria-label="Back" onclick="history.back()">&#8592;</button>
+        <div id="sv-city">
+          <span id="sv-city-flag">{{ page.flag }}</span>
+          <span id="sv-city-name">{{ page.city }}</span>
+        </div>
+        <span id="sv-counter"></span>
+      </div>
+    </div>
+
+    <!-- slides injected by JS -->
+    <div id="sv-slides"></div>
+
+    <!-- pause indicator -->
+    <div id="sv-pause-dot">&#9646;&#9646;</div>
+
+    <!-- tap zones -->
+    <div id="sv-tap-l"></div>
+    <div id="sv-tap-r"></div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  var stories = {{ page.stories | jsonify }};
+  var AUTO_MS  = 5000;
+  var current  = 0;
+  var paused   = false;
+  var timer    = null;
+  var card     = document.getElementById('sv-card');
+  var barsEl   = document.getElementById('sv-bars');
+  var slidesEl = document.getElementById('sv-slides');
+  var counter  = document.getElementById('sv-counter');
+
+  /* Build DOM */
+  stories.forEach(function (s, i) {
+    /* bar */
+    var bar = document.createElement('div');
+    bar.className = 'sv-bar';
+    bar.innerHTML = '<div class="sv-bar-fill"></div>';
+    barsEl.appendChild(bar);
+
+    /* slide */
+    var slide = document.createElement('div');
+    slide.className = 'sv-slide';
+    slide.innerHTML =
+      '<img src="' + s.image + '" alt="' + (s.title || '') + '" loading="' + (i === 0 ? 'eager' : 'lazy') + '">' +
+      '<div class="sv-caption">' +
+        (s.title ? '<div class="sv-caption-title">' + s.title + '</div>' : '') +
+        (s.caption ? '<div class="sv-caption-text">' + s.caption + '</div>' : '') +
+      '</div>';
+    slidesEl.appendChild(slide);
+  });
+
+  var bars   = document.querySelectorAll('.sv-bar');
+  var slides = document.querySelectorAll('.sv-slide');
+
+  function goTo(idx) {
+    if (idx < 0) idx = 0;
+    if (idx >= stories.length) { window.history.back(); return; }
+
+    /* reset previous */
+    slides[current].classList.remove('active');
+    bars[current].classList.remove('active', 'done');
+    bars[current].querySelector('.sv-bar-fill').style.animation = 'none';
+
+    current = idx;
+
+    /* mark done bars */
+    bars.forEach(function (b, i) {
+      b.classList.remove('active', 'done');
+      b.querySelector('.sv-bar-fill').style.animation = 'none';
+      if (i < current) b.classList.add('done');
+    });
+
+    slides[current].classList.add('active');
+    counter.textContent = (current + 1) + ' / ' + stories.length;
+
+    if (!paused) startBar();
+  }
+
+  function startBar() {
+    clearTimeout(timer);
+    var fill = bars[current].querySelector('.sv-bar-fill');
+    fill.style.animation = 'none';
+    /* force reflow */
+    void fill.offsetWidth;
+    bars[current].classList.add('active');
+    fill.style.setProperty('--dur', AUTO_MS + 'ms');
+    fill.style.animation = 'bar-progress ' + AUTO_MS + 'ms linear forwards';
+    timer = setTimeout(function () { goTo(current + 1); }, AUTO_MS);
+  }
+
+  function pause() {
+    if (paused) return;
+    paused = true;
+    clearTimeout(timer);
+    card.classList.add('paused');
+    /* freeze the bar fill at current width */
+    var fill = bars[current].querySelector('.sv-bar-fill');
+    var w = fill.getBoundingClientRect().width / bars[current].getBoundingClientRect().width * 100;
+    fill.style.animation = 'none';
+    fill.style.width = w + '%';
+  }
+
+  function resume() {
+    if (!paused) return;
+    paused = false;
+    card.classList.remove('paused');
+    /* restart bar from current position (recalculate remaining time) */
+    var fill = bars[current].querySelector('.sv-bar-fill');
+    var w = parseFloat(fill.style.width) || 0;
+    var remaining = AUTO_MS * (1 - w / 100);
+    fill.style.setProperty('--dur', remaining + 'ms');
+    fill.style.animation = 'bar-progress ' + remaining + 'ms linear forwards';
+    timer = setTimeout(function () { goTo(current + 1); }, remaining);
+  }
+
+  /* Tap zones */
+  document.getElementById('sv-tap-l').addEventListener('click', function () { goTo(current - 1); });
+  document.getElementById('sv-tap-r').addEventListener('click', function () { goTo(current + 1); });
+  document.getElementById('btn-prev').addEventListener('click', function () { goTo(current - 1); });
+  document.getElementById('btn-next').addEventListener('click', function () { goTo(current + 1); });
+
+  /* Hold to pause */
+  card.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('#sv-tap-l, #sv-tap-r')) pause();
+  });
+  card.addEventListener('pointerup',   resume);
+  card.addEventListener('pointerleave', resume);
+
+  /* Keyboard */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') goTo(current + 1);
+    if (e.key === 'ArrowLeft')  goTo(current - 1);
+    if (e.key === 'Escape')     history.back();
+  });
+
+  /* Touch swipe */
+  var touchX = null;
+  card.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+  card.addEventListener('touchend', function (e) {
+    if (touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) { dx < 0 ? goTo(current + 1) : goTo(current - 1); }
+    touchX = null;
+  }, { passive: true });
+
+  /* Start */
+  goTo(0);
+})();
+</script>
+
+</body>
+</html>
