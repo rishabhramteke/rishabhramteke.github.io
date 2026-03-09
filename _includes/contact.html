@@ -5,7 +5,7 @@
 			<header class="major">
 				<h1>Contact Me</h1>
 			</header>
-			<form action="https://formspree.io/{{ site.email }}" method="POST">
+			<form action="https://formspree.io/rishabhramtekegsr@gmail.com" method="POST">
 				<div class="field half first">
 					<label for="name">Your Name</label>
 					<input type="text" name="name" id="name" />
@@ -27,43 +27,9 @@
 		<section class="split">
 			<section>
 				<div class="contact-method">
-					<a href="mailto:{{ site.email }}">
-					<span class="icon alt fa-envelope"></span>
-					<h3>Email</h3>
-					{{ site.email }}
-					</a>
-				</div>
-			</section>
-			<section>
-				<div class="contact-method">
-					<span class="icon alt fa-phone"></span>
-					<h3>Phone</h3>
-					<span>{{ site.phone }}</span>
-				</div>
-			</section>
-			<section>
-				<div class="contact-method">
-					<a href="https://goo.gl/maps/A4arqFJsi1JdzCgr8">
 					<span class="icon alt fa-home"></span>
-					<h3>Address</h3>
-					<span>
-					{% if site.street_address %}
-					    {{ site.street_address }}<br />
-					{% endif %}
-					{% if site.city %}
-					    {{ site.city }},
-					{% endif %}
-					{% if site.state %}
-					    {{ site.state }}
-					{% endif %}
-					{% if site.zip_code %}
-					    {{ site.zip_code }}<br />
-					{% endif %}
-					{% if site.country %}
-					    {{ site.country }}
-					{% endif %}
-					</span>
-					</a>
+					<h3>Location</h3>
+					<span>Amsterdam, Netherlands</span>
 				</div>
 			</section>
 		</section>
