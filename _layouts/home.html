@@ -175,20 +175,6 @@
 }
 #fluid-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-/* ─────────────────────────────────────────────────────────────
-   WORLD GLOBE SECTION
-───────────────────────────────────────────────────────────── */
-#travel-section {
-  background: #0B0B0F;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  padding: 90px 0 0;
-}
-.travel-header { max-width: 1100px; margin: 0 auto; padding: 0 60px; }
-.travel-sub {
-  font-size: 13px; color: rgba(255,255,255,0.3);
-  margin-top: 12px; font-family: 'Inter', sans-serif;
-}
-#globe-container { width: 100%; height: 540px; overflow: hidden; display: block; }
 
 /* ─────────────────────────────────────────────────────────────
    SCROLL REVEAL
@@ -288,7 +274,7 @@
           <span class="feat-tab-num">06</span>
           <h3 class="feat-tab-title">Travel Blogs</h3>
           <p class="feat-tab-desc">Cities I've lived in, places I've wandered through — stories from the road.</p>
-          <a href="/blog" class="feat-tab-link">Read travel posts →</a>
+          <a href="/travel" class="feat-tab-link">Explore the map →</a>
         </div>
 
       </div>
@@ -343,15 +329,6 @@
   <canvas id="fluid-canvas"></canvas>
 </div>
 
-<!-- ══════════════════════ WORLD GLOBE ══════════════════════ -->
-<section id="travel-section">
-  <div class="travel-header js-reveal">
-    <span class="sect-eyebrow">Places I've Been</span>
-    <h2 class="sect-title">The world,<br>one city at a time.</h2>
-    <p class="travel-sub">Drag to rotate &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Hover for city details</p>
-  </div>
-  <div id="globe-container"></div>
-</section>
 
 {% include contact.html %}
 <div class="social">
@@ -635,7 +612,7 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
   });
 });
 
-/* ── WORLD GLOBE (Three.js, drag-only, cartoonish Blue Marble) ── */
+/* ── WORLD GLOBE — moved to /travel page ── */
 (function () {
   var container = document.getElementById('globe-container');
   if (!container || typeof THREE === 'undefined') return;
@@ -831,7 +808,6 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
     camera.position.z = 2.8;
 
     var group  = new THREE.Group();
-    group.rotation.x = 0.42;
     scene.add(group);
 
     var R   = 1;
@@ -883,10 +859,32 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
       ));
     }
 
+    var miniRotX = 0.42, miniVelX = 0, miniVelY = 0.004, miniDragging = false, miniLPX = 0, miniLPY = 0;
+    var cv = renderer.domElement;
+    cv.style.cursor = 'grab';
+    cv.addEventListener('pointerdown', function(e) {
+      miniDragging = true; miniLPX = e.clientX; miniLPY = e.clientY;
+      miniVelX = 0; miniVelY = 0; cv.style.cursor = 'grabbing';
+      cv.setPointerCapture(e.pointerId);
+    });
+    cv.addEventListener('pointermove', function(e) {
+      if (!miniDragging) return;
+      miniVelY = (e.clientX - miniLPX) * 0.005;
+      miniVelX = (e.clientY - miniLPY) * 0.005;
+      miniRotY += miniVelY; miniRotX = Math.max(-1.1, Math.min(1.1, miniRotX + miniVelX));
+      miniLPX = e.clientX; miniLPY = e.clientY;
+    });
+    cv.addEventListener('pointerup',    function() { miniDragging = false; cv.style.cursor = 'grab'; });
+    cv.addEventListener('pointerleave', function() { miniDragging = false; cv.style.cursor = 'grab'; });
+
     function loop() {
       miniRaf = requestAnimationFrame(loop);
-      miniRotY += 0.004;
-      group.rotation.y = miniRotY;
+      if (!miniDragging) {
+        miniVelY += (0.004 - miniVelY) * 0.01;
+        miniVelX *= 0.88;
+      }
+      miniRotY += miniVelY; miniRotX = Math.max(-1.1, Math.min(1.1, miniRotX + miniVelX));
+      group.rotation.set(miniRotX, miniRotY, 0);
       renderer.render(scene, camera);
     }
     loop();

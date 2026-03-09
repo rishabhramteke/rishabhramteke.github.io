@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+{% include head.html %}
+
+<style>
+body { margin: 0; background: #0B0B0F; overflow: hidden; }
+
+#travel-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: 3.25em;
+  box-sizing: border-box;
+}
+
+.tp-header {
+  padding: 36px 60px 20px;
+  flex-shrink: 0;
+}
+.tp-eyebrow {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: #5E6AD2; margin-bottom: 12px;
+}
+.tp-title {
+  font-family: 'Inter', sans-serif !important;
+  font-size: clamp(26px, 3.5vw, 44px) !important;
+  font-weight: 700 !important; letter-spacing: -0.03em !important;
+  line-height: 1.1 !important; color: #fff !important;
+  margin: 0 0 8px !important; border: none !important;
+}
+.tp-title::after { display: none !important; }
+.tp-sub {
+  font-size: 12px; color: rgba(255,255,255,0.3);
+  font-family: 'Inter', sans-serif;
+}
+
+#globe-travel {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  cursor: grab;
+}
+#globe-travel:active { cursor: grabbing; }
+
+@media (max-width: 736px) {
+  .tp-header { padding: 24px 24px 14px; }
+}
+</style>
+
+<body>
+
+{% include header.html %}
+
+<div id="travel-page">
+  <div class="tp-header">
+    <span class="tp-eyebrow">Places I've Been</span>
+    <h1 class="tp-title">The world,<br>one city at a time.</h1>
+    <p class="tp-sub">Drag to rotate &nbsp;·&nbsp; Hover for city details</p>
+  </div>
+  <div id="globe-travel"></div>
+</div>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script>
+(function () {
+  var container = document.getElementById('globe-travel');
+  if (!container || typeof THREE === 'undefined') return;
+
+  var W = container.offsetWidth, H = container.offsetHeight || 500;
+
+  var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x000000, 0);
+  container.appendChild(renderer.domElement);
+
+  var scene  = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 100);
+  camera.position.z = 3.2;
+
+  var globeGroup = new THREE.Group();
+  scene.add(globeGroup);
+
+  var R       = 1;
+  var earthMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  globeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(R, 64, 64), earthMat));
+
+  new THREE.TextureLoader().load(
+    '//unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
+    function (t) { earthMat.map = t; earthMat.needsUpdate = true; }
+  );
+
+  scene.add(new THREE.AmbientLight(0xffffff, 1.8));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.5);
+  sun.position.set(5, 3, 5);
+  scene.add(sun);
+
+  function ll2v(lat, lng, r) {
+    var phi = (90 - lat) * Math.PI / 180, theta = (lng + 180) * Math.PI / 180;
+    return new THREE.Vector3(
+      -r * Math.sin(phi) * Math.cos(theta),
+       r * Math.cos(phi),
+       r * Math.sin(phi) * Math.sin(theta)
+    );
+  }
+
+  var places = [
+    { city: 'Mumbai',    country: 'India',       lat:  19.076, lng:  72.877 },
+    { city: 'Pune',      country: 'India',       lat:  18.520, lng:  73.856 },
+    { city: 'Amsterdam', country: 'Netherlands', lat:  52.377, lng:   4.897 },
+    { city: 'Vienna',    country: 'Austria',     lat:  48.208, lng:  16.373 },
+    { city: 'Paris',     country: 'France',      lat:  48.856, lng:   2.352 },
+    { city: 'Berlin',    country: 'Germany',     lat:  52.520, lng:  13.405 },
+  ];
+
+  var dotMeshes = [];
+  var dotGeo    = new THREE.SphereGeometry(0.022, 12, 12);
+  places.forEach(function (p) {
+    var pos = ll2v(p.lat, p.lng, R + 0.012);
+    var dot = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
+    dot.position.copy(pos); dot.userData = p;
+    globeGroup.add(dot); dotMeshes.push(dot);
+    var ring = new THREE.Mesh(
+      new THREE.RingGeometry(0.030, 0.046, 28),
+      new THREE.MeshBasicMaterial({ color: 0x7B8FE8, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+    );
+    ring.position.copy(pos); ring.lookAt(0, 0, 0);
+    globeGroup.add(ring);
+  });
+
+  var ARC_SEGS = 80;
+  function addArc(pa, pb) {
+    var v0 = ll2v(pa.lat, pa.lng, 1).normalize();
+    var v1 = ll2v(pb.lat, pb.lng, 1).normalize();
+    var pts = [];
+    for (var i = 0; i <= ARC_SEGS; i++) {
+      var t = i / ARC_SEGS;
+      pts.push(v0.clone().lerp(v1, t).normalize().multiplyScalar(R + 0.015 + 0.1 * Math.sin(Math.PI * t)));
+    }
+    globeGroup.add(new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(pts),
+      new THREE.LineBasicMaterial({ color: 0x7B8FE8, transparent: true, opacity: 0.55 })
+    ));
+  }
+  for (var i = 0; i < places.length - 1; i++) addArc(places[i], places[i + 1]);
+
+  /* Tooltip */
+  var tip = document.createElement('div');
+  tip.style.cssText = 'position:fixed;background:rgba(11,11,15,0.92);color:#fff;' +
+    'font-family:Inter,sans-serif;font-size:13px;padding:8px 14px;border-radius:8px;' +
+    'border:1px solid rgba(94,106,210,0.4);pointer-events:none;display:none;z-index:9999;white-space:nowrap;';
+  document.body.appendChild(tip);
+
+  var rc = new THREE.Raycaster(), mouse2 = new THREE.Vector2();
+  renderer.domElement.addEventListener('pointermove', function (e) {
+    if (isDragging) { tip.style.display = 'none'; return; }
+    var rect = renderer.domElement.getBoundingClientRect();
+    mouse2.set(((e.clientX - rect.left) / rect.width) * 2 - 1,
+              -((e.clientY - rect.top)  / rect.height) * 2 + 1);
+    rc.setFromCamera(mouse2, camera);
+    var hits = rc.intersectObjects(dotMeshes);
+    if (hits.length) {
+      var d = hits[0].object.userData;
+      tip.innerHTML = '<strong>' + d.city + '</strong>' +
+        '<span style="color:rgba(255,255,255,0.45);margin-left:8px;font-size:11px">' + d.country + '</span>';
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top  = (e.clientY - 8)  + 'px';
+      renderer.domElement.style.cursor = 'pointer';
+    } else {
+      tip.style.display = 'none';
+      renderer.domElement.style.cursor = isDragging ? 'grabbing' : 'grab';
+    }
+  });
+  renderer.domElement.addEventListener('pointerleave', function () { tip.style.display = 'none'; });
+
+  /* Drag rotation — no zoom, no scroll capture */
+  var isDragging = false, lastPX = 0, lastPY = 0;
+  var rotX = 0.42, rotY = -0.48;
+  var velX = 0, velY = 0.0018;
+
+  renderer.domElement.style.cursor = 'grab';
+
+  renderer.domElement.addEventListener('pointerdown', function (e) {
+    isDragging = true; lastPX = e.clientX; lastPY = e.clientY;
+    velX = 0; velY = 0;
+    renderer.domElement.style.cursor = 'grabbing';
+    renderer.domElement.setPointerCapture(e.pointerId);
+  });
+  renderer.domElement.addEventListener('pointermove', function (e) {
+    if (!isDragging) return;
+    velY = (e.clientX - lastPX) * 0.005;
+    velX = (e.clientY - lastPY) * 0.005;
+    rotY += velY; rotX = Math.max(-1.1, Math.min(1.1, rotX + velX));
+    lastPX = e.clientX; lastPY = e.clientY;
+  });
+  renderer.domElement.addEventListener('pointerup',    function () { isDragging = false; renderer.domElement.style.cursor = 'grab'; });
+  renderer.domElement.addEventListener('pointerleave', function () { isDragging = false; renderer.domElement.style.cursor = 'grab'; });
+
+  window.addEventListener('resize', function () {
+    W = container.offsetWidth; H = container.offsetHeight || 500;
+    camera.aspect = W / H; camera.updateProjectionMatrix(); renderer.setSize(W, H);
+  });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (!isDragging) {
+      velY += (0.0018 - velY) * 0.008;
+      velX *= 0.88;
+    }
+    rotY += velY; rotX = Math.max(-1.1, Math.min(1.1, rotX + velX));
+    globeGroup.rotation.set(rotX, rotY, 0);
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+</script>
+
+{% include scripts.html %}
+</body>
+</html>
