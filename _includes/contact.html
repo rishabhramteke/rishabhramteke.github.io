@@ -255,23 +255,17 @@
 
       <div class="ct-socials">
         <div class="ct-social-label">Find me on</div>
-        <div class="ct-social-links">
+        <ul class="icons" style="list-style:none;padding:0;margin:0;display:flex;gap:8px;flex-wrap:wrap;">
           {% if site.linkedin_url %}
-          <a href="{{ site.linkedin_url }}" class="ct-social-link" target="_blank" rel="noopener">
-            <span class="icon fa-linkedin"></span> LinkedIn
-          </a>
+          <li><a href="{{ site.linkedin_url }}" class="icon alt fa-linkedin" target="_blank" rel="noopener"><span class="label">LinkedIn</span></a></li>
           {% endif %}
           {% if site.github_url %}
-          <a href="{{ site.github_url }}" class="ct-social-link" target="_blank" rel="noopener">
-            <span class="icon fa-github"></span> GitHub
-          </a>
+          <li><a href="{{ site.github_url }}" class="icon alt fa-github" target="_blank" rel="noopener"><span class="label">GitHub</span></a></li>
           {% endif %}
           {% if site.instagram_url %}
-          <a href="{{ site.instagram_url }}" class="ct-social-link" target="_blank" rel="noopener">
-            <span class="icon fa-instagram"></span> Instagram
-          </a>
+          <li><a href="{{ site.instagram_url }}" class="icon alt fa-instagram" target="_blank" rel="noopener"><span class="label">Instagram</span></a></li>
           {% endif %}
-        </div>
+        </ul>
       </div>
     </div>
 
