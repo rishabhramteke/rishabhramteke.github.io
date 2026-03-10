@@ -722,15 +722,14 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
     var bH = banner.offsetHeight;
     /* Natural height of each 1024×384 layer at 100% width */
     var layerH = W * (384 / 1024);
-    /* Show the composition starting from 72% of one layer height
-       → reveals bottom of sky + full mountains (which has the tree) */
-    var viewStart = layerH * 0.72;
+    /* viewStart = 30% of one layer height → shows most of the sky clearly */
+    var viewStart = layerH * 0.30;
     document.getElementById('b-sky').style.top       = (0 * layerH - viewStart) + 'px';
     document.getElementById('b-mountains').style.top = (1 * layerH - viewStart) + 'px';
     /* Tree: 1536×1024 canvas. At 100% width → height = W × (1024/1536).
-       Position so the tree (centered vertically in the canvas) sits at ~60% of banner height */
+       Position tree center at ~70% of banner height so it sits in the lower scene */
     var treeH = W * (1024 / 1536);
-    document.getElementById('b-tree').style.top = (bH * 0.6 - treeH * 0.5) + 'px';
+    document.getElementById('b-tree').style.top = (bH * 0.70 - treeH * 0.5) + 'px';
   }
 
   /* Run after images load + on resize */
@@ -741,13 +740,15 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
   }
   window.addEventListener('resize', positionLayers);
 
-  /* ── Scroll parallax — each layer at its own depth ──────── */
+  /* ── Scroll parallax — front layers rise over back layers ── */
+  /* Sky barely moves (far away). Mountains move medium. Tree rises fast,
+     sliding upward in front of the mountains as you scroll down. */
   var st = { trigger: banner, start: 'top top', end: 'bottom top', scrub: 0.5 };
-  gsap.to('#b-sky',       { y: -20,  ease: 'none', scrollTrigger: st });
-  gsap.to('#b-mountains', { y: -65,  ease: 'none', scrollTrigger: st });
-  gsap.to('#b-tree',      { y: -110, ease: 'none', scrollTrigger: st });
-  /* Text drifts slightly upward (no opacity fade — keep it readable) */
-  if (inner) gsap.to(inner, { y: -40, ease: 'none', scrollTrigger: st });
+  gsap.to('#b-sky',       { y: -25,  ease: 'none', scrollTrigger: st });
+  gsap.to('#b-mountains', { y: -80,  ease: 'none', scrollTrigger: st });
+  gsap.to('#b-tree',      { y: -260, ease: 'none', scrollTrigger: st });
+  /* Text stays readable — minimal drift only */
+  if (inner) gsap.to(inner, { y: -30, ease: 'none', scrollTrigger: st });
 
   /* ── Mouse drift — layers separate horizontally ─────────── */
   document.addEventListener('mousemove', function (e) {
