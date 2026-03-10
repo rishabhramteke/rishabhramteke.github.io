@@ -722,9 +722,9 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
     var W  = banner.offsetWidth;
     var bH = banner.offsetHeight;
 
-    // Sky: 1536×1024 canvas, cloud band sits in upper-center of image (~40% down)
-    var skyH = W * (1024 / 1536);
-    document.getElementById('b-sky').style.top = (bH * 0.20 - skyH * 0.40) + 'px';
+    // Sky: 1532×283, cloud band fills most of image height
+    var skyH = W * (283 / 1532);
+    document.getElementById('b-sky').style.top = (bH * 0.18 - skyH * 0.50) + 'px';
 
     // Mountains: 1008×259, content fills the whole image, center at 50% banner height
     var mtnH = W * (259 / 1008);
