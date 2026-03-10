@@ -217,8 +217,9 @@ body.cursor-drag  #cur-ring { width: 28px; height: 28px; }
   position: absolute; left: 0; width: 100%; height: auto;
   pointer-events: none; will-change: transform;
 }
-/* Tree is a wide transparent canvas — position it via JS */
-#b-tree { left: 0; width: 100%; height: auto; }
+#b-sky       { z-index: 1; }
+#b-mountains { z-index: 2; }
+#b-tree      { z-index: 3; }
 
 /* ─────────────────────────────────────────────────────────────
    FLUID DIVIDER
