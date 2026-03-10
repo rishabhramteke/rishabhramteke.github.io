@@ -726,9 +726,9 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
     var skyH = W * (283 / 1532);
     document.getElementById('b-sky').style.top = (bH * 0.18 - skyH * 0.50) + 'px';
 
-    // Mountains: 1008×259, content fills the whole image, center at 50% banner height
+    // Mountains: 1008×259, moved higher in the banner
     var mtnH = W * (259 / 1008);
-    document.getElementById('b-mountains').style.top = (bH * 0.52 - mtnH * 0.50) + 'px';
+    document.getElementById('b-mountains').style.top = (bH * 0.38 - mtnH * 0.50) + 'px';
 
     // Tree: 1536×1024 canvas, tree+lake sits at vertical center of image
     var treeH = W * (1024 / 1536);
@@ -749,7 +749,7 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
   var st = { trigger: banner, start: 'top top', end: 'bottom top', scrub: 0.5 };
   gsap.to('#b-sky',       { y: -25,  ease: 'none', scrollTrigger: st });
   gsap.to('#b-mountains', { y: -80,  ease: 'none', scrollTrigger: st });
-  gsap.to('#b-tree',      { y: -260, ease: 'none', scrollTrigger: st });
+  gsap.to('#b-tree',      { y: -140, ease: 'none', scrollTrigger: st });
   /* Text stays readable — minimal drift only */
   if (inner) gsap.to(inner, { y: -30, ease: 'none', scrollTrigger: st });
 
