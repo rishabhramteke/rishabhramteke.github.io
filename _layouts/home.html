@@ -212,12 +212,13 @@ body.cursor-drag  #cur-ring { width: 28px; height: 28px; }
 #banner-layers {
   position: absolute; inset: 0; z-index: 0; overflow: hidden;
 }
-.b-layer {
-  position: absolute; left: 0; right: 0;
-  top: -160px; height: calc(100% + 320px);
-  background-size: cover; background-position: center center;
-  background-repeat: no-repeat; will-change: transform;
+/* img layers — width:100%, height:auto keeps natural aspect ratio */
+#banner-layers img {
+  position: absolute; left: 0; width: 100%; height: auto;
+  pointer-events: none; will-change: transform;
 }
+/* Tree is a wide transparent canvas — position it via JS */
+#b-tree { left: 0; width: 100%; height: auto; }
 
 /* ─────────────────────────────────────────────────────────────
    FLUID DIVIDER
@@ -265,10 +266,9 @@ body.cursor-drag  #cur-ring { width: 28px; height: 28px; }
 <!-- Banner (unchanged) -->
 <section id="banner" class="major">
   <div id="banner-layers">
-    <div class="b-layer" id="b-sky"       style="background-image:url('/assets/images/layer-sky.png')"></div>
-    <div class="b-layer" id="b-mountains" style="background-image:url('/assets/images/layer-mountains.png')"></div>
-    <div class="b-layer" id="b-lake"      style="background-image:url('/assets/images/layer-lake-tree.png')"></div>
-    <div class="b-layer" id="b-fg"        style="background-image:url('/assets/images/layer-foreground.png')"></div>
+    <img id="b-sky"       src="/assets/images/layer-sky.png"       alt="">
+    <img id="b-mountains" src="/assets/images/layer-mountains.png" alt="">
+    <img id="b-tree"      src="/assets/images/layer-tree.png"      alt="">
   </div>
   <div class="inner">
     <header class="major">
@@ -706,46 +706,58 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
 })();
 
 /* ══════════════════════════════════════════════════════════════
-   BANNER PARALLAX — multi-layer scroll depth + mouse drift
+   BANNER PARALLAX — multi-layer scroll + mouse depth
 ══════════════════════════════════════════════════════════════ */
 (function () {
   var banner = document.getElementById('banner');
   if (!banner) return;
   var inner = banner.querySelector('.inner');
 
-  /* ── Scroll parallax — each layer moves at its own depth ── */
-  var layers = [
-    { id: '#b-sky',       y: -18  },   /* furthest — barely moves */
-    { id: '#b-mountains', y: -55  },
-    { id: '#b-lake',      y: -105 },
-    { id: '#b-fg',        y: -155 },   /* closest  — moves most   */
-  ];
-  layers.forEach(function (l) {
-    gsap.to(l.id, {
-      y: l.y, ease: 'none',
-      scrollTrigger: { trigger: banner, start: 'top top', end: 'bottom top', scrub: 0.6 }
-    });
-  });
-
-  /* Text fades and drifts up as banner exits */
-  if (inner) {
-    gsap.to(inner, {
-      y: -50, opacity: 0.15, ease: 'none',
-      scrollTrigger: { trigger: banner, start: 'top top', end: 'bottom top', scrub: 0.4 }
-    });
+  /* ── Position layers once images are loaded ─────────────── */
+  /* Each source layer is 1024×384 (4 equal strips of the 1024×1536 composition)
+     The tree image is 1536×1024 (wide canvas, tree centered with transparency)
+     We display all at width:100% so height = width × (h/w) */
+  function positionLayers () {
+    var W  = banner.offsetWidth;
+    var bH = banner.offsetHeight;
+    /* Natural height of each 1024×384 layer at 100% width */
+    var layerH = W * (384 / 1024);
+    /* Show the composition starting from 72% of one layer height
+       → reveals bottom of sky + full mountains (which has the tree) */
+    var viewStart = layerH * 0.72;
+    document.getElementById('b-sky').style.top       = (0 * layerH - viewStart) + 'px';
+    document.getElementById('b-mountains').style.top = (1 * layerH - viewStart) + 'px';
+    /* Tree: 1536×1024 canvas. At 100% width → height = W × (1024/1536).
+       Position so the tree (centered vertically in the canvas) sits at ~60% of banner height */
+    var treeH = W * (1024 / 1536);
+    document.getElementById('b-tree').style.top = (bH * 0.6 - treeH * 0.5) + 'px';
   }
 
-  /* ── Mouse drift — subtle horizontal layer separation ───── */
+  /* Run after images load + on resize */
+  if (document.readyState === 'complete') {
+    positionLayers();
+  } else {
+    window.addEventListener('load', positionLayers);
+  }
+  window.addEventListener('resize', positionLayers);
+
+  /* ── Scroll parallax — each layer at its own depth ──────── */
+  var st = { trigger: banner, start: 'top top', end: 'bottom top', scrub: 0.5 };
+  gsap.to('#b-sky',       { y: -20,  ease: 'none', scrollTrigger: st });
+  gsap.to('#b-mountains', { y: -65,  ease: 'none', scrollTrigger: st });
+  gsap.to('#b-tree',      { y: -110, ease: 'none', scrollTrigger: st });
+  /* Text drifts slightly upward (no opacity fade — keep it readable) */
+  if (inner) gsap.to(inner, { y: -40, ease: 'none', scrollTrigger: st });
+
+  /* ── Mouse drift — layers separate horizontally ─────────── */
   document.addEventListener('mousemove', function (e) {
     var bRect = banner.getBoundingClientRect();
     if (bRect.bottom < 0 || bRect.top > window.innerHeight) return;
-    var cx = (e.clientX / window.innerWidth  - 0.5) * 2;
-    var cy = (e.clientY / window.innerHeight - 0.5) * 2;
-    gsap.to('#b-sky',       { x: cx * 6,  duration: 1.8, ease: 'power2.out', overwrite: 'auto' });
-    gsap.to('#b-mountains', { x: cx * 12, duration: 1.5, ease: 'power2.out', overwrite: 'auto' });
-    gsap.to('#b-lake',      { x: cx * 18, duration: 1.3, ease: 'power2.out', overwrite: 'auto' });
-    gsap.to('#b-fg',        { x: cx * 24, duration: 1.1, ease: 'power2.out', overwrite: 'auto' });
-    if (inner) gsap.to(inner, { x: cx * 14, duration: 1.2, ease: 'power2.out', overwrite: 'auto' });
+    var cx = (e.clientX / window.innerWidth - 0.5) * 2;
+    gsap.to('#b-sky',       { x: cx * 8,  duration: 2.0, ease: 'power2.out', overwrite: 'auto' });
+    gsap.to('#b-mountains', { x: cx * 16, duration: 1.6, ease: 'power2.out', overwrite: 'auto' });
+    gsap.to('#b-tree',      { x: cx * 26, duration: 1.2, ease: 'power2.out', overwrite: 'auto' });
+    if (inner) gsap.to(inner, { x: cx * 14, duration: 1.3, ease: 'power2.out', overwrite: 'auto' });
   });
 })();
 
