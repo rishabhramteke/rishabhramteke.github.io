@@ -724,8 +724,10 @@ gsap.utils.toArray('.js-reveal').forEach(function (el) {
     var layerH = W * (384 / 1024);
     /* viewStart = 30% of one layer height → shows most of the sky clearly */
     var viewStart = layerH * 0.30;
+    /* overlap: push mountains up so sky covers its dark top edge */
+    var overlap = layerH * 0.18;
     document.getElementById('b-sky').style.top       = (0 * layerH - viewStart) + 'px';
-    document.getElementById('b-mountains').style.top = (1 * layerH - viewStart) + 'px';
+    document.getElementById('b-mountains').style.top = (1 * layerH - viewStart - overlap) + 'px';
     /* Tree: 1536×1024 canvas. At 100% width → height = W × (1024/1536).
        Position tree center at ~70% of banner height so it sits in the lower scene */
     var treeH = W * (1024 / 1536);
