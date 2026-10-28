@@ -46,4 +46,4 @@ The mechanism is stable: substitution, a positive sell-out premium, no reliable 
 <figure style="margin:1.2em 0"><img src="{{ site.url }}/assets/images/project/flights/15_year_effect.png" alt="Higher 2026 connecting fares, with route, date, direct fare, travel time and sell-out controlled." style="width:100%;height:auto"><figcaption style="font-size:0.85em;opacity:0.8">Higher 2026 connecting fares, with route, date, direct fare, travel time and sell-out controlled.</figcaption></figure>
 
 <h4>Links</h4>
-<a href="https://github.com/rishabhramteke/flight-price-substitution">Code and results</a> · <a href="https://github.com/rishabhramteke/flight-price-substitution/blob/main/docs/FINDINGS.md">Full findings, every question with hypothesis and caveats</a>
+<a href="https://github.com/rishabhramteke/flight-price-substitution">Code, results and regression-ready data</a> · <a href="https://github.com/rishabhramteke/flight-price-substitution/blob/main/docs/FINDINGS.md">Full findings, every question with hypothesis and caveats</a>
