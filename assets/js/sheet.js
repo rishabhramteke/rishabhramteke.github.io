@@ -52,7 +52,7 @@
   var POINT_DEPTH = 1.15;
   var st = pts.map(function (p, i) { return { el: p, i: i, mark: p.querySelector('.mark'), px: 0, py: 0, tx: 0, ty: 0, gx: 0, gy: 0, ph: i * 1.7 }; });
   var trig = st.filter(function (s) { return s.el.classList.contains('pt-trig'); })[0];
-  var routePath = document.getElementById('route-path'), exitEl = neat.querySelector('.exit');
+  var routePath = document.getElementById('route-path'), exitAt = window.SHEET.exit || { x: 52, y: 100 };
   var boxes = [neat.querySelector('.legend'), neat.querySelector('.titleblock')];
   var mx = -1e4, my = -1e4, nx = 0, ny = 0, lx = 0, ly = 0, ltx = 0, lty = 0, t0 = performance.now(), visible = true;
 
@@ -90,9 +90,9 @@
       s.el.style.setProperty('--mx', ox.toFixed(2) + 'px'); s.el.style.setProperty('--my', oy.toFixed(2) + 'px');
       s.ox = ox; s.oy = oy;
     });
-    if (routePath && trig && exitEl) {          /* dashed route from the trig point to the edge of the sheet */
+    if (routePath && trig) {                    /* dashed route from the trig point off the bottom edge, on to Sheet 2 */
       var ax = +trig.el.dataset.x / 100 * r.width + trig.ox + 2, ay = +trig.el.dataset.y / 100 * r.height + trig.oy + 4;
-      var e = exitEl.getBoundingClientRect(), bx = e.left + e.width / 2 - r.left, by = e.top - r.top;
+      var bx = exitAt.x / 100 * r.width, by = r.height + 2;
       var c1x = ax + (bx - ax) * 0.15 + 60, c1y = ay + (by - ay) * 0.55, c2x = bx - 40, c2y = by - (by - ay) * 0.35;
       routePath.setAttribute('d', 'M' + ax.toFixed(1) + ' ' + (ay + 14).toFixed(1) + ' C' + c1x.toFixed(1) + ' ' + c1y.toFixed(1) + ' ' + c2x.toFixed(1) + ' ' + c2y.toFixed(1) + ' ' + bx.toFixed(1) + ' ' + by.toFixed(1));
     }

@@ -80,9 +80,6 @@ h1, h2 { font-family: var(--cond); font-weight: 600; color: var(--wine-deep); le
 /* route to Sheet 2: drawn by sheet.js from the live point positions */
 .route-line { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; overflow: visible; }
 .route-line path { fill: none; stroke: var(--wine); stroke-width: 2; stroke-dasharray: 7 6; stroke-linecap: round; }
-.exit { position: absolute; left: var(--x); bottom: 1.1rem; z-index: 3; transform: translateX(-50%); display: flex; align-items: center; gap: .4rem; text-decoration: none; font: italic 400 1.02rem/1.2 var(--serif); color: var(--wine-deep); background: var(--paper); padding: .2rem .55rem; }
-.exit svg { width: 16px; height: 16px; fill: none; stroke: var(--wine); stroke-width: 2; flex: none; }
-.exit:hover span { text-decoration: underline; }
 
 .points { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .points:has(.pt:hover), .points:has(.pt:focus-within) { z-index: 6; }
@@ -134,9 +131,10 @@ h1, h2 { font-family: var(--cond); font-weight: 600; color: var(--wine-deep); le
 .ry { top: 0; bottom: 0; width: 1px; left: 0; transform: translateX(var(--cx, -10px)); }
 .readout { position: absolute; left: 0; top: 0; transform: translate(calc(var(--cx, 0px) + 12px), calc(var(--cy, 0px) + 10px)); font: 600 .8rem/1 var(--cond); letter-spacing: .14em; color: var(--wine-deep); text-shadow: var(--halo); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-.motto { position: absolute; left: 3.5%; bottom: 1.2rem; z-index: 3; margin: 0; max-width: min(30rem, 34%); pointer-events: none; }
-.motto p { margin: 0; font: 600 .8rem/1.45 var(--cond); letter-spacing: .18em; text-transform: uppercase; color: var(--wine-deep); text-shadow: var(--halo); }
-.motto footer { margin-top: .15rem; font: italic 400 .86rem/1.3 var(--serif); color: var(--ink-2); text-shadow: var(--halo); }
+.motto { padding: clamp(2.5rem, 6vw, 4.5rem) var(--gutter); text-align: center; }
+.motto blockquote { margin: 0 auto; max-width: 40rem; }
+.motto p { margin: 0; font: 600 clamp(.95rem, 1.4vw, 1.15rem)/1.5 var(--cond); letter-spacing: .22em; text-transform: uppercase; color: var(--wine-deep); text-wrap: balance; }
+.motto footer { margin-top: .5rem; font: italic 400 1rem/1.3 var(--serif); color: var(--ink-2); }
 .motto footer::before { content: "— "; }
 
 /* ---------- Sheet 2: journal ---------- */
@@ -172,7 +170,7 @@ h1, h2 { font-family: var(--cond); font-weight: 600; color: var(--wine-deep); le
 /* ---------- Imprint ---------- */
 .imprint { max-width: 72rem; margin: 0 auto; padding: clamp(4rem, 8vw, 6.5rem) var(--gutter) 3rem; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(2rem, 5vw, 5rem); }
 .imp-text p { font: 400 1.18rem/1.5 var(--serif); color: var(--ink-2); max-width: 40ch; margin: .8rem 0 1.4rem; }
-.imp-links { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; font-weight: 600; }
+.imp-links { list-style: none; padding: 0; margin: 1.2rem 0 0; display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; font-weight: 600; }
 .imp-links a { text-decoration: underline; }
 .imp-form { display: grid; gap: 1.1rem; }
 .imp-form label { display: grid; gap: .35rem; font: 600 .8rem/1 var(--cond); letter-spacing: .2em; text-transform: uppercase; color: var(--wine); }
@@ -214,9 +212,7 @@ h1, h2 { font-family: var(--cond); font-weight: 600; color: var(--wine-deep); le
   .label { white-space: normal; text-shadow: none; flex: 1; }
   .note, .pt-up .note { position: static; opacity: 1; transform: none; width: 100%; border: 0; padding: .1rem 0 0 1.6rem; background: none; }
   .mark::before { display: none; }
-  .exit { order: 4; position: relative; left: auto; bottom: auto; transform: none; margin: 0 1.1rem 1rem; padding: 0; align-self: flex-start; background: none; }
   .titleblock { order: 5; }
-  .motto { order: 6; position: relative; left: auto; bottom: auto; max-width: none; padding: 1rem 1.1rem 1.2rem; border-top: 1px solid var(--rule-soft); }
   .n2 { grid-template-columns: minmax(0, 1fr); grid-template-areas: "text" "globe" "tb"; padding: 3rem 1.1rem 1.5rem; }
   .n2 .ticks { display: none; }
   .tb2 { border: 0; border-top: 1.5px solid var(--rule); padding: 1.1rem 0 0; background: none; max-width: none; }

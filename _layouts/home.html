@@ -45,7 +45,6 @@
       </header>
 
       <svg class="route-line" aria-hidden="true" focusable="false"><path id="route-path" d=""/></svg>
-      <a class="exit" href="#journal" style="--x:{{ sh.exit.x }}%"><span>Journal continues on Sheet 2</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2 V13 M3 8.5 L8 13.5 L13 8.5"/></svg></a>
 
       <ol class="points" aria-label="Work sections of this site">
         {% for p in sh.points %}
@@ -70,11 +69,13 @@
         <a class="tb-next" href="#journal">Sheet 2 · Journal</a>
       </div>
 
-      <blockquote class="motto"><p>You only live once, but if you do it right, once is enough.</p><footer>Mae West</footer></blockquote>
-
       <div class="reticle" aria-hidden="true"><span class="rx"></span><span class="ry"></span><span class="readout"></span></div>
     </div>
   </section>
+
+  <aside class="motto" aria-label="A quote I like">
+    <blockquote><p>You only live once, but if you do it right, once is enough.</p><footer>Mae West</footer></blockquote>
+  </aside>
 
   <!-- Sheet 2: journal, for friends and readers -->
   <section class="sheet sheet2" id="journal" aria-labelledby="jr-h">
@@ -110,7 +111,6 @@
   <footer class="imprint" id="imprint" aria-labelledby="imp-h">
     <div class="imp-text">
       <h2 id="imp-h">Write to me</h2>
-      <p>Questions about the work, a role, or a place I should visit. I read everything.</p>
       <ul class="imp-links">
         <li><a href="{{ site.linkedin_url }}" rel="me">LinkedIn</a></li>
         <li><a href="{{ site.scholar_url }}" rel="me">Google Scholar</a></li>
