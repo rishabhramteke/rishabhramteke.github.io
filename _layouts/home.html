@@ -27,7 +27,6 @@
 
       <!-- Mobile map face: the same symbols, plotted (decorative; the list below carries the links) -->
       <div class="face" aria-hidden="true">
-        <svg class="face-route" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M{% for p in sh.points %}{% if p.kind == 'trig' %}{{ p.x }} {{ p.y }}{% endif %}{% endfor %} Q 50 82 {{ sh.exit.x }} 100"/></svg>
         {% for p in sh.points %}<span class="fm" style="--x:{{ p.x }}%;--y:{{ p.y }}%;--i:{{ forloop.index0 }}"><svg viewBox="0 0 16 16">{% if p.kind == 'trig' %}<path d="M8 2 L14 13 L2 13 Z"/><circle class="dot" cx="8" cy="9.5" r="1.4"/>{% else %}<circle cx="8" cy="8" r="5"/>{% endif %}</svg></span>{% endfor %}
       </div>
 
@@ -44,7 +43,6 @@
         </nav>
       </header>
 
-      <svg class="route-line" aria-hidden="true" focusable="false"><path id="route-path" d=""/></svg>
 
       <ol class="points" aria-label="Work sections of this site">
         {% for p in sh.points %}
