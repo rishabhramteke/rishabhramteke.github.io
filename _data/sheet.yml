@@ -1,0 +1,60 @@
+# Home page survey sheets. Sheet 1 plots the work sections; Sheet 2 is the journal for friends and readers.
+ground: { name: "Dolomites, Italy: Seceda to Sella", contours: "every 30 m, index every 150 m" }
+# x and y are percent of Sheet 1; ref is the grid square they fall in. kind: trig (start here) or work.
+points:
+  - title: About me
+    url: /aboutme
+    kind: trig
+    note: Cartographer and ML scientist in Amsterdam. I explore the world and dabble in 3D art.
+    x: 44
+    y: 62
+    ref: D4
+  - title: My projects
+    url: /project
+    kind: work
+    note: From geospatial data pipelines to Blender renders, a collection of things I have built.
+    x: 68
+    y: 26
+    ref: F2
+  - title: My publications
+    url: /publications
+    kind: work
+    note: Research papers and academic work from university and beyond.
+    x: 84
+    y: 42
+    ref: G3
+    side: left
+  - title: My résumé
+    url: /assets/files/Resume.pdf
+    kind: work
+    note: Experience, education and skills, as a PDF.
+    x: 63
+    y: 56
+    ref: F4
+  - title: My patents
+    url: /patents
+    kind: work
+    note: US patent applications on autonomous mowers that judge their own cut from a rear camera.
+    x: 24
+    y: 56
+    ref: B4
+exit: { x: 52, y: 100 }
+journal:
+  - title: Travel stories
+    url: /travel
+    note: "Cities I have lived in and places I have wandered through."
+  - title: Side quests
+    url: /side-quest
+    note: "Things I chase for fun."
+  - title: Curiosity map
+    url: /curiosity-map/
+    note: "A constellation of curiosities: things to do, places to go and sparks."
+  - title: My blog
+    url: /blog
+    note: "Writing about engineering, data, travel and the occasional random thought."
+route:
+  - { name: Mumbai, years: "2017–2021", lat: 19.076, lng: 72.877, lat_s: "19.08° N", lng_s: "72.88° E" }
+  - { name: Melbourne, years: "2019", lat: -37.814, lng: 144.946, lat_s: "37.81° S", lng_s: "144.95° E" }
+  - { name: Vienna, years: "2021", lat: 48.208, lng: 16.373, lat_s: "48.21° N", lng_s: "16.37° E" }
+  - { name: Tokyo, years: "2022–2024", lat: 35.682, lng: 139.691, lat_s: "35.68° N", lng_s: "139.69° E" }
+  - { name: Amsterdam, years: "2024–present", lat: 52.377, lng: 4.897, lat_s: "52.38° N", lng_s: "4.90° E" }

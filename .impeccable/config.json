@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "_layouts/home.html"
+        ],
+        "createdAt": "2026-11-13T14:37:52.506Z",
+        "reason": "agent: false positive; the detector cannot resolve the Liquid-templated stylesheet links in this Jekyll layout and reads default 16px; the built page (_site/index.html, h1 up to 4.4rem, h2 up to 3.4rem) shows no flat-hierarchy finding"
+      }
+    ]
+  }
+}

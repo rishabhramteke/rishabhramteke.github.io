@@ -21,6 +21,7 @@ gitlab_url:
 googleplus_url:
 instagram_url: https://www.instagram.com/parquinnien/
 linkedin_url: https://www.linkedin.com/in/rishabhramteke7699/
+scholar_url: https://scholar.google.com/citations?user=8WepWLcAAAAJ&hl=en
 pinterest_url:
 slack_url:
 twitter_url:
@@ -33,3 +34,6 @@ sass:
 
 pulgins:
   'jekyll-watch'
+
+# not published
+exclude: [PRODUCT.md, DESIGN.md, Gemfile, Gemfile.lock, node_modules, vendor, forty_jekyll_theme.gemspec]
