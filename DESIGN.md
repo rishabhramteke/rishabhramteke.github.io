@@ -306,3 +306,15 @@ The closing band: a headline, a row of underlined links, the underline-field con
 - **Don't** use drop shadows, blurs, gradients or rounded rectangles; depth is overprint layers, and circles are map symbols only.
 - **Don't** introduce a second accent hue; Invalid Red is for a failed field and nothing else.
 - **Don't** build a dark developer portfolio or a headline-plus-card-grid.
+
+## Inner pages
+
+Every page other than Home and Travel shares one frame, built from `_includes/sheet-head.html`, `sheet-bar.html` and `sheet-foot.html`, and styled by `assets/css/pages.css` on top of the `sheet.css` tokens.
+
+- **Top bar:** paper band with a 1.5px bottom rule, sticky on desktop. The name links home in Barlow Condensed 600, deep wine. Work links (About, Projects, Publications, Patents, Résumé) and journal links (Journal, Travel, Contact) are split by a soft hairline. The current page carries a 1.5px deep-wine underline (`aria-current`).
+- **Document:** a centred column of 46rem (lists widen to 72rem). The title is condensed display, the optional description is italic serif in faded ink, and a hero image sits in a 1.5px rule.
+- **Prose:** Source Serif 4 at 1.125rem/1.65. Headings are condensed deep wine with more space above than below. Links are deep wine, underlined at 45% wine. Blockquotes carry a 1px wine rule and italic faded ink. Tables use label-caps headers over a 1.5px rule, with tabular figures. Iframes, such as the résumé PDF, fill the column inside a 1.5px rule. The old theme's content helpers (`image fit/left/right/main`, `button`, `special`, `small`, `fit`, `actions`, `label`, `row`) keep working in this world: buttons are square wine outlines or fills.
+- **Entry list:** used for projects, publications, patents, the blog and all posts. Entries are separated by soft rules under a 1.5px top rule. Each has a 4:3 image in a soft frame beside the year (label caps, wine), the title (condensed, deep wine) and the description (serif, faded ink). Entries without an image span the full width. The image scales by 3% on hover.
+- **Footer:** a 1.5px top rule, underlined profile links, and the italic colophon "Surveyed and drawn by Rishabh Ramteke, Amsterdam."
+- **Side quest:** a field card (paper panel, 1.5px rule) centred on a gridded neatline sheet. Difficulty is shown as three wine diamonds, filled up to the level. The single action is "Roll a new quest".
+- **Travel story:** the photo viewer keeps its full-bleed photographs on a wine-black card inside a 1.5px rule, over the paper page. Progress bars are square paper strips, and the controls are square paper buttons with deep-wine arrows. Captions sit over wine-black scrims.

@@ -1,0 +1,13 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} · {% endif %}{{ site.title }}</title>
+  {% if page.description %}<meta name="description" content="{{ page.description | strip_html | strip_newlines | truncate: 160 }}">{% endif %}
+  <meta name="theme-color" content="#EDEFEC">
+  <script>document.documentElement.className += ' js';</script>
+  <link rel="preload" href="{{ '/assets/fonts/BarlowCondensed-600-normal-latin.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ '/assets/fonts/fonts.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/sheet.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/pages.css' | relative_url }}">
+  {% include googleanalytics.html %}
+</head>

@@ -1,192 +1,45 @@
 <!DOCTYPE html>
-<html>
-{% include head.html %}
-
+<html lang="en">
+{% include sheet-head.html %}
+<body class="sheet-page doc-page sq-page">
+{% include sheet-bar.html %}
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  background: #0B0B0F;
-  font-family: 'Inter', -apple-system, sans-serif;
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  overflow: hidden;
-}
-
-/* Ambient background */
-#sq-bg {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
-}
-#sq-bg::before {
-  content: '';
-  position: absolute;
-  width: 700px; height: 700px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(94,106,210,0.09) 0%, transparent 65%);
-  top: 50%; left: 50%; transform: translate(-50%, -60%);
-}
-#sq-bg::after {
-  content: '';
-  position: absolute;
-  width: 400px; height: 400px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 65%);
-  bottom: 10%; right: 10%;
-}
-
-/* Card / Placard */
-#sq-card {
-  position: relative; z-index: 1;
-  width: min(560px, 92vw);
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
-  padding: 48px 44px 44px;
-  box-shadow:
-    0 0 0 1px rgba(94,106,210,0.12),
-    0 32px 80px rgba(0,0,0,0.6),
-    inset 0 1px 0 rgba(255,255,255,0.08);
-  animation: card-in 0.7s cubic-bezier(0.22,1,0.36,1) both;
-  display: flex; flex-direction: column;
-}
-
-@keyframes card-in {
-  from { opacity: 0; transform: translateY(32px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
-}
-
-/* Decorative corner accents */
-#sq-card::before, #sq-card::after {
-  content: '';
-  position: absolute;
-  width: 18px; height: 18px;
-  border-color: rgba(94,106,210,0.5);
-  border-style: solid;
-}
-#sq-card::before {
-  top: 14px; left: 14px;
-  border-width: 2px 0 0 2px;
-  border-radius: 4px 0 0 0;
-}
-#sq-card::after {
-  bottom: 14px; right: 14px;
-  border-width: 0 2px 2px 0;
-  border-radius: 0 0 4px 0;
-}
-
-/* Header row */
-.sq-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 32px;
-}
-.sq-label {
-  font-size: 10px; font-weight: 600;
-  letter-spacing: 0.25em; text-transform: uppercase;
-  color: #5E6AD2;
-}
-.sq-diff {
-  display: flex; gap: 3px;
-}
-.sq-diff span {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: rgba(255,255,255,0.12);
-}
-.sq-diff span.lit { background: #5E6AD2; }
-
-/* Category badge */
-.sq-category {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(94,106,210,0.1);
-  border: 1px solid rgba(94,106,210,0.25);
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-size: 11px; font-weight: 500;
-  color: rgba(255,255,255,0.55);
-  letter-spacing: 0.03em;
-  margin-bottom: 20px;
-  align-self: flex-start;
-}
-
-/* Quest emoji */
-.sq-emoji {
-  font-size: 52px; line-height: 1;
-  display: block; margin-bottom: 16px;
-  animation: emoji-bounce 0.5s cubic-bezier(0.22,1,0.36,1) 0.35s both;
-}
-@keyframes emoji-bounce {
-  from { transform: scale(0.5) rotate(-15deg); opacity: 0; }
-  to   { transform: scale(1)   rotate(0deg);   opacity: 1; }
-}
-
-/* Quest text */
-.sq-quest {
-  font-size: clamp(20px, 4vw, 26px);
-  font-weight: 700;
-  color: #fff;
-  line-height: 1.3;
-  letter-spacing: -0.02em;
-  margin-bottom: 16px;
-}
-
-/* Flavour text */
-.sq-flavour {
-  font-size: 13px;
-  color: rgba(255,255,255,0.38);
-  line-height: 1.7;
-  margin-bottom: 36px;
-  flex: 1;
-}
-
-/* New Quest button — bottom, full width, centered text */
-#sq-reroll {
-  width: 100%;
-  background: #5E6AD2;
-  border: none; border-radius: 10px;
-  color: #fff; font-family: 'Inter', sans-serif;
-  font-size: 14px; font-weight: 600;
-  padding: 14px 20px;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-  letter-spacing: -0.01em;
-  text-align: center;
-}
-#sq-reroll:hover {
-  background: #4f5bbf;
-  box-shadow: 0 8px 24px rgba(94,106,210,0.4);
-  transform: translateY(-1px);
-}
-#sq-reroll:active { transform: translateY(0); }
-
-/* Back link */
-#sq-back {
-  position: fixed; top: 24px; left: 28px; z-index: 10;
-  color: rgba(255,255,255,0.35);
-  font-size: 13px; font-weight: 500;
-  text-decoration: none;
-  display: flex; align-items: center; gap: 6px;
-  transition: color 0.2s;
-}
-#sq-back:hover { color: rgba(255,255,255,0.75); }
+  .sq-sheet { flex: 1; padding: var(--gutter); }
+  .sq-sheet .neatline { min-height: calc(100vh - 12rem); display: grid; place-items: center; padding: clamp(3rem, 7vw, 5rem) 1rem; }
+  #sq-card { position: relative; z-index: 2; width: min(36rem, 100%); background: var(--paper); border: 1.5px solid var(--rule); padding: clamp(1.4rem, 3vw, 2.2rem); animation: sq-in .45s var(--ease) both; }
+  @keyframes sq-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .sq-top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; border-bottom: 1px solid var(--rule-soft); padding-bottom: .8rem; }
+  .sq-top h1 { font-size: clamp(2rem, 4vw, 2.8rem); }
+  .sq-diff-wrap { display: flex; align-items: center; gap: .5rem; font: 600 .74rem/1 var(--cond); letter-spacing: .16em; text-transform: uppercase; color: var(--wine); }
+  #sq-diff { display: flex; gap: .3rem; }
+  #sq-diff span { width: 11px; height: 11px; transform: rotate(45deg); border: 1.75px solid var(--wine); }
+  #sq-diff span.lit { background: var(--wine); }
+  #sq-category { margin-top: 1.2rem; font: 600 .82rem/1.3 var(--cond); letter-spacing: .18em; text-transform: uppercase; color: var(--wine-deep); }
+  #sq-emoji { display: block; font-size: 2.6rem; line-height: 1; margin-top: .8rem; }
+  #sq-quest { margin: .9rem 0 0; font: 400 clamp(1.3rem, 2.4vw, 1.6rem)/1.35 var(--serif); color: var(--ink); text-wrap: pretty; }
+  #sq-flavour { margin: .8rem 0 0; font: italic 400 1.05rem/1.5 var(--serif); color: var(--ink-2); }
+  #sq-reroll { margin-top: 1.6rem; font: 600 1rem/1 var(--sans); background: var(--wine); color: var(--paper); border: 0; padding: .85rem 1.3rem; cursor: pointer; transition: background .25s var(--ease); }
+  #sq-reroll:hover { background: var(--wine-deep); }
+  @media (prefers-reduced-motion: reduce) { #sq-card { animation: none; } }
 </style>
-
-<body>
-
-<a id="sq-back" href="/">← Home</a>
-
-<div id="sq-bg"></div>
-
-<div id="sq-card">
-  <div class="sq-header">
-    <span class="sq-label">⚔ Side Quest</span>
-    <div class="sq-diff" id="sq-diff"></div>
+<main id="content" class="sq-sheet">
+  <div class="neatline">
+    <div class="ticks ticks-x" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span></div>
+    <div class="ticks ticks-y" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+    <section id="sq-card" aria-live="polite">
+      <div class="sq-top">
+        <h1>Side quest</h1>
+        <div class="sq-diff-wrap">Difficulty <div id="sq-diff" aria-hidden="true"></div></div>
+      </div>
+      <p id="sq-category"></p>
+      <span id="sq-emoji" aria-hidden="true"></span>
+      <h2 id="sq-quest"></h2>
+      <p id="sq-flavour"></p>
+      <button id="sq-reroll" type="button">Roll a new quest</button>
+    </section>
   </div>
-
-  <div class="sq-category" id="sq-category"></div>
-  <span class="sq-emoji" id="sq-emoji"></span>
-  <h2 class="sq-quest" id="sq-quest"></h2>
-  <p class="sq-flavour" id="sq-flavour"></p>
-
-  <button id="sq-reroll">🎲 &nbsp;New Quest</button>
-</div>
-
+</main>
+{% include sheet-foot.html %}
 <script>
 var QUESTS = [
   // ── Social / tiny risks ──────────────────────────────────────────────────
@@ -250,6 +103,7 @@ function renderQuest(q) {
 
   var dots = document.getElementById('sq-diff');
   dots.innerHTML = '';
+  dots.parentElement.setAttribute('aria-label', 'Difficulty ' + q.diff + ' of 3');
   for (var i = 1; i <= 3; i++) {
     var s = document.createElement('span');
     if (i <= q.diff) s.classList.add('lit');
@@ -268,7 +122,5 @@ document.getElementById('sq-reroll').addEventListener('click', function() {
 
 renderQuest(getQuest());
 </script>
-
-{% include page-transition.html %}
 </body>
 </html>

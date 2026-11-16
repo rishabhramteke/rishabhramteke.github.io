@@ -1,41 +1,16 @@
 <!DOCTYPE html>
-<!--
-    Forty by HTML5 UP
-    html5up.net | @ajlkn
-    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-  -->
-<html>
-
-  {% include head.html %}
-
-  <body>
-
-    {% include header.html %} 
-    
-    
-    <!-- Main -->
-    <div id="main" class="alt">
-
-      <!-- One -->
-      <section id="one">
-	<div class="inner">
-          {% for post in site.posts %}
-	  {% if post.title != 404 %}
-	  <header class="major">
-	    <h1>{{ post.title }}</h1>
-	  </header>
-	  {% if post.image %}<span class="image main"><img src="{{ site.baseurl }}/{{ post.image }}" alt="" /></span>{% endif %}
-	  {% if post.date %}<p>{{ post.date }}</p>{% endif %}
-	  <p>{{ post.content }}</p>
-	  {% endif %}
-          {% endfor %}
-	</div>
-      </section>
-
-    </div>
-
-    {% include footer.html %}
-
-  </body>
-
+<html lang="en">
+{% include sheet-head.html %}
+<body class="sheet-page doc-page">
+{% include sheet-bar.html %}
+<main id="content" class="doc doc-wide">
+  <header class="doc-head"><h1>{{ page.title | default: "All posts" }}</h1></header>
+  <div class="entries">
+    {% for post in site.posts %}{% if post.title != 404 %}
+      {% include sheet-entry.html post=post %}
+    {% endif %}{% endfor %}
+  </div>
+</main>
+{% include sheet-foot.html %}
+</body>
 </html>

@@ -1,0 +1,16 @@
+<a class="skip" href="#content">Skip to content</a>
+<header class="bar">
+  <a class="bar-name" href="{{ '/' | relative_url }}">Rishabh Ramteke</a>
+  <nav class="bar-nav" aria-label="Site">
+    <ul>
+      <li><a href="{{ '/aboutme' | relative_url }}"{% if page.url == '/aboutme' %} aria-current="page"{% endif %}>About</a></li>
+      <li><a href="{{ '/project' | relative_url }}"{% if page.url == '/project' or page.category == 'project' %} aria-current="page"{% endif %}>Projects</a></li>
+      <li><a href="{{ '/publications' | relative_url }}"{% if page.url == '/publications' or page.category == 'publication' %} aria-current="page"{% endif %}>Publications</a></li>
+      <li><a href="{{ '/patents' | relative_url }}"{% if page.url == '/patents' or page.category == 'patent' %} aria-current="page"{% endif %}>Patents</a></li>
+      <li><a href="{{ '/assets/files/Resume.pdf' | relative_url }}">Résumé</a></li>
+      <li class="bar-gap"><a href="{{ '/' | relative_url }}#journal">Journal</a></li>
+      <li><a href="{{ '/travel' | relative_url }}">Travel</a></li>
+      <li><a href="{{ '/' | relative_url }}#imprint">Contact</a></li>
+    </ul>
+  </nav>
+</header>

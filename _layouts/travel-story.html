@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
-{% include head.html %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.city }} · {{ site.title }}</title>
+  <meta name="theme-color" content="#EDEFEC">
+  <link rel="stylesheet" href="{{ '/assets/fonts/fonts.css' | relative_url }}">
+  {% include googleanalytics.html %}
+</head>
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -153,6 +160,25 @@ body { background: #000; overflow: hidden; font-family: 'Inter', -apple-system, 
 @media (max-width: 520px) {
   #sv-bg-l, #sv-bg-r { display: none; }
 }
+
+/* ---- survey-sheet palette over the story viewer ---- */
+body { background: #EDEFEC; font-family: "Barlow", "Helvetica Neue", Arial, sans-serif; }
+#sv { background: #EDEFEC; }
+#sv-bg-l, #sv-bg-r { background: transparent; }
+#sv-bg-l button, #sv-bg-r button { background: #EDEFEC; border: 1.5px solid #3A1D24; color: #5B1426; border-radius: 0; }
+#sv-bg-l button:hover, #sv-bg-r button:hover { background: #5B1426; color: #EDEFEC; }
+#sv-card { background: #231518; border: 1.5px solid #3A1D24; border-radius: 0; box-shadow: none; }
+.sv-slide::before { background: linear-gradient(to bottom, rgba(35,21,24,.62) 0%, transparent 100%); }
+.sv-slide::after { background: linear-gradient(to top, rgba(35,21,24,.78) 0%, transparent 100%); }
+.sv-caption-title { font: 600 1.25rem/1.15 "Barlow Condensed", "Barlow", sans-serif; letter-spacing: .02em; }
+.sv-caption-text { font: italic 400 .95rem/1.45 "Source Serif 4", Georgia, serif; color: rgba(237,239,236,.86); }
+.sv-bar { background: rgba(237,239,236,.35); border-radius: 0; }
+.sv-bar-fill { background: #EDEFEC; border-radius: 0; }
+#sv-city-name { font: 600 1.1rem/1 "Barlow Condensed", "Barlow", sans-serif; letter-spacing: .04em; }
+#sv-counter { font: 600 .8rem/1 "Barlow Condensed", "Barlow", sans-serif; letter-spacing: .14em; font-variant-numeric: tabular-nums; color: rgba(237,239,236,.75); }
+#sv-pause-dot { background: rgba(35,21,24,.6); backdrop-filter: none; -webkit-backdrop-filter: none; }
+::selection { background: #8A2A3D; color: #EDEFEC; }
+:focus-visible { outline: 2px solid #8A2A3D; outline-offset: 3px; }
 </style>
 
 <body>

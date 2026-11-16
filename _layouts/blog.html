@@ -1,63 +1,19 @@
 <!DOCTYPE html>
-<!--
-	Forty by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-
-{% include head.html %}
-
-<body>
-
-    {% include header.html %}
-
-
-<!-- Main -->
-<div id="main" class="alt">
-
-<!-- One -->
-<section id="one">
-	<div class="inner">
-		<header class="major">
-			<h1>{{ page.title }}</h1>
-		</header>
-    {{ content }}
-
+<html lang="en">
+{% include sheet-head.html %}
+<body class="sheet-page doc-page">
+{% include sheet-bar.html %}
+<main id="content" class="doc doc-wide">
+  <header class="doc-head">
+    <h1>{{ page.title }}</h1>
+    {% if content != "" %}<div class="prose doc-intro">{{ content }}</div>{% endif %}
+  </header>
+  <div class="entries">
+    {% for category in site.categories %}{% for post in site.posts %}{% if post.category_descriptor == true and post.post_category == category[0] %}
+      {% include sheet-entry.html post=post nodate=true %}
+    {% endif %}{% endfor %}{% endfor %}
   </div>
-
-  <!-- Two -->
-  <section id="two" class="spotlights">
-    {% for category in site.categories %}
-      {% for post in site.posts %}
-        {% if post.category_descriptor == true and post.post_category == category[0] %}
-          <section>
-        		<a href="{{ post.url }}" class="image">
-        			<img src="{{ post.image }}" alt="" data-position="center center" />
-        		<div class="content">
-        			<div class="inner">
-        				<header class="major">
-        					<h3 style= "text-transform: uppercase;">{{ post.title }}</h3>
-        				</header>
-                <h3> {{ post.description }} </h3>
-        				<ul class="actions">
-        					<li><a href="{{ post.url }}" class="button">Learn more</a></li>
-        				</ul>
-        			</div>
-        		</div>
-            </a>
-        	</section>
-        {% endif %}
-      {% endfor %}
-    {% endfor %}
-  </section>
-
-</section>
-
-</div>
-
-    {% include footer.html %}
-
+</main>
+{% include sheet-foot.html %}
 </body>
-
 </html>

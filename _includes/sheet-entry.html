@@ -1,0 +1,8 @@
+<article class="entry{% unless include.post.image %} entry-noimg{% endunless %}">
+  {% if include.post.image %}<a class="entry-img" href="{{ include.post.url | relative_url }}" tabindex="-1" aria-hidden="true"><img src="{{ include.post.image | relative_url }}" alt="" loading="lazy"></a>{% endif %}
+  <div class="entry-text">
+    {% unless include.nodate %}<p class="entry-date">{{ include.post.date | date: "%Y" }}</p>{% endunless %}
+    <h2><a href="{{ include.post.url | relative_url }}">{{ include.post.title }}</a></h2>
+    {% if include.post.description %}<p class="entry-desc">{{ include.post.description | strip_html }}</p>{% endif %}
+  </div>
+</article>
