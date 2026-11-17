@@ -47,7 +47,7 @@ The price is Mercator itself. Tiles are equal in the projection, not on the grou
 
 ### Morton codes, or the Z-order curve
 
-For a long time I half-remembered this one as "merone" codes. The name is **Morton**, after G. M. Morton, who described it in a 1966 IBM report on a geodetic database. It is also called the **Z-order** curve. The idea is simple: write x and y in binary and interleave their bits.
+This one is the **Morton** code, after G. M. Morton, who described it in a 1966 IBM report on a geodetic database. It is also called the **Z-order** curve. The idea is simple: write x and y in binary and interleave their bits.
 
 With x = 5 (`101`) and y = 3 (`011`), taking a y bit then an x bit at each position from the top, you get `01 10 11`, which is 27. Read those pairs as base-4 digits and you have the quadkey idea exactly: a quadkey is a Morton code written in base 4.
 
