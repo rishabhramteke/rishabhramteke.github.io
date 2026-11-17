@@ -1,42 +1,43 @@
 # Home page survey sheets. Sheet 1 plots the work sections; Sheet 2 is the journal for friends and readers.
 ground: { name: "Dolomites, Italy: Seceda to Sella", contours: "every 30 m, index every 150 m" }
 # x and y are percent of Sheet 1; ref is the grid square they fall in. kind: trig (start here) or work.
+# x, y: the summit each point stands on, in percent of the map drawing (1600 x 1000 contour sheet);
+# sheet.js keeps every point on its summit whatever the window shape. ref is the fallback grid square.
 points:
   - title: About me
     url: /aboutme
     kind: trig
     note: Cartographer and ML scientist in Amsterdam. I explore the world and dabble in 3D art.
-    x: 44
-    y: 62
-    ref: D4
+    x: 53.25
+    y: 34.5
+    ref: E3
   - title: My projects
     url: /project
     kind: work
     note: From geospatial data pipelines to Blender renders, a collection of things I have built.
-    x: 68
-    y: 26
-    ref: F2
+    x: 43.6
+    y: 85.8
+    ref: D6
   - title: My publications
     url: /publications
     kind: work
     note: Research papers and academic work from university and beyond.
-    x: 84
-    y: 42
-    ref: G3
-    side: left
+    x: 71.9
+    y: 45.2
+    ref: F3
   - title: My résumé
     url: /assets/files/Resume.pdf
     kind: work
     note: Experience, education and skills, as a PDF.
-    x: 63
-    y: 56
-    ref: F4
+    x: 41.2
+    y: 53.2
+    ref: D4
   - title: My patents
     url: /patents
     kind: work
     note: US patent applications on autonomous mowers that judge their own cut from a rear camera.
-    x: 24
-    y: 56
+    x: 14.1
+    y: 62.9
     ref: B4
 exit: { x: 52, y: 100 }
 journal:

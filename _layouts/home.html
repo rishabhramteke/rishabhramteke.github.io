@@ -27,13 +27,13 @@
 
       <!-- Mobile map face: the same symbols, plotted (decorative; the list below carries the links) -->
       <div class="face" aria-hidden="true">
-        {% for p in sh.points %}<span class="fm" style="--x:{{ p.x }}%;--y:{{ p.y }}%;--i:{{ forloop.index0 }}"><svg viewBox="0 0 16 16">{% if p.kind == 'trig' %}<path d="M8 2 L14 13 L2 13 Z"/><circle class="dot" cx="8" cy="9.5" r="1.4"/>{% else %}<circle cx="8" cy="8" r="5"/>{% endif %}</svg></span>{% endfor %}
+        {% for p in sh.points %}<span class="fm" style="--x:{{ p.x }}%;--y:{{ p.y }}%;--i:{{ forloop.index0 }}" data-mx="{{ p.x }}" data-my="{{ p.y }}"><svg viewBox="0 0 16 16">{% if p.kind == 'trig' %}<path d="M8 2 L14 13 L2 13 Z"/><circle class="dot" cx="8" cy="9.5" r="1.4"/>{% else %}<circle cx="8" cy="8" r="5"/>{% endif %}</svg></span>{% endfor %}
       </div>
 
       <header class="legend">
         <h1 id="who">Rishabh Ramteke</h1>
         <p class="role">Cartographer and ML scientist working on computer vision and maps.</p>
-        <p class="coords">Amsterdam · 52°22′ N 4°54′ E · <span class="nw"><abbr title="Uber H3 hexagonal grid, resolution 7">H3 r7</abbr> 871969526ffffff</span></p>
+        <p class="coords">Amsterdam · 52°22′ N 4°54′ E · <span class="nw" title="H3 hexagonal grid cell, resolution 7">871969526ffffff</span></p>
         <nav class="actions" aria-label="Primary">
           <a class="act act-main" href="{{ '/assets/files/Resume.pdf' | relative_url }}">Résumé</a>
           <a class="act" href="{{ site.linkedin_url }}" rel="me">LinkedIn</a>
@@ -46,11 +46,11 @@
 
       <ol class="points" aria-label="Work sections of this site">
         {% for p in sh.points %}
-        <li class="pt pt-{{ p.kind }}{% if p.side == 'left' %} pt-left{% endif %}{% if p.y > 55 %} pt-up{% endif %}" style="--x:{{ p.x }}%;--y:{{ p.y }}%" data-x="{{ p.x }}" data-y="{{ p.y }}" data-i="{{ forloop.index0 }}">
+        <li class="pt pt-{{ p.kind }}{% if p.side == 'left' %} pt-left{% endif %}{% if p.y > 55 %} pt-up{% endif %}" style="--x:{{ p.x }}%;--y:{{ p.y }}%" data-x="{{ p.x }}" data-y="{{ p.y }}" data-mx="{{ p.x }}" data-my="{{ p.y }}" data-i="{{ forloop.index0 }}">
           <a href="{{ p.url | relative_url }}">
             <span class="mark" aria-hidden="true"><svg viewBox="0 0 16 16">{% if p.kind == 'trig' %}<path d="M8 2 L14 13 L2 13 Z"/><circle class="dot" cx="8" cy="9.5" r="1.4"/>{% else %}<circle cx="8" cy="8" r="5"/>{% endif %}</svg></span>
             <span class="label">{{ p.title }}</span>
-            <span class="note"><span class="note-meta">{{ p.ref }} · <span class="elev"></span></span>{{ p.note }}</span>
+            <span class="note"><span class="note-meta"><span class="ref">{{ p.ref }}</span> · <span class="elev"></span></span>{{ p.note }}</span>
           </a>
         </li>
         {% endfor %}
@@ -64,7 +64,6 @@
           <dt>Heights</dt><dd>metres above EGM2008, datum WGS 84</dd>
           <dt>Ground</dt><dd>{{ sh.ground.name }} · Copernicus DEM GLO-30</dd>
         </dl>
-        <a class="tb-next" href="#journal">Sheet 2 · Journal</a>
       </div>
 
       <div class="reticle" aria-hidden="true"><span class="rx"></span><span class="ry"></span><span class="readout"></span></div>

@@ -30,6 +30,25 @@
   function metres(z) { return Math.round(z).toLocaleString('en-GB') + ' m'; }
 
   var pts = Array.prototype.slice.call(neat.querySelectorAll('.pt'));
+  var marks = Array.prototype.slice.call(neat.querySelectorAll('.fm'));
+  /* every point stands on a summit given in map coordinates (data-mx/my, percent of the 1600 x 1000 drawing);
+     convert to percent of its box for the current window shape, kept clear of the frame */
+  function onMap(el, W, H) {
+    var f = fit(W, H), X = (f.ox + +el.dataset.mx / 100 * 1600 * f.s) / W * 100, Y = (f.oy + +el.dataset.my / 100 * 1000 * f.s) / H * 100;
+    X = Math.max(3, Math.min(95, X)); Y = Math.max(5, Math.min(94, Y));
+    el.style.setProperty('--x', X.toFixed(2) + '%'); el.style.setProperty('--y', Y.toFixed(2) + '%');
+    return [X, Y];
+  }
+  function place() {
+    var r = neat.getBoundingClientRect();
+    pts.forEach(function (p) {
+      var xy = onMap(p, r.width, r.height); p.dataset.x = xy[0].toFixed(2); p.dataset.y = xy[1].toFixed(2);
+      p.classList.toggle('pt-left', xy[0] > 66); p.classList.toggle('pt-up', xy[1] > 55);   /* labels and notes open towards the middle of the sheet */
+      var ref = p.querySelector('.ref'); if (ref) ref.textContent = gridRef(xy[0] / 100 * r.width, xy[1] / 100 * r.height, r.width, r.height);
+    });
+    var fr = marks.length && marks[0].parentNode.getBoundingClientRect();
+    if (fr && fr.width) marks.forEach(function (m) { onMap(m, fr.width, fr.height); });
+  }
   function labelPoints() {
     var r = neat.getBoundingClientRect();
     pts.forEach(function (p) {
@@ -93,7 +112,7 @@
   }
   var running = false;
   function start() { if (!running && wide.matches) { running = true; requestAnimationFrame(frame); } }
-  function settle() { guard(); labelPoints(); scaleBar(); if (reduce || !wide.matches) { requestAnimationFrame(function (n) { frame(n); }); } else start(); }
+  function settle() { place(); guard(); labelPoints(); scaleBar(); if (reduce || !wide.matches) { requestAnimationFrame(function (n) { frame(n); }); } else start(); }
   if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; if (visible) start(); }).observe(neat);
   window.addEventListener('resize', settle);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(settle); else settle();

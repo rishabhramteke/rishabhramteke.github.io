@@ -1,5 +1,5 @@
 <article class="entry{% unless include.post.image %} entry-noimg{% endunless %}">
-  {% if include.post.image %}<a class="entry-img" href="{{ include.post.url | relative_url }}" tabindex="-1" aria-hidden="true"><img class="col" src="{{ include.post.image | relative_url }}" alt="" loading="lazy"><img class="duo" src="{{ include.post.image | relative_url }}" alt="" loading="lazy"></a>{% endif %}
+  {% if include.post.image %}<a class="entry-img" href="{{ include.post.url | relative_url }}" tabindex="-1" aria-hidden="true"><img class="col" src="{{ include.post.image | relative_url }}" alt="" loading="lazy"><span class="duo"><img src="{{ include.post.image | relative_url }}" alt="" loading="lazy"></span></a>{% endif %}
   <div class="entry-text">
     <h2><a href="{{ include.post.url | relative_url }}">{{ include.post.title }}</a></h2>
     {% capture meta %}{% unless include.nodate %}<span>{{ include.post.date | date: "%Y" }}</span>{% endunless %}{% for d in include.post.documents %}{% assign ext = d.file | split: '.' | last | downcase %}<span>{{ d.title }}{% if ext == 'pdf' and d.pages %}, {{ d.pages }} {% if d.pages == 1 %}page{% else %}pages{% endif %}{% endif %}</span>{% endfor %}{% endcapture %}
