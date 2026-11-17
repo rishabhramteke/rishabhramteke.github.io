@@ -1,13 +1,15 @@
 """Printable models for the 'Printable things' project page. All sizes in millimetres.
-Run:  <python with trimesh + manifold3d + shapely + scikit-image> tools/models/make_models.py   -> assets/models/*.stl
+Run:  <python with trimesh + manifold3d + shapely> tools/models/make_models.py   -> assets/models/*.stl
+The mountain keycaps read tools/models/terrain/*.npy, made by fetch_terrain.py from the Copernicus GLO-30 DEM.
 None of these has been test-printed yet; adjust the clearances below for your printer."""
-import numpy as np, trimesh
-from shapely.geometry import Polygon, LineString
+import os, numpy as np, trimesh, manifold3d as mf
+from shapely.geometry import Polygon, LineString, Point
 from shapely.ops import unary_union
-from skimage.measure import find_contours
 
 OUT = 'assets/models'
+TERRAIN = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'terrain')
 
+# ---------- small helpers ----------
 def rounded_square(w, r=1.2, n=10):
     """Square of side w with corner radius r, as a 2D vertex ring."""
     pts = []
@@ -28,9 +30,30 @@ def extrude(poly, h, z0=0.0):
     m = trimesh.boolean.union([trimesh.creation.extrude_polygon(g, h) for g in parts]) if len(parts) > 1 else trimesh.creation.extrude_polygon(parts[0], h)
     m.apply_translation([0, 0, z0]); return m
 
-def keycap(top_art=None):
+def to_mf(t):
+    return mf.Manifold(mf.Mesh(vert_properties=np.asarray(t.vertices, np.float32), tri_verts=np.asarray(t.faces, np.uint32)))
+
+def to_tm(m):
+    x = m.to_mesh(); t = trimesh.Trimesh(np.asarray(x.vert_properties)[:, :3], np.asarray(x.tri_verts))
+    t.merge_vertices(digits_vertex=5); t.update_faces(t.nondegenerate_faces()); t.remove_unreferenced_vertices()   # weld float32 slivers
+    return t
+
+def rounded_slab(poly, T, r=1.2):
+    """Extrude a 2D outline to height T with the top edges rounded over (radius r) and a flat bottom for the print
+    bed: the Minkowski sum of the outline shrunk by r with a half-sphere of radius r. The outline is split into
+    triangles, each triangle's sum is an exact convex hull, and the union of those is the sum for the whole outline."""
+    ball = trimesh.creation.icosphere(subdivisions=2, radius=r)
+    half = ball.intersection(trimesh.creation.box([3 * r, 3 * r, 1.5 * r], transform=trimesh.transformations.translation_matrix([0, 0, 0.75 * r])))
+    v2, f2 = trimesh.creation.triangulate_polygon(poly.buffer(-r, resolution=16))
+    pieces = []
+    for tri in f2:
+        p = v2[tri]; prism = np.vstack([np.c_[p, np.zeros(3)], np.c_[p, np.full(3, T - r)]])
+        pieces.append(mf.Manifold.hull_points((prism[:, None, :] + half.vertices[None, :, :]).reshape(-1, 3)))
+    return to_tm(mf.Manifold.batch_boolean(pieces, mf.OpType.Add))
+
+# ---------- keycaps ----------
+def keycap(top_art=None, H=7.6):
     """1u keycap with a Cherry MX cross stem, uniform (DSA-like) height, flat top."""
-    H = 7.6
     outer = frustum(18.2, 12.7, 0.0, H)
     inner = frustum(15.6, 10.3, -0.01, H - 1.4, r=0.8)
     shell = outer.difference(inner)
@@ -43,63 +66,99 @@ def keycap(top_art=None):
         cap = cap.difference(extrude(top_art, 0.61, H - 0.6))
     return cap
 
-def hexagon_art():
-    """An H3-style hexagon with its ring of six neighbours, as engraved lines."""
-    def hexring(cx, cy, r):
-        return [(cx + r * np.cos(np.radians(60 * k + 30)), cy + r * np.sin(np.radians(60 * k + 30))) for k in range(6)]
-    lines = [LineString(hexring(0, 0, 2.4) + [hexring(0, 0, 2.4)[0]])]
-    for k in range(6):
-        a = np.radians(60 * k); cx, cy = 4.16 * np.cos(a), 4.16 * np.sin(a)
-        ring = hexring(cx, cy, 2.4); lines.append(LineString(ring + [ring[0]]))
-    clip = Polygon(rounded_square(11.7, 1.0))
-    return unary_union([l.buffer(0.28, join_style=2) for l in lines]).intersection(clip)
+def heightfield(Z, half_w, zb):
+    """Closed solid under a height grid Z (row 0 = north = +y), spanning +-half_w in x and y, floor at zb."""
+    n = Z.shape[0]; s = np.linspace(-half_w, half_w, n)
+    X, Y = np.meshgrid(s, s[::-1])
+    top = np.c_[X.ravel(), Y.ravel(), Z.ravel()]
+    idx = np.arange(n * n).reshape(n, n)
+    a, b, c, d = idx[:-1, :-1].ravel(), idx[:-1, 1:].ravel(), idx[1:, :-1].ravel(), idx[1:, 1:].ravel()
+    faces = [np.c_[a, c, b], np.c_[b, c, d]]
+    ring = np.r_[idx[0, :], idx[1:, -1], idx[-1, -2::-1], idx[-2:0:-1, 0]]       # perimeter, clockwise from above
+    bot = top[ring].copy(); bot[:, 2] = zb
+    nb = len(ring); bi = n * n + np.arange(nb); centre = n * n + nb
+    verts = np.vstack([top, bot, [[0, 0, zb]]])
+    nxt = np.roll(np.arange(nb), -1)
+    faces += [np.c_[ring, bi[nxt], ring[nxt]], np.c_[ring, bi, bi[nxt]],            # walls
+              np.c_[bi, np.full(nb, centre), bi[nxt]]]                              # floor
+    m = trimesh.Trimesh(verts, np.vstack(faces), process=True)
+    trimesh.repair.fix_normals(m)
+    return m
 
-def contour_art():
-    """Contour lines of a small made-up summit, like the homepage map, as engraved lines."""
-    x = np.linspace(-6, 6, 241); X, Y = np.meshgrid(x, x)
-    Z = np.exp(-((X - 1.2) ** 2 + (Y + 0.6) ** 2) / 9) + 0.55 * np.exp(-((X + 2.6) ** 2 + (Y - 2.2) ** 2) / 4) + 0.04 * np.sin(1.7 * X + 0.8 * Y)
-    lines = []
-    for lev in np.linspace(0.12, 1.0, 8):
-        for c in find_contours(Z, lev):
-            pts = [(x[0] + (p[1] / 240) * 12, x[0] + (p[0] / 240) * 12) for p in c]
-            if len(pts) > 8: lines.append(LineString(pts).simplify(0.05))
-    clip = Polygon(rounded_square(11.7, 1.0))
-    return unary_union([l.buffer(0.22, resolution=4) for l in lines]).intersection(clip)
+MOUNTAINS = {   # name: (half-width of the terrain square in km, vertical exaggeration); must match fetch_terrain.py
+    'fuji': (7.0, 2.0),
+    'matterhorn': (2.6, 1.0),
+}
 
+def mountain_keycap(name, H=6.6, plinth=0.3, fade=1.8):
+    """Keycap whose top is the real terrain around a summit, cut to the keycap's rounded-square top.
+    Horizontal scale: the terrain square fills the 12.7 mm top. Vertical: true scale times the exaggeration, eased down
+    to a thin plinth over the last `fade` mm so the mountain rises out of the key instead of ending in cliffs."""
+    half_km, exag = MOUNTAINS[name]
+    Z = np.load(f'{TERRAIN}/{name}.npy').astype(float)
+    half_w = 12.7 / 2; mm_per_m = half_w / (half_km * 1000) * exag
+    n = Z.shape[0]; s = np.linspace(-half_w, half_w, n); X, Y = np.meshgrid(s, s[::-1])
+    top = Polygon(rounded_square(12.7, 1.2))
+    edge = np.array([top.exterior.distance(Point(x, y)) if top.contains(Point(x, y)) else 0.0 for x, y in zip(X.ravel(), Y.ravel())]).reshape(n, n)
+    base = Z[edge > 0].min()
+    u = np.clip(edge / fade, 0, 1); weight = u * u * (3 - 2 * u)                  # smoothstep: the relief fades to the rim
+    Zmm = H + plinth + np.clip(Z - base, 0, None) * mm_per_m * weight
+    relief = heightfield(Zmm, half_w, H - 0.4).intersection(extrude(Polygon(rounded_square(12.7, 1.2)), 30, H - 0.5))
+    return keycap(None, H).union(relief), (Z.max() - base, Zmm.max())
+
+# ---------- towel hook ----------
 def towel_hook():
     """Swing-out towel hook, printed in place, lying flat. In use the wall plate is vertical and the hinge axis is
     vertical too: the arm lies flat along the wall when folded and swings out 90 degrees. A hanging towel pulls along
     the hinge axis, so it cannot fold the arm shut and no stop is needed. Print coordinates: bed = wall plane,
-    +y = up in use. The arm's knuckle turns on a pin with 0.4 mm clearance all round."""
-    T, CL = 4.0, 0.4                       # plate and arm thickness, hinge clearance
-    plate = trimesh.creation.box([22, 56, T]); plate.apply_translation([0, 0, T / 2])
-    for y in (-18, 18):                    # two 4 mm screw holes with countersinks, one above the other
+    +y = up in use. The arm's knuckle turns on a pin with 0.4 mm clearance all round. All top edges are rounded."""
+    T, CL, R_K, AX = 4.0, 0.4, 4.0, 15.0     # thickness, hinge clearance, knuckle radius, hinge axis x (axis at z = 4)
+    def knuckle(y0, y1, r, c=0.6):
+        """Cylinder along y around the hinge axis, with chamfered ends."""
+        t = np.linspace(0, 2 * np.pi, 64, endpoint=False); ring = lambda y, rr: np.c_[AX + rr * np.cos(t), np.full(64, y), 4.0 + rr * np.sin(t)]
+        return trimesh.convex.convex_hull(np.vstack([ring(y0, r - c), ring(y0 + c, r), ring(y1 - c, r), ring(y1, r - c)]))
+    def rod(y0, y1, r):
+        c = trimesh.creation.cylinder(radius=r, height=y1 - y0, sections=48)
+        c.apply_transform(trimesh.transformations.rotation_matrix(np.pi / 2, [1, 0, 0])); c.apply_translation([AX, (y0 + y1) / 2, 4.0]); return c
+
+    # wall plate: a slim pill with two lobes that carry the fixed knuckles, filleted where they meet
+    pill = LineString([(0, -19), (0, 19)]).buffer(10, resolution=24)
+    lobes = [Polygon([(5, y0), (AX, y0), (AX, y1), (5, y1)]) for y0, y1 in ((9.4, 16.6), (-16.6, -9.4))]
+    outline = unary_union([pill] + lobes).buffer(3, resolution=16).buffer(-3, resolution=16)
+    plate = rounded_slab(outline, T, 1.2)
+    for y in (-21, 21):                    # two 4 mm screw holes with countersinks, one above the other
         hole = trimesh.creation.cylinder(radius=2.1, height=T * 3, sections=40); hole.apply_translation([0, y, T / 2])
         sink = trimesh.creation.cone(radius=4.2, height=4.2, sections=40)
         sink.apply_transform(trimesh.transformations.rotation_matrix(np.pi, [1, 0, 0])); sink.apply_translation([0, y, T + 2.1])
         plate = plate.difference(hole).difference(sink)
-    ax = 11 + 4.0                          # hinge axis beside the plate, parallel to y (vertical in use)
-    def knuckle(y0, y1, r):
-        c = trimesh.creation.cylinder(radius=r, height=y1 - y0, sections=56)
-        c.apply_transform(trimesh.transformations.rotation_matrix(np.pi / 2, [1, 0, 0])); c.apply_translation([ax, (y0 + y1) / 2, 4.0]); return c
-    lugs = []
-    for yc in (-13.0, 13.0):               # plate-to-knuckle bridges
-        lug = trimesh.creation.box([6, 8, T]); lug.apply_translation([11 + 1.5, yc, T / 2]); lugs.append(lug)
     base = plate
-    for part in lugs + [knuckle(-17, -9, 4.0), knuckle(9, 17, 4.0), knuckle(-17, 17, 1.6)]:   # pin runs through all three knuckles
+    for part in (knuckle(-17, -9, R_K), knuckle(9, 17, R_K), rod(-17, 17, 1.6)):   # the pin runs through all three knuckles
         base = base.union(part)
-    arm_knuckle = knuckle(-9 + CL, 9 - CL, 4.0).difference(knuckle(-9.5, 9.5, 1.6 + CL))
-    bar = trimesh.creation.box([64, 14, T]); bar.apply_translation([ax + 4.5 + 32, 0, T / 2])          # the arm, 64 mm
-    neck = trimesh.creation.box([6, 14, T]); neck.apply_translation([ax + 3.0, 0, T / 2])               # knuckle to arm
-    lip = trimesh.creation.box([T + 1, 12, T]); lip.apply_translation([ax + 4.5 + 64 - (T + 1) / 2, 7 + 6, T / 2])  # tip rises 12 mm up in use
-    arm = arm_knuckle.union(neck.difference(knuckle(-9.5, 9.5, 1.6 + CL))).union(bar).union(lip)
+
+    # arm: a J that tapers from 12 mm at the hinge to 7 mm and ends in a round knob; the curl rises up in use
+    Ls, R, sweep = 46.0, 10.0, np.radians(105)
+    s_line = np.linspace(0, Ls, 40); s_arc = np.linspace(0, sweep, 40)[1:]
+    P = np.vstack([np.c_[AX + s_line, np.zeros_like(s_line)],
+                   np.c_[AX + Ls + R * np.sin(s_arc), R - R * np.cos(s_arc)]])
+    tang = np.gradient(P, axis=0); tang /= np.linalg.norm(tang, axis=1)[:, None]; nrm = np.c_[-tang[:, 1], tang[:, 0]]
+    w = np.linspace(6.0, 3.5, len(P))[:, None]                                    # half-width
+    body = Polygon(np.vstack([P + nrm * w, (P - nrm * w)[::-1]])).buffer(0)
+    knob = Point(P[-1]).buffer(4.2, resolution=24)
+    arm_outline = unary_union([body, knob]).buffer(1.5, resolution=16).buffer(-1.5, resolution=16)
+    arm = rounded_slab(arm_outline, T, 1.2).union(knuckle(-9 + CL, 9 - CL, R_K)).difference(rod(-9.5, 9.5, 1.6 + CL))
     return base, arm
 
+def swing(arm, deg):
+    """The arm turned about the hinge axis; negative angles swing it out of the wall."""
+    return arm.copy().apply_transform(trimesh.transformations.rotation_matrix(np.radians(deg), [0, 1, 0], point=[15.0, 0, 4.0]))
+
 if __name__ == '__main__':
-    import os; os.makedirs(OUT, exist_ok=True)
-    for name, art in [('keycap-h3-hexagon', hexagon_art()), ('keycap-contours', contour_art())]:
-        m = keycap(art); m.export(f'{OUT}/{name}.stl'); print(name, 'watertight', m.is_watertight, 'volume mm3', round(m.volume, 1), 'bounds', np.round(m.bounds, 2).tolist())
+    os.makedirs(OUT, exist_ok=True)
+    for name in MOUNTAINS:
+        m, (relief_m, top_mm) = mountain_keycap(name); m.export(f'{OUT}/keycap-{name}.stl')
+        print(f'keycap-{name}', 'watertight', m.is_watertight, 'relief m', round(relief_m), 'height mm', round(top_mm, 2), 'bounds', np.round(m.bounds, 2).tolist())
     base, arm = towel_hook()
     hook = trimesh.util.concatenate([base, arm]); hook.export(f'{OUT}/folding-towel-hook.stl')
-    gap = base.intersection(arm).volume if base.intersection(arm).volume else 0.0
-    print('folding-towel-hook', 'parts watertight', base.is_watertight, arm.is_watertight, 'parts overlap mm3', round(gap, 4), 'bounds', np.round(hook.bounds, 1).tolist())
+    print('folding-towel-hook', 'parts watertight', base.is_watertight, arm.is_watertight, 'bounds', np.round(hook.bounds, 1).tolist())
+    for deg in (0, -30, -60, -90):         # the arm must clear the base all the way out
+        x = base.intersection(swing(arm, deg)); print(f'  overlap with the base at {deg} deg: {round(x.volume if len(x.faces) else 0.0, 4)} mm3')
