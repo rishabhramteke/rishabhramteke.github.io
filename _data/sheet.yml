@@ -50,6 +50,9 @@ journal:
   - title: Icebreaker
     url: /icebreaker/
     note: "Opening lines for saying hello to someone new, with a five-minute dare and a score."
+  - title: Record shelf
+    url: /records
+    note: "My vinyl, one record at a time on the turntable."
   - title: Curiosity map
     url: /curiosity-map/
     note: "A constellation of curiosities: things to do, places to go and sparks."

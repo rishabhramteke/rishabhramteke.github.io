@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+{% include sheet-head.html %}
+<body class="sheet-page doc-page rec-page">
+{% include sheet-bar.html %}
+{% assign recs = site.data.records.records %}
+<style>
+  .rec { flex: 1; width: 100%; max-width: 78rem; margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) var(--gutter) clamp(2.5rem, 5vw, 4rem); }
+  .rec-head h1 { font-size: clamp(2.3rem, 5vw, 3.8rem); }
+  .rec-sheet { margin-top: 1.8rem; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; border-top: 1.5px solid var(--rule); padding-top: 1.8rem; }
+  .deck { margin: 0; }
+  .deck svg { display: block; width: 100%; height: auto; }
+  .deck-cap { margin-top: 1rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem 1.4rem; }
+  .now { margin: 0; font: italic 400 1.05rem/1.4 var(--serif); color: var(--ink-2); min-height: 1.4em; }
+  .now b { font: 600 1.1rem/1.3 var(--cond); font-style: normal; letter-spacing: .02em; color: var(--wine-deep); }
+  .needle { font: 600 .98rem/1 var(--sans); padding: .75rem 1.15rem; cursor: pointer; background: var(--wine-deep); color: var(--paper); border: 1.5px solid var(--wine-deep); transition: background .2s var(--ease), color .2s var(--ease); }
+  .needle:hover { background: var(--wine); border-color: var(--wine); }
+  .needle[aria-pressed="false"] { background: transparent; color: var(--wine-deep); }
+  .needle[aria-pressed="false"]:hover { background: rgba(91, 20, 38, .08); }
+  .disc { transform-box: fill-box; transform-origin: center; animation: spin 1.8s linear infinite; animation-play-state: paused; }   /* 33⅓ rpm */
+  .deck.is-playing .disc { animation-play-state: running; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .lbl-title { font: 600 15px var(--cond); letter-spacing: .03em; }
+  .lbl-sub { font: italic 400 11.5px var(--serif); }
+  .lbl-year { font: 600 10px var(--cond); letter-spacing: .14em; }
+  .plinth-type { font: 600 11px var(--cond); letter-spacing: .18em; fill: var(--ink-2); }
+  .shelf h2 { font-size: 1.7rem; }
+  .shelf-count { margin: .3rem 0 0; font: 600 .82rem/1.3 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--wine); font-variant-numeric: tabular-nums; }
+  .sleeves { list-style: none; margin: 1rem 0 0; padding: 0; border-top: 1px solid var(--rule-soft); max-height: min(34rem, 70vh); overflow-y: auto; scrollbar-color: var(--wine-deep) var(--paper-2); }
+  .sleeve { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: .1rem .9rem; align-items: center; width: 100%; padding: .8rem .4rem; text-align: left; cursor: pointer; background: none; border: 0; border-bottom: 1px solid var(--rule-soft); color: var(--ink); transition: background .2s var(--ease); }
+  .sleeve:hover { background: rgba(91, 20, 38, .05); }
+  .sleeve[aria-pressed="true"] { background: rgba(91, 20, 38, .09); }
+  .sl-dot { grid-row: span 3; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--ink); position: relative; }
+  .sl-dot::after { content: ""; position: absolute; inset: 32%; border-radius: 50%; background: var(--dot, var(--wine)); }
+  .sl-title { font: 600 1.12rem/1.2 var(--cond); color: var(--wine-deep); letter-spacing: .01em; }
+  .sl-meta { font: 500 .9rem/1.35 var(--sans); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .sl-note { font: italic 400 .92rem/1.4 var(--serif); color: var(--ink-2); }
+  .shelf-empty { margin: 1rem 0 0; padding: 1.4rem 1rem; border: 1px dashed var(--rule-soft); font: italic 400 1.02rem/1.5 var(--serif); color: var(--ink-2); }
+  @media (max-width: 860px) { .rec-sheet { grid-template-columns: minmax(0, 1fr); } .sleeves { max-height: none; } }
+  @media (prefers-reduced-motion: reduce) { .disc { animation: none; } .needle, .sleeve { transition: none; } }
+</style>
+<main id="content" class="rec">
+  <header class="rec-head">
+    <h1>Record shelf</h1>
+    <p class="doc-meta">The vinyl I own, one record at a time on the turntable. Pick a record and the needle drops.</p>
+  </header>
+
+  <div class="rec-sheet">
+    <figure class="deck" id="deck" aria-label="Turntable">
+      <svg viewBox="0 0 640 470" role="img" aria-labelledby="deck-t">
+        <title id="deck-t">A turntable playing the selected record</title>
+        <!-- plinth -->
+        <rect x="8" y="8" width="624" height="454" fill="#E2E5E1" stroke="#3A1D24" stroke-width="1.5"/>
+        <text class="plinth-type" x="28" y="446">33⅓ RPM</text>
+        <!-- platter -->
+        <circle cx="262" cy="238" r="208" fill="#3A1D24"/>
+        <circle cx="262" cy="238" r="208" fill="none" stroke="#5A4549" stroke-width="1"/>
+        <!-- the record: this group spins -->
+        <g class="disc">
+          <circle cx="262" cy="238" r="198" fill="#231518"/>
+          {% for r in (0..21) %}<circle cx="262" cy="238" r="{{ r | times: 5.6 | plus: 72 }}" fill="none" stroke="rgba(237,239,236,{% cycle '0.05', '0.08', '0.05', '0.12' %})" stroke-width="0.8"/>{% endfor %}
+          <circle cx="262" cy="238" r="194" fill="none" stroke="rgba(237,239,236,0.16)" stroke-width="1"/>
+          <circle id="lbl" cx="262" cy="238" r="64" fill="#8A2A3D"/>
+          <circle cx="262" cy="238" r="58" fill="none" id="lbl-ring" stroke="#EDEFEC" stroke-opacity=".5" stroke-width="0.8"/>
+          <text id="lbl-a" class="lbl-title" x="262" y="214" text-anchor="middle" fill="#EDEFEC"></text>
+          <text id="lbl-b" class="lbl-title" x="262" y="231" text-anchor="middle" fill="#EDEFEC"></text>
+          <text id="lbl-c" class="lbl-sub" x="262" y="262" text-anchor="middle" fill="#EDEFEC"></text>
+          <text id="lbl-d" class="lbl-year" x="262" y="280" text-anchor="middle" fill="#EDEFEC"></text>
+        </g>
+        <!-- light catching the grooves (does not spin) -->
+        <path d="M 120 110 A 198 198 0 0 1 200 60 L 262 238 Z" fill="#EDEFEC" opacity=".05"/>
+        <path d="M 404 366 A 198 198 0 0 1 324 416 L 262 238 Z" fill="#EDEFEC" opacity=".04"/>
+        <circle cx="262" cy="238" r="4.5" fill="#E2E5E1"/>
+        <!-- tonearm: rotated about its pivot by the script -->
+        <circle cx="548" cy="86" r="30" fill="#EDEFEC" stroke="#3A1D24" stroke-width="1.5"/>
+        <g id="arm">
+          <circle cx="544" cy="50" r="13" fill="#5A4549"/>
+          <path d="M 548 86 L 556 250 Q 560 300 578 330" fill="none" stroke="#231518" stroke-width="5" stroke-linecap="round"/>
+          <rect x="566" y="324" width="24" height="34" rx="2" fill="#231518" transform="rotate(-28 578 341)"/>
+          <circle cx="548" cy="86" r="9" fill="#5B1426"/>
+        </g>
+        <!-- arm rest -->
+        <rect x="590" y="300" width="14" height="40" fill="#5A4549" opacity=".55"/>
+      </svg>
+      <figcaption class="deck-cap">
+        <p class="now" id="now" aria-live="polite"></p>
+        <button class="needle" id="needle" type="button" aria-pressed="false">Drop the needle</button>
+      </figcaption>
+    </figure>
+
+    <section class="shelf" aria-labelledby="shelf-h">
+      <h2 id="shelf-h">On the shelf</h2>
+      {% if recs and recs.size > 0 %}
+      <p class="shelf-count">{{ recs.size }} {% if recs.size == 1 %}record{% else %}records{% endif %}</p>
+      <ol class="sleeves">
+        {% for r in recs %}
+        {% capture dflt %}{% cycle '#8A2A3D', '#EDEFEC', '#5B1426' %}{% endcapture %}
+        <li><button class="sleeve" type="button" aria-pressed="false" data-title="{{ r.title | escape }}" data-artist="{{ r.artist | escape }}" data-year="{{ r.year }}" data-label="{{ r.label | default: dflt }}" style="--dot: {{ r.label | default: dflt }}">
+          <span class="sl-dot" aria-hidden="true"></span>
+          <span class="sl-title">{{ r.title }}</span>
+          <span class="sl-meta">{{ r.artist }}{% if r.year %} · {{ r.year }}{% endif %}</span>
+          {% if r.note %}<span class="sl-note">{{ r.note }}</span>{% endif %}
+        </button></li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="shelf-empty">The collection is being catalogued. The first records arrive here soon; until then the turntable plays a test pressing.</p>
+      {% endif %}
+    </section>
+  </div>
+</main>
+{% include sheet-foot.html %}
+<script>
+(function () {
+  'use strict';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var deck = document.getElementById('deck'), arm = document.getElementById('arm'), needle = document.getElementById('needle'), now = document.getElementById('now');
+  var sleeves = Array.prototype.slice.call(document.querySelectorAll('.sleeve'));
+  var lbl = document.getElementById('lbl'), ring = document.getElementById('lbl-ring');
+  var L = ['lbl-a', 'lbl-b', 'lbl-c', 'lbl-d'].map(function (id) { return document.getElementById(id); });
+  var PIVOT = '548 86', ON = 36, angle = 0, tween = null, playing = false, current = null;
+
+  function ink(bg) {          /* paper text on dark labels, deep wine on light ones */
+    var c = document.createElement('canvas').getContext('2d'); c.fillStyle = bg; var h = c.fillStyle;
+    var n = parseInt(h.slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255;
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 150 ? '#5B1426' : '#EDEFEC';
+  }
+  function split(t) {         /* up to two label lines of about 17 characters */
+    if (t.length <= 17) return [t, ''];
+    var cut = t.lastIndexOf(' ', 17); if (cut < 6) cut = 17;
+    var a = t.slice(0, cut).trim(), b = t.slice(cut).trim();
+    return [a, b.length > 18 ? b.slice(0, 17) + '…' : b];
+  }
+  function setLabel(rec) {
+    var col = rec.label || '#8A2A3D', txt = ink(col), lines = split(rec.title);
+    lbl.setAttribute('fill', col); ring.setAttribute('stroke', txt);
+    L[0].textContent = lines[0]; L[1].textContent = lines[1];
+    L[0].setAttribute('y', lines[1] ? 222 : 230); L[1].setAttribute('y', 239);
+    L[2].textContent = rec.artist; L[2].setAttribute('y', lines[1] ? 262 : 256);
+    L[3].textContent = rec.year ? String(rec.year) : ''; L[3].setAttribute('y', lines[1] ? 279 : 274);
+    L.forEach(function (t) { t.setAttribute('fill', txt); });
+  }
+  function swing(to, done) {  /* ease the tonearm about its pivot */
+    if (tween) cancelAnimationFrame(tween);
+    if (reduce) { angle = to; arm.setAttribute('transform', 'rotate(' + angle + ' ' + PIVOT + ')'); if (done) done(); return; }
+    var from = angle, t0 = performance.now(), dur = 900;
+    (function step(t) {
+      var k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 4);
+      angle = from + (to - from) * e; arm.setAttribute('transform', 'rotate(' + angle.toFixed(2) + ' ' + PIVOT + ')');
+      if (k < 1) tween = requestAnimationFrame(step); else { tween = null; if (done) done(); }
+    })(t0);
+  }
+  function caption() {
+    if (!current) return;
+    now.innerHTML = '';
+    var b = document.createElement('b'); b.textContent = current.title; now.appendChild(b);
+    now.appendChild(document.createTextNode((playing ? ' · now playing · ' : ' · on the platter · ') + current.artist));
+  }
+  function play() {
+    playing = true; needle.setAttribute('aria-pressed', 'true'); needle.textContent = 'Lift the needle';
+    swing(ON, function () { if (playing) deck.classList.add('is-playing'); }); caption();
+  }
+  function stop(done) {
+    playing = false; deck.classList.remove('is-playing'); needle.setAttribute('aria-pressed', 'false'); needle.textContent = 'Drop the needle';
+    swing(0, done); caption();
+  }
+  function load(rec, btn) {
+    sleeves.forEach(function (s) { s.setAttribute('aria-pressed', String(s === btn)); });
+    var go = function () { current = rec; setLabel(rec); play(); };
+    if (playing) stop(go); else go();
+  }
+  needle.addEventListener('click', function () { if (playing) stop(); else play(); });
+  sleeves.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      load({ title: btn.dataset.title, artist: btn.dataset.artist, year: btn.dataset.year, label: btn.dataset.label }, btn);
+    });
+  });
+  /* start with the first record on the platter, or a test pressing while the shelf is empty */
+  current = sleeves.length ? { title: sleeves[0].dataset.title, artist: sleeves[0].dataset.artist, year: sleeves[0].dataset.year, label: sleeves[0].dataset.label }
+                           : { title: 'Test pressing', artist: 'Records coming soon', year: '', label: '#8A2A3D' };
+  setLabel(current); if (sleeves[0]) sleeves[0].setAttribute('aria-pressed', 'true');
+  caption();
+  setTimeout(play, reduce ? 0 : 500);
+})();
+</script>
+</body>
+</html>

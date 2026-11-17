@@ -1,0 +1,13 @@
+# The record shelf at /records. One block per record, in the order they should appear on the shelf.
+#   title:  album title (required)
+#   artist: artist or band (required)
+#   year:   release year (optional)
+#   note:   one line about the record, shown under it on the shelf (optional)
+#   label:  colour of the centre label, any CSS colour (optional; the shelf cycles wine, paper and deep wine)
+#
+# Example:
+#   - title: Kind of Blue
+#     artist: Miles Davis
+#     year: 1959
+#     note: The first one on the shelf.
+records: []
