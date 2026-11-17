@@ -26,6 +26,7 @@
 .prose { font: 400 1.125rem/1.65 var(--serif); color: var(--ink); }
 .prose > * + * { margin-top: 1.1em; }
 .prose p { margin: 0; }
+.prose > p, .prose > ul, .prose > ol, .prose li { max-width: 68ch; }
 .prose p + p { margin-top: 1em; }
 .prose h2, .prose h3, .prose h4, .prose h5 { font-family: var(--cond); font-weight: 600; color: var(--wine-deep); line-height: 1.15; margin: 2.2em 0 .5em; letter-spacing: .01em; text-wrap: balance; }
 .prose h2 { font-size: 1.9rem; } .prose h3 { font-size: 1.55rem; } .prose h4 { font-size: 1.3rem; } .prose h5 { font-size: 1.1rem; }
@@ -74,14 +75,11 @@
 .entries { border-top: 1.5px solid var(--rule); }
 .entry { display: grid; grid-template-columns: 13.5rem minmax(0, 1fr); gap: 1.6rem; padding: 1.5rem 0; border-bottom: 1px solid var(--rule-soft); align-items: start; }
 .entry-noimg { grid-template-columns: minmax(0, 1fr); }
-/* thumbnails are plates printed in the sheet's wine ink, the colour plate shows on hover.
-   Duotone without SVG filters (which Safari draws unreliably on images): a greyscale copy screened onto wine-deep
-   maps black to wine and white to white, then multiplying by paper maps white to paper. */
+/* thumbnails are plates printed in the sheet's wine ink: pre-rendered files from tools/make_plates.py
+   (no CSS filters or blend modes, which some browsers draw unreliably); the colour image shows on hover */
 .entry-img { position: relative; display: block; aspect-ratio: 4 / 3; background: var(--paper); border: 1px solid var(--rule-soft); overflow: hidden; }
 .entry-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s var(--ease); }
-.entry-img .duo { position: absolute; inset: 0; background: var(--wine-deep); isolation: isolate; transition: opacity .5s var(--ease); }
-.entry-img .duo img { filter: grayscale(1) contrast(1.05); mix-blend-mode: screen; }
-.entry-img .duo::after { content: ""; position: absolute; inset: 0; background: var(--paper); mix-blend-mode: multiply; pointer-events: none; }
+.entry-img .duo { transition: opacity .5s var(--ease), transform .6s var(--ease); }
 .entry:hover .entry-img img { transform: scale(1.03); }
 .entry:hover .entry-img .duo, .entry:focus-within .entry-img .duo { opacity: 0; }
 .entry-meta { margin: .4rem 0 0; font: 600 .86rem/1.4 var(--cond); letter-spacing: .03em; color: var(--wine); font-variant-numeric: tabular-nums; }
@@ -103,6 +101,8 @@
 .doc-facts dt { font: 600 .76rem/1.3 var(--cond); letter-spacing: .16em; text-transform: uppercase; color: var(--wine); }
 .doc-facts dd { margin: 0; font: 500 1rem/1.45 var(--sans); color: var(--ink); font-variant-numeric: tabular-nums; }
 .doc-facts .sep { color: var(--ink-2); }
+.doc-facts div.wide { flex-basis: 100%; display: grid; grid-template-columns: 5.4rem minmax(0, 1fr); gap: .15rem .8rem; }
+@media (max-width: 560px) { .doc-facts div.wide { grid-template-columns: minmax(0, 1fr); } }
 .doc-facts a, .docfile-meta a { color: var(--wine-deep); text-decoration: underline; text-decoration-color: rgba(138, 42, 61, .45); text-underline-offset: .18em; }
 .doc-facts a:hover, .docfile-meta a:hover { color: var(--wine); text-decoration-color: var(--wine); }
 
@@ -153,3 +153,48 @@
   .prose .image.right, .prose .image.left { float: none; width: 100%; margin: 1em 0; }
 }
 @media (prefers-reduced-motion: reduce) { .entry-img img, .entry-img .duo, .pdf-btn, .pdf-sheet canvas, .pdf-stage canvas { transition: none; } .entry:hover .entry-img img { transform: none; } }
+
+/* ---------- Trip planning content inside a post (the Shikoku 88 page) ---------- */
+.trip .lede { font-style: italic; color: var(--ink-2); }
+.trip .card { background: #F6F7F4; border: 1px solid var(--rule-soft) !important; padding: 1rem 1.25rem; margin: 1.1rem 0; }
+.trip .card > strong:first-child { font-family: var(--cond); font-size: 1.08rem; color: var(--wine-deep); }
+.trip .grid { display: grid; gap: .8rem; }
+.trip .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.trip .pref { padding: .9rem 1rem; margin: 0; }
+.trip .pref .name { font: 600 1.2rem/1.15 var(--cond); color: var(--wine-deep); }
+.trip .pref .theme { font-size: .92rem; font-style: italic; color: var(--ink-2); margin-top: .1rem; }
+.trip .pref .stats { margin-top: .45rem; font: 500 .86rem/1.5 var(--sans); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.trip .scroller { overflow-x: auto; }
+.trip table { font-size: .92rem; }
+.trip .rest, .trip .mid { color: var(--wine-deep); font-weight: 600; }
+.trip .warn { color: var(--wine); font-weight: 600; }
+.trip .note { font-style: italic; color: var(--ink-2); }
+.trip .kicker { font: 600 .8rem/1.3 var(--cond); letter-spacing: .16em; text-transform: uppercase; color: var(--wine); }
+.trip .pill { display: inline-block; padding: .05rem .45rem; border: 1.5px solid var(--wine-deep); font: 600 .76rem/1.3 var(--cond); letter-spacing: .12em; text-transform: uppercase; color: var(--wine-deep); }
+.trip h3.as-h4 { font-size: 1.05rem; color: var(--wine); text-transform: uppercase; letter-spacing: .12em; }
+.trip .legs { display: grid; margin: 1rem 0; border-top: 1.5px solid var(--rule); }
+.trip .leg { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; padding: .6rem 0; border-bottom: 1px solid var(--rule-soft); }
+.trip .leg .when { font: 600 .95rem/1.3 var(--cond); letter-spacing: .04em; color: var(--wine-deep); min-width: 7rem; font-variant-numeric: tabular-nums; }
+.trip .leg .what { flex: 1 1 15rem; }
+.trip .leg .tag { font: 600 .76rem/1.3 var(--cond); letter-spacing: .12em; text-transform: uppercase; color: var(--wine); }
+.trip .footnote { margin-top: 3rem; padding-top: 1rem; border-top: 1.5px solid var(--rule); font: italic 400 .92rem/1.5 var(--serif); color: var(--ink-2); }
+
+/* ---------- 3D models on a project page ---------- */
+.doc-models { max-width: 64rem; }
+.doc-models .doc-head, .doc-models .prose, .doc-models .models > h2 { max-width: 42rem; margin-left: auto; margin-right: auto; }
+.models { margin-top: clamp(2.6rem, 6vw, 3.6rem); }
+.models > h2 { font-size: clamp(1.7rem, 3vw, 2.2rem); padding-top: 1.5rem; border-top: 1.5px solid var(--rule); }
+.model { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(1.2rem, 3vw, 2.4rem); align-items: center; margin: 1.6rem 0 0; padding-bottom: 1.6rem; border-bottom: 1px solid var(--rule-soft); }
+.mv { aspect-ratio: 4 / 3; background: var(--paper-2); border: 1px solid var(--rule-soft); cursor: grab; touch-action: none; display: grid; place-items: center; }
+.mv:active { cursor: grabbing; }
+.mv canvas { display: block; width: 100% !important; height: 100% !important; }
+.mv-status { margin: 0; font: italic 400 1rem/1.4 var(--serif); color: var(--ink-2); padding: 1rem; text-align: center; }
+.model-title { margin: 0; font: 600 1.4rem/1.15 var(--cond); color: var(--wine-deep); }
+.model-about { margin: .6rem 0 0; font: 400 1.05rem/1.6 var(--serif); color: var(--ink); }
+.model-print { margin: .7rem 0 0; font: 400 .98rem/1.55 var(--serif); color: var(--ink-2); }
+.model-print span { font: 600 .78rem/1.3 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--wine); margin-right: .4rem; }
+.model-dl { margin: 1rem 0 0; display: flex; align-items: center; gap: 1rem; }
+.model-dl .dl { display: inline-block; font: 600 .95rem/1 var(--sans); text-decoration: none; color: var(--paper); background: var(--wine-deep); border: 1.5px solid var(--wine-deep); padding: .75rem 1.1rem; transition: background .2s var(--ease); }
+.model-dl .dl:hover { background: var(--wine); border-color: var(--wine); }
+.model-size { font: 600 .82rem/1.3 var(--cond); letter-spacing: .1em; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .model { grid-template-columns: minmax(0, 1fr); } }

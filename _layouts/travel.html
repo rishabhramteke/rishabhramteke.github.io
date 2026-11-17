@@ -21,6 +21,8 @@
     #globe-travel:active { cursor: grabbing; }
     #globe-travel canvas { display: block; }
     .tv-tb { position: absolute; right: 3.5%; bottom: 6%; z-index: 3; width: min(22rem, 30%); }
+    .tv-links { margin: 1rem 0 0; font: 600 .98rem/1.6 var(--sans); color: var(--ink-2); }
+    .tv-links .tv-back { margin: 0; }
     .tv-count { font: 600 1rem/1.3 var(--cond); letter-spacing: .06em; color: var(--wine-deep); margin: 0; font-variant-numeric: tabular-nums; }
     .tv-tip { position: fixed; z-index: 20; pointer-events: none; display: none; width: 220px; background: var(--paper); border: 1.5px solid var(--rule); color: var(--ink); overflow: hidden; }
     .tv-tip img { width: 100%; height: 130px; object-fit: cover; display: block; border-bottom: 1px solid var(--rule-soft); }
@@ -49,7 +51,7 @@
       <header class="tv-head">
         <h1 id="tv-h">The world, one city at a time.</h1>
         <p>Drag to turn the globe, scroll to zoom, and point at a flag for the city.</p>
-        <a class="tv-back" href="{{ '/' | relative_url }}#journal">Back to Sheet 2 · Journal</a>
+        <p class="tv-links"><a class="tv-back" href="{{ '/travel-diary' | relative_url }}">The travel diary</a> · <a class="tv-back" href="{{ '/camino-de-santiago' | relative_url }}">Camino de Santiago</a> · <a class="tv-back" href="{{ '/' | relative_url }}#journal">Back to Sheet 2 · Journal</a></p>
       </header>
       <div class="titleblock tv-tb">
         <p class="tb-title">Sheet 3 · Travel</p>

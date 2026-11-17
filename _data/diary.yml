@@ -1,0 +1,17 @@
+# The travel diary at /travel-diary. People I meet write in it in their own language.
+# One block per diary page, in order. Every field is optional except one of image or text.
+#   image:       a photo or scan of the page, e.g. assets/images/diary/001.jpg
+#   text:        what they wrote, typed out (shown when there is no image, or under it)
+#   language:    e.g. Spanish
+#   place:       where we met, e.g. "Arzúa, Camino Francés"
+#   date:        e.g. "April 2026"
+#   writer:      a first name, only if they were happy to be named
+#   translation: an English translation
+#
+# Example:
+#   - image: assets/images/diary/001.jpg
+#     language: Galician
+#     place: "Palas de Rei, Camino Francés"
+#     date: "2026"
+#     translation: "Walk slowly, the road is long and beautiful."
+pages: []

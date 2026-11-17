@@ -3,9 +3,9 @@
 {% include sheet-head.html %}
 <body class="sheet-page doc-page">
 {% include sheet-bar.html %}
-<main id="content" class="doc{% if page.documents %} doc-docs{% endif %}">
+<main id="content" class="doc{% if page.documents %} doc-docs{% endif %}{% if page.models %} doc-models{% endif %}">
   <article>
-    {% assign is_project = false %}{% if page.category == 'project' or page.category == 'acad' %}{% assign is_project = true %}{% endif %}
+    {% assign is_project = false %}{% if page.category == 'project' or page.category == 'acad' or page.category == 'publication' %}{% assign is_project = true %}{% endif %}
     {% assign body_text = content | strip_html | strip %}
     {% assign show_hero = false %}
     {% if page.image %}{% if page.image_show_on_page != false %}{% assign show_hero = true %}{% elsif is_project and body_text == "" and page.documents == nil %}{% unless content contains '<img' or content contains '<iframe' %}{% assign show_hero = true %}{% endunless %}{% endif %}{% endif %}
@@ -15,6 +15,9 @@
       {% if is_project %}
       <dl class="doc-facts">
         <div><dt>Year</dt><dd>{{ page.date | date: "%Y" }}</dd></div>
+        {% if page.venue %}<div class="wide"><dt>Venue</dt><dd>{{ page.venue }}</dd></div>{% endif %}
+        {% if page.authors %}<div class="wide"><dt>Authors</dt><dd>{{ page.authors }}</dd></div>{% endif %}
+        {% if page.links %}<div class="wide"><dt>Links</dt><dd>{% for l in page.links %}<a href="{{ l.url }}" target="_blank" rel="noopener">{{ l.title }}</a>{% unless forloop.last %}<span class="sep" aria-hidden="true"> · </span>{% endunless %}{% endfor %}</dd></div>{% endif %}
         {% if page.documents %}<div><dt>Documents</dt><dd>{% for d in page.documents %}<a href="#{% if d.id %}{{ d.id }}{% else %}doc-{{ forloop.index }}{% endif %}">{{ d.title }}</a>{% unless forloop.last %}<span class="sep" aria-hidden="true"> · </span>{% endunless %}{% endfor %}</dd></div>{% endif %}
       </dl>
       {% endif %}
@@ -24,6 +27,7 @@
       {{ content }}
     </div>
     {% include doc-viewer.html %}
+    {% include model-viewer.html %}
   </article>
 </main>
 {% include sheet-foot.html %}

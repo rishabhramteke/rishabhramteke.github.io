@@ -1,0 +1,51 @@
+{% comment %}3D models on a project page: front matter `models` (title, file, about, print). Each is drawn with three.js and offered as an STL download.{% endcomment %}
+{% if page.models %}
+<section class="models" aria-labelledby="models-h">
+  <h2 id="models-h">Models</h2>
+  {% for m in page.models %}
+  <figure class="model" id="model-{{ forloop.index }}">
+    <div class="mv" data-src="{{ m.file | relative_url }}" role="img" aria-label="3D view of {{ m.title | escape }}. Drag to turn it."><p class="mv-status">Loading the model…</p></div>
+    <figcaption class="model-text">
+      <p class="model-title">{{ m.title }}</p>
+      <p class="model-about">{{ m.about }}</p>
+      {% if m.print %}<p class="model-print"><span>Printing</span> {{ m.print }}</p>{% endif %}
+      <p class="model-dl"><a class="dl" href="{{ m.file | relative_url }}" download>Download STL</a><span class="model-size">{{ m.size }}</span></p>
+    </figcaption>
+  </figure>
+  {% endfor %}
+</section>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+<script type="module">
+import * as THREE from 'three';
+import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.querySelectorAll('.mv').forEach((box) => {
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 2000);
+  scene.add(new THREE.HemisphereLight(0xf6f7f4, 0x5a4549, 1.6));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(2, 4, 3); scene.add(sun);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.enablePan = false; controls.autoRotate = !reduce; controls.autoRotateSpeed = 1.2;
+  let visible = false;
+  function size() { const w = box.clientWidth, h = box.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  const load = (tries) => new STLLoader().load(box.dataset.src, (geo) => {
+    geo.rotateX(-Math.PI / 2); geo.computeVertexNormals(); geo.center();       // files are Z-up, the viewer is Y-up
+    geo.computeBoundingSphere(); const r = geo.boundingSphere.radius;
+    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x8a2a3d, roughness: 0.62, metalness: 0.0 }));
+    scene.add(mesh);
+    camera.position.set(r * 1.9, r * 1.5, r * 2.3); controls.target.set(0, 0, 0); controls.minDistance = r * 1.4; controls.maxDistance = r * 6;
+    box.innerHTML = ''; box.appendChild(renderer.domElement); size();
+    new ResizeObserver(size).observe(box);
+    new IntersectionObserver((es) => { visible = es[0].isIntersecting; }).observe(box);
+    (function loop() { if (visible || reduce) { controls.update(); renderer.render(scene, camera); } requestAnimationFrame(loop); })();
+  }, undefined, (e) => {
+    if (tries > 0) { setTimeout(() => load(tries - 1), 900); return; }   /* one quiet retry for a dropped request */
+    console.error('model viewer:', e && (e.message || e)); box.querySelector('.mv-status').textContent = 'The model could not be drawn here. Use Download STL to open it in a slicer.';
+  });
+  load(1);
+});
+</script>
+{% endif %}

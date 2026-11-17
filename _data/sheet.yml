@@ -53,15 +53,18 @@ journal:
   - title: Record shelf
     url: /records
     note: "My vinyl, one record at a time on the turntable."
+  - title: Board game shelf
+    url: /board-games
+    note: "Games I own, games I have played and my reviews."
   - title: Curiosity map
     url: /curiosity-map/
-    note: "A constellation of curiosities: things to do, places to go and sparks."
+    note: "A star chart of things I want to learn, make and do, and places I want to go."
   - title: My blog
     url: /blog
     note: "Writing about engineering, data, travel and the occasional random thought."
 route:
-  - { name: Mumbai, years: "2017–2021", lat: 19.076, lng: 72.877, lat_s: "19.08° N", lng_s: "72.88° E" }
-  - { name: Melbourne, years: "2019", lat: -37.814, lng: 144.946, lat_s: "37.81° S", lng_s: "144.95° E" }
-  - { name: Vienna, years: "2021", lat: 48.208, lng: 16.373, lat_s: "48.21° N", lng_s: "16.37° E" }
-  - { name: Tokyo, years: "2022–2024", lat: 35.682, lng: 139.691, lat_s: "35.68° N", lng_s: "139.69° E" }
-  - { name: Amsterdam, years: "2024–present", lat: 52.377, lng: 4.897, lat_s: "52.38° N", lng_s: "4.90° E" }
+  - { name: Mumbai, years: "2017–2021", lat: 19.1334, lng: 72.9133, h3: "87608b543ffffff", spot: "IIT Bombay" }
+  - { name: Melbourne, years: "2019", lat: -37.8183, lng: 144.9416, h3: "87be6356effffff", spot: "Docklands" }
+  - { name: Vienna, years: "2021", lat: 48.2166, lng: 16.3958, h3: "871e15b44ffffff", spot: "the Prater" }
+  - { name: Tokyo, years: "2022–2024", lat: 35.7700, lng: 139.6443, h3: "872f5a351ffffff", spot: "Chikatetsu-akatsuka" }
+  - { name: Amsterdam, years: "2024–present", lat: 52.3777, lng: 4.8934, h3: "871969c9bffffff", spot: "home" }

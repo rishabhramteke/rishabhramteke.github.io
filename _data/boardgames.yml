@@ -1,0 +1,43 @@
+# The board game shelf at /board-games. One block per game.
+#   title:    name of the game (required)
+#   status:   own | played | wishlist (required: which shelf it stands on)
+#   year:     year it came out
+#   designer: who designed it
+#   players:  e.g. "2–5"
+#   plays:    how much I have played it, e.g. "a lot", "once"
+#   rating:   my score out of 5 (leave empty until I have one)
+#   review:   my review, a few sentences (leave empty until written)
+#   size:     small | medium | large (how big the box looks on the shelf)
+games:
+  - title: Saboteur
+    status: own
+    year: 2004
+    designer: Frederic Moyersoen
+    players: "3–10"
+    size: small
+  - title: "Ticket to Ride: Rails & Sails"
+    status: own
+    year: 2016
+    designer: Alan R. Moon
+    players: "2–5"
+    size: large
+  - title: SHASN
+    status: own
+    year: 2021
+    designer: Zain Memon
+    players: "2–5"
+    size: large
+  - title: Catan
+    status: played
+    year: 1995
+    designer: Klaus Teuber
+    players: "3–4"
+    plays: a lot
+    size: large
+  - title: Cascadia
+    status: played
+    year: 2021
+    designer: Randy Flynn
+    players: "1–4"
+    plays: a lot
+    size: medium

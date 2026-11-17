@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+{% include sheet-head.html %}
+<body class="sheet-page doc-page diary-page">
+{% include sheet-bar.html %}
+{% assign pages = site.data.diary.pages %}
+<style>
+  .diary { flex: 1; width: 100%; max-width: 76rem; margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) var(--gutter) clamp(2.5rem, 5vw, 4rem); }
+  .diary-head h1 { font-size: clamp(2.3rem, 5vw, 3.8rem); }
+  .desk { margin-top: 2rem; display: grid; place-items: center; padding: clamp(1rem, 4vw, 3rem) 0; border-top: 1.5px solid var(--rule); }
+  /* the book: leaves hinge on the spine; a flipped leaf turns -180deg */
+  .book { position: relative; width: min(64rem, 100%); aspect-ratio: 1.42; perspective: 2600px; transition: transform .9s var(--ease); }
+  .book.closed { transform: translateX(-25%); }
+  .book.ended { transform: translateX(25%); }
+  .leaf { position: absolute; top: 0; left: 50%; width: 50%; height: 100%; transform-origin: left center; transform-style: preserve-3d; transition: transform .9s var(--ease); cursor: pointer; }
+  .leaf.flipped { transform: rotateY(-180deg); }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
+  .face.back { transform: rotateY(180deg); }
+  .page { background-color: #F6F3EC; background-image: linear-gradient(rgba(138, 42, 61, .13) 1px, transparent 1px); background-size: 100% 1.9rem; background-position: 0 3.2rem;
+          box-shadow: inset 12px 0 18px -14px rgba(35, 21, 24, .35); padding: clamp(1.2rem, 3.5vw, 2.6rem) clamp(1.1rem, 3vw, 2.4rem); display: flex; flex-direction: column; }
+  .face.back.page { box-shadow: inset -12px 0 18px -14px rgba(35, 21, 24, .35); }
+  .cover { background: #5B1426; color: #EDEFEC; display: grid; place-items: center; text-align: center; padding: 2rem; box-shadow: inset 0 0 0 10px #5B1426, inset 0 0 0 11.5px rgba(237, 239, 236, .55); }
+  .cover h2 { color: #EDEFEC; font-size: clamp(2rem, 5vw, 3.4rem); letter-spacing: .02em; }
+  .cover p { margin: .6rem 0 0; font: italic 400 clamp(.95rem, 1.6vw, 1.15rem)/1.4 var(--serif); color: rgba(237, 239, 236, .85); }
+  .cover .mark { margin: 1.4rem auto 0; width: 3.2rem; height: 3.2rem; }
+  .cover.back-cover { background: #4A0F1E; }
+  .pg-h { margin: 1.3rem 0 0; font: 600 clamp(1.4rem, 2.6vw, 2rem)/1.1 var(--cond); color: var(--wine-deep); }
+  .pg-t { margin: .9rem 0 0; font: 400 clamp(.98rem, 1.6vw, 1.1rem)/1.9rem var(--serif); color: var(--ink); }
+  .pg-t + .pg-t { margin-top: 0; }
+  .pg-img { flex: 1; min-height: 0; display: grid; place-items: center; margin: .4rem 0 .6rem; }
+  .pg-img img { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 1px 2px rgba(35, 21, 24, .12), 0 10px 24px -16px rgba(35, 21, 24, .45); }
+  .pg-hand { flex: 1; font: italic 400 clamp(1.05rem, 1.9vw, 1.35rem)/1.9rem var(--serif); color: #2B2350; white-space: pre-wrap; }
+  .pg-meta { margin-top: auto; padding-top: .6rem; font: 600 .86rem/1.4 var(--cond); letter-spacing: .06em; color: var(--wine-deep); }
+  .pg-tr { margin: .25rem 0 0; font: italic 400 .95rem/1.45 var(--serif); color: var(--ink-2); }
+  .pg-no { position: absolute; bottom: .7rem; font: 600 .78rem/1 var(--cond); letter-spacing: .1em; color: var(--ink-2); }
+  .face.front .pg-no { right: 1.1rem; } .face.back .pg-no { left: 1.1rem; }
+  .pg-empty { margin: auto 0; text-align: center; font: italic 400 1.05rem/1.9rem var(--serif); color: var(--ink-2); }
+  .turn { margin-top: 1.4rem; display: flex; align-items: center; justify-content: center; gap: 1.1rem; }
+  .turn button { width: 2.9rem; height: 2.9rem; display: grid; place-items: center; padding: 0; cursor: pointer; background: transparent; border: 1.5px solid var(--wine-deep); color: var(--wine-deep); transition: background .2s var(--ease), color .2s var(--ease); }
+  .turn button svg { width: 1.05rem; height: 1.05rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: square; }
+  .turn button:hover:not(:disabled) { background: var(--wine-deep); color: var(--paper); }
+  .turn button:disabled { border-color: var(--rule-soft); color: var(--rule-soft); cursor: default; }
+  .turn .at { min-width: 8rem; text-align: center; font: 600 1rem/1 var(--cond); letter-spacing: .06em; color: var(--wine-deep); font-variant-numeric: tabular-nums; }
+  .hint { margin: .7rem 0 0; text-align: center; font: italic 400 .92rem/1.4 var(--serif); color: var(--ink-2); }
+  /* phones: one page at a time, turning off to the left */
+  @media (max-width: 720px) {
+    .book { aspect-ratio: .7; width: min(26rem, 100%); }
+    .book.closed, .book.ended { transform: none; }
+    .leaf { left: 0; width: 100%; }
+    .leaf.flipped { transform: rotateY(-180deg); opacity: 0; transition: transform .9s var(--ease), opacity .3s .6s; }
+  }
+  @media (prefers-reduced-motion: reduce) { .book, .leaf { transition: none !important; } }
+</style>
+<main id="content" class="diary">
+  <header class="diary-head">
+    <h1>Travel diary</h1>
+    <p class="doc-meta">People I meet write in this notebook in their own language. It started on the Camino de Santiago in 2026. Click a page, use the arrows or swipe to turn it.</p>
+  </header>
+  <div class="desk">
+    <div class="book closed" id="book" tabindex="0" role="region" aria-roledescription="book" aria-label="Travel diary. Use the arrow keys to turn the pages."></div>
+    <div class="turn">
+      <button type="button" id="prev" aria-label="Previous page"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 L5 8 L10 13"/></svg></button>
+      <span class="at" id="at" aria-live="polite"></span>
+      <button type="button" id="next" aria-label="Next page"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13"/></svg></button>
+    </div>
+  </div>
+  <!-- the diary pages, read by the script below and laid out as a book -->
+  <template id="pages">
+    <section data-kind="cover" class="cover"><div><h2>Travel diary</h2><p>Written by strangers, in their own languages</p><svg class="mark" viewBox="0 0 48 48" aria-hidden="true" fill="none" stroke="#EDEFEC" stroke-width="1.6"><path d="M24 6 L27 21 L42 24 L27 27 L24 42 L21 27 L6 24 L21 21 Z"/><circle cx="24" cy="24" r="17" stroke-opacity=".5"/></svg></div></section>
+    <section data-kind="page"><p class="pg-h">One page, one stranger</p><p class="pg-t">I carry this notebook when I travel and ask people I meet to write something in it, in their own language: a wish, a joke, advice, a line from a song.</p><p class="pg-t">It began on the last five days of the Camino de Santiago, walking from Sarria in 2026.</p></section>
+    {% if pages and pages.size > 0 %}
+    {% for p in pages %}
+    <section data-kind="page">
+      {% if p.image %}<div class="pg-img"><img src="{{ p.image | relative_url }}" alt="A diary page written {% if p.language %}in {{ p.language }}{% endif %}{% if p.place %} in {{ p.place }}{% endif %}" loading="lazy"></div>{% endif %}
+      {% if p.text %}<p class="pg-hand">{{ p.text }}</p>{% endif %}
+      <p class="pg-meta">{% if p.language %}{{ p.language }}{% endif %}{% if p.place %} · {{ p.place }}{% endif %}{% if p.date %} · {{ p.date }}{% endif %}{% if p.writer %} · {{ p.writer }}{% endif %}</p>
+      {% if p.translation %}<p class="pg-tr">“{{ p.translation }}”</p>{% endif %}
+    </section>
+    {% endfor %}
+    {% else %}
+    <section data-kind="page"><p class="pg-empty">The first pages are being scanned.<br>Written ones arrive here soon.</p></section>
+    <section data-kind="page"><p class="pg-empty">This page is waiting for the next stranger.</p></section>
+    {% endif %}
+    <section data-kind="cover" class="cover back-cover"><div><p>Thank you to everyone who wrote in it.</p></div></section>
+  </template>
+</main>
+{% include sheet-foot.html %}
+<script>
+(function () {
+  'use strict';
+  var book = document.getElementById('book'), prev = document.getElementById('prev'), next = document.getElementById('next'), at = document.getElementById('at');
+  var src = Array.prototype.slice.call(document.getElementById('pages').content.children);
+  var narrow = window.matchMedia('(max-width: 720px)'), leaves = [], pos = 0, swiped = false;
+  function face(el, side, n) {
+    var f = document.createElement('div'); f.className = 'face ' + side + (el ? (el.dataset.kind === 'cover' ? ' cover' + (el.classList.contains('back-cover') ? ' back-cover' : '') : ' page') : ' page');
+    if (el) { f.innerHTML = el.innerHTML; if (el.dataset.kind === 'page') { var no = document.createElement('span'); no.className = 'pg-no'; no.textContent = n; f.appendChild(no); } }
+    return f;
+  }
+  function build() {
+    book.innerHTML = ''; leaves = []; var n = 0, nums = src.map(function (el) { return el.dataset.kind === 'page' ? ++n : ''; });
+    if (narrow.matches) {   /* one page per leaf */
+      src.forEach(function (el, i) { var lf = document.createElement('div'); lf.className = 'leaf'; lf.appendChild(face(el, 'front', nums[i])); lf.appendChild(face(null, 'back', '')); leaves.push(lf); });
+    } else {                /* two pages per leaf: front on the right, back on the left once turned */
+      for (var i = 0; i < src.length; i += 2) {
+        var lf = document.createElement('div'); lf.className = 'leaf';
+        lf.appendChild(face(src[i], 'front', nums[i])); lf.appendChild(face(src[i + 1] || null, 'back', nums[i + 1] || '')); leaves.push(lf);
+      }
+    }
+    leaves.forEach(function (lf, i) { lf.addEventListener('click', function () { if (swiped) { swiped = false; return; } go(lf.classList.contains('flipped') ? i : i + 1); }); book.appendChild(lf); });
+    pos = Math.min(pos, leaves.length); render();
+  }
+  function render() {
+    leaves.forEach(function (lf, i) {
+      var f = i < pos; lf.classList.toggle('flipped', f);
+      lf.style.zIndex = f ? String(i + 1) : String(leaves.length - i + 1);
+      lf.setAttribute('aria-hidden', String(!(i === pos || i === pos - 1)));
+      lf.style.visibility = (i >= pos - 2 && i <= pos + 1) ? 'visible' : 'hidden';   /* leaves deep in the stack stay hidden */
+    });
+    book.classList.toggle('closed', pos === 0 && !narrow.matches);
+    book.classList.toggle('ended', pos === leaves.length && !narrow.matches);
+    prev.disabled = pos === 0; next.disabled = pos === leaves.length;
+    at.textContent = pos === 0 ? 'Cover' : pos === leaves.length ? 'Back cover' : (narrow.matches ? 'Page ' + pos : 'Spread ' + pos + ' of ' + (leaves.length - 1));
+  }
+  function go(p) { pos = Math.max(0, Math.min(leaves.length, p)); render(); }
+  prev.addEventListener('click', function () { go(pos - 1); });
+  next.addEventListener('click', function () { go(pos + 1); });
+  book.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { go(pos + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { go(pos - 1); e.preventDefault(); }
+  });
+  var x0 = null;
+  book.addEventListener('pointerdown', function (e) { x0 = e.clientX; });
+  book.addEventListener('pointerup', function (e) { if (x0 === null) return; var dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 40) { swiped = true; go(pos + (dx < 0 ? 1 : -1)); setTimeout(function () { swiped = false; }, 400); } });
+  (narrow.addEventListener ? narrow.addEventListener('change', build) : narrow.addListener(build));
+  build();
+})();
+</script>
+</body>
+</html>

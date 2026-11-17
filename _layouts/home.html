@@ -33,7 +33,7 @@
       <header class="legend">
         <h1 id="who">Rishabh Ramteke</h1>
         <p class="role">Cartographer and ML scientist working on computer vision and maps.</p>
-        <p class="coords">Amsterdam · 52°22′ N 4°54′ E · <span class="nw" title="H3 hexagonal grid cell, resolution 7">871969526ffffff</span></p>
+        <p class="coords">Amsterdam · 52°22′ N 4°54′ E · <span class="nw" title="H3 hexagonal grid cell, resolution 7">871969c9bffffff</span></p>
         <nav class="actions" aria-label="Primary">
           <a class="act act-main" href="{{ '/assets/files/Resume.pdf' | relative_url }}">Résumé</a>
           <a class="act" href="{{ site.linkedin_url }}" rel="me">LinkedIn</a>
@@ -97,7 +97,7 @@
         <table class="route-gaz">
           <caption>My route so far</caption>
           <tbody>
-            {% for c in sh.route %}<tr><th scope="row">{{ c.name }}</th><td class="yrs">{{ c.years }}</td><td>{{ c.lat_s }}</td><td>{{ c.lng_s }}</td></tr>{% endfor %}
+            {% for c in sh.route %}<tr><th scope="row">{{ c.name }}</th><td class="yrs">{{ c.years }}</td><td class="h3" title="H3 cell, resolution 7, around {{ c.spot }}">{{ c.h3 }}</td></tr>{% endfor %}
           </tbody>
         </table>
       </div>
