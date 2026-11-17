@@ -47,6 +47,9 @@ journal:
   - title: Side quests
     url: /side-quest
     note: "Things I chase for fun."
+  - title: Icebreaker
+    url: /icebreaker/
+    note: "Kind opening lines, a five-minute dare and a score, for practising saying hello."
   - title: Curiosity map
     url: /curiosity-map/
     note: "A constellation of curiosities: things to do, places to go and sparks."

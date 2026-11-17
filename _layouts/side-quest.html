@@ -14,6 +14,9 @@
   #sq-diff { display: flex; gap: .3rem; }
   #sq-diff span { width: 11px; height: 11px; transform: rotate(45deg); border: 1.75px solid var(--wine); }
   #sq-diff span.lit { background: var(--wine); }
+  .sq-more { margin: 1.1rem 0 0; font: italic 400 .98rem/1.45 var(--serif); color: var(--ink-2); }
+  .sq-more a { color: var(--wine-deep); text-decoration-color: rgba(138, 42, 61, .45); text-underline-offset: .18em; }
+  .sq-more a:hover { color: var(--wine); text-decoration-color: var(--wine); }
   #sq-category { margin-top: 1.2rem; font: 600 .82rem/1.3 var(--cond); letter-spacing: .18em; text-transform: uppercase; color: var(--wine-deep); }
   #sq-emoji { display: block; font-size: 2.6rem; line-height: 1; margin-top: .8rem; }
   #sq-quest { margin: .9rem 0 0; font: 400 clamp(1.3rem, 2.4vw, 1.6rem)/1.35 var(--serif); color: var(--ink); text-wrap: pretty; }
@@ -36,6 +39,7 @@
       <h2 id="sq-quest"></h2>
       <p id="sq-flavour"></p>
       <button id="sq-reroll" type="button">Roll a new quest</button>
+      <p class="sq-more">Need a first line? <a href="{{ '/icebreaker/' | relative_url }}">Try the Icebreaker cards</a>.</p>
     </section>
   </div>
 </main>
