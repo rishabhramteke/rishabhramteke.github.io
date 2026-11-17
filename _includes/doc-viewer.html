@@ -1,0 +1,21 @@
+{% comment %}Documents shown on the page itself (front matter `documents`: title, file, pages, optional id). PDFs are drawn by assets/js/docs.js; other files are shown as numbered text.{% endcomment %}
+{% if page.documents %}
+<section class="docs" aria-labelledby="docs-h">
+  <h2 id="docs-h">Documents</h2>
+  {% for d in page.documents %}
+  {% capture did %}{% if d.id %}{{ d.id }}{% else %}doc-{{ forloop.index }}{% endif %}{% endcapture %}
+  {% assign ext = d.file | split: '.' | last | downcase %}
+  <figure class="docfile{% if d.kind == 'slides' %} is-deck{% endif %}" id="{{ did }}">
+    <figcaption class="docfile-head">
+      <span class="docfile-title">{{ d.title }}</span>
+      <span class="docfile-meta">{% if ext == 'pdf' %}{% if d.pages %}{{ d.pages }} {% if d.pages == 1 %}page{% else %}pages{% endif %} · {% endif %}<a href="{{ d.file | relative_url }}" target="_blank" rel="noopener">Open PDF</a>{% else %}{{ d.file | split: '/' | last }}{% endif %}</span>
+    </figcaption>
+    {% if ext == 'pdf' %}
+    <div class="pdf" data-src="{{ d.file | relative_url }}" data-title="{{ d.title | escape }}"><p class="pdf-status">Use Open PDF to read this document.</p></div>
+    {% else %}
+    <pre class="code-file" data-src="{{ d.file | relative_url }}" tabindex="0" aria-label="{{ d.title | escape }}"><code>Use a browser with JavaScript to read this file.</code></pre>
+    {% endif %}
+  </figure>
+  {% endfor %}
+</section>
+{% endif %}

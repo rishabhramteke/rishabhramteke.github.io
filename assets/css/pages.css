@@ -17,7 +17,7 @@
 .doc-wide { max-width: 72rem; }
 .doc-head { margin-bottom: 2rem; }
 .doc-head h1 { font-size: clamp(2.3rem, 5vw, 3.8rem); }
-.doc-meta { margin: .9rem 0 0; font: italic 400 1.05rem/1.5 var(--serif); color: var(--ink-2); max-width: 62ch; }
+.doc-meta { margin: .9rem 0 0; font: italic 400 1.05rem/1.5 var(--serif); color: var(--ink-2); max-width: 62ch; text-wrap: pretty; }
 .doc-intro { margin-top: 1rem; max-width: 62ch; }
 .doc-hero { margin: 0 0 2rem; }
 .doc-hero img { width: 100%; height: auto; display: block; border: 1.5px solid var(--rule); }
@@ -74,20 +74,71 @@
 .entries { border-top: 1.5px solid var(--rule); }
 .entry { display: grid; grid-template-columns: 13.5rem minmax(0, 1fr); gap: 1.6rem; padding: 1.5rem 0; border-bottom: 1px solid var(--rule-soft); align-items: start; }
 .entry-noimg { grid-template-columns: minmax(0, 1fr); }
-.entry-img { display: block; aspect-ratio: 4 / 3; background: #fff; border: 1px solid var(--rule-soft); overflow: hidden; }
-.entry-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s var(--ease); }
+/* thumbnails are plates printed in the sheet's wine ink (SVG filter #duo in sheet-foot.html); the colour plate shows on hover */
+.entry-img { position: relative; display: block; aspect-ratio: 4 / 3; background: var(--paper); border: 1px solid var(--rule-soft); overflow: hidden; }
+.entry-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s var(--ease), opacity .5s var(--ease); }
+.entry-img .duo { filter: url(#duo); }
 .entry:hover .entry-img img { transform: scale(1.03); }
-.entry-date { margin: 0 0 .3rem; font: 600 .8rem/1.3 var(--cond); letter-spacing: .16em; color: var(--wine); font-variant-numeric: tabular-nums; }
+.entry:hover .entry-img .duo, .entry:focus-within .entry-img .duo { opacity: 0; }
+.entry-meta { margin: .4rem 0 0; font: 600 .86rem/1.4 var(--cond); letter-spacing: .03em; color: var(--wine); font-variant-numeric: tabular-nums; }
+.entry-meta span + span::before { content: "·"; margin: 0 .55em; color: var(--ink-2); }
 .entry h2 { font-size: clamp(1.35rem, 2.2vw, 1.75rem); line-height: 1.15; }
 .entry h2 a { text-decoration: none; }
 .entry h2 a:hover { text-decoration: underline; color: var(--wine-deep); }
-.entry-desc { margin: .5rem 0 0; font: 400 1.02rem/1.5 var(--serif); color: var(--ink-2); max-width: 64ch; }
+.entry-desc { margin: .5rem 0 0; font: 400 1.02rem/1.5 var(--serif); color: var(--ink-2); max-width: 64ch; text-wrap: pretty; }
 
 /* ---------- Footer ---------- */
 .foot { border-top: 1.5px solid var(--rule); padding: 1.6rem var(--gutter) 2rem; display: flex; flex-wrap: wrap; justify-content: space-between; gap: .8rem 2rem; align-items: baseline; }
 .foot-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .3rem 1.3rem; font-weight: 600; }
 .foot-links a { text-decoration: underline; }
 .foot-col { margin: 0; font: italic 400 .9rem/1.4 var(--serif); color: var(--ink-2); }
+
+/* ---------- Project pages: facts strip and documents shown in the page ---------- */
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.doc-facts { display: flex; flex-wrap: wrap; gap: .45rem 2.4rem; margin: 1.4rem 0 0; padding: .75rem 0; border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft); }
+.doc-facts div { display: flex; flex-wrap: wrap; gap: .2rem .8rem; align-items: baseline; }
+.doc-facts dt { font: 600 .76rem/1.3 var(--cond); letter-spacing: .16em; text-transform: uppercase; color: var(--wine); }
+.doc-facts dd { margin: 0; font: 500 1rem/1.45 var(--sans); color: var(--ink); font-variant-numeric: tabular-nums; }
+.doc-facts .sep { color: var(--ink-2); }
+.doc-facts a, .docfile-meta a { color: var(--wine-deep); text-decoration: underline; text-decoration-color: rgba(138, 42, 61, .45); text-underline-offset: .18em; }
+.doc-facts a:hover, .docfile-meta a:hover { color: var(--wine); text-decoration-color: var(--wine); }
+
+/* pages with documents: text keeps the reading column, slide decks use the full width */
+.doc-docs { max-width: 64rem; }
+.doc-docs .doc-head, .doc-docs .doc-hero, .doc-docs .prose, .doc-docs .docs > h2, .doc-docs .docfile:not(.is-deck) { max-width: 42rem; margin-left: auto; margin-right: auto; }
+.docs { margin-top: clamp(2.8rem, 6vw, 4rem); }
+.docs > h2 { font-size: clamp(1.7rem, 3vw, 2.2rem); padding-top: 1.5rem; border-top: 1.5px solid var(--rule); }
+.docfile { margin: 1.5rem 0 0; scroll-margin-top: 5rem; }
+.docfile + .docfile { margin-top: 3rem; }
+.docfile-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .25rem 1.2rem; padding-bottom: .55rem; margin-bottom: 1rem; border-bottom: 1px solid var(--rule-soft); }
+.docfile-title { font: 600 1.3rem/1.2 var(--cond); color: var(--wine-deep); letter-spacing: .01em; }
+.docfile-meta { font: 500 .92rem/1.4 var(--sans); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.pdf-status { margin: 0; padding: 2.4rem 1rem; text-align: center; font: italic 400 1rem/1.5 var(--serif); color: var(--ink-2); background: var(--paper-2); border: 1px dashed var(--rule-soft); }
+
+/* each page is a white sheet lying on the paper */
+.pdf-sheet, .pdf-stage { position: relative; background: #fff; border: 1px solid var(--rule-soft); box-shadow: 0 1px 2px rgba(35, 21, 24, .06), 0 12px 28px -18px rgba(35, 21, 24, .35); overflow: hidden; }
+.pdf-sheet:not(.is-drawn), .pdf-stage:not(.is-drawn) { background: var(--paper-2); }
+.pdf-sheet canvas, .pdf-stage canvas { display: block; width: 100%; height: 100%; transition: opacity .25s var(--ease); }
+.pdf-stack { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.6rem; }
+.pdf-page { margin: 0; }
+.pdf-no { display: block; margin-top: .45rem; text-align: right; font: 600 .8rem/1 var(--cond); letter-spacing: .12em; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* slide decks: one slide at a time */
+.pdf-stage { cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.pdf-stage:active { cursor: grabbing; }
+.pdf-stage.is-loading canvas { opacity: .55; }
+.pdf-stage:focus-visible, .pdf-btn:focus-visible, .code-file:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
+.pdf-ctrl { display: flex; align-items: center; justify-content: center; gap: 1.1rem; margin-top: 1rem; }
+.pdf-btn { width: 2.75rem; height: 2.75rem; display: inline-grid; place-items: center; padding: 0; background: transparent; border: 1.5px solid var(--wine-deep); color: var(--wine-deep); cursor: pointer; transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease); }
+.pdf-btn svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: square; stroke-linejoin: miter; }
+.pdf-btn:hover:not(:disabled) { background: var(--wine-deep); color: var(--paper); }
+.pdf-btn:disabled { border-color: var(--rule-soft); color: var(--rule-soft); cursor: default; }
+.pdf-count { min-width: 4.6rem; text-align: center; font: 600 1.05rem/1 var(--cond); letter-spacing: .08em; color: var(--wine-deep); font-variant-numeric: tabular-nums; }
+
+/* code files as numbered lines */
+.code-file { margin: 0; max-height: 34rem; overflow: auto; padding: 1rem 1.2rem 1rem .5rem; background: var(--paper-2); border: 1px solid var(--rule-soft); font: 400 .84rem/1.65 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--ink); tab-size: 4; scrollbar-width: thin; scrollbar-color: rgba(138, 42, 61, .55) transparent; }
+.code-file code { counter-reset: ln; white-space: pre; }
+.code-file .ln::before { counter-increment: ln; content: counter(ln); display: inline-block; width: 2.4em; margin-right: 1.2em; text-align: right; color: var(--ink-2); user-select: none; -webkit-user-select: none; }
 
 @media (max-width: 760px) {
   .bar { position: static; }
@@ -98,4 +149,4 @@
   .entry-img { aspect-ratio: 16 / 9; }
   .prose .image.right, .prose .image.left { float: none; width: 100%; margin: 1em 0; }
 }
-@media (prefers-reduced-motion: reduce) { .entry-img img { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .entry-img img, .pdf-btn, .pdf-sheet canvas, .pdf-stage canvas { transition: none; } .entry:hover .entry-img img { transform: none; } }

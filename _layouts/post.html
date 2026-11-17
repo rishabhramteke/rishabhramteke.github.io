@@ -3,18 +3,30 @@
 {% include sheet-head.html %}
 <body class="sheet-page doc-page">
 {% include sheet-bar.html %}
-<main id="content" class="doc">
+<main id="content" class="doc{% if page.documents %} doc-docs{% endif %}">
   <article>
+    {% assign is_project = false %}{% if page.category == 'project' %}{% assign is_project = true %}{% endif %}
+    {% assign body_text = content | strip_html | strip %}
+    {% assign show_hero = false %}
+    {% if page.image %}{% if page.image_show_on_page != false %}{% assign show_hero = true %}{% elsif is_project and body_text == "" and page.documents == nil %}{% unless content contains '<img' or content contains '<iframe' %}{% assign show_hero = true %}{% endunless %}{% endif %}{% endif %}
     <header class="doc-head">
       <h1>{{ page.title }}</h1>
       {% if page.description and page.layout == 'post' and page.category %}<p class="doc-meta">{{ page.description }}</p>{% endif %}
+      {% if is_project %}
+      <dl class="doc-facts">
+        <div><dt>Year</dt><dd>{{ page.date | date: "%Y" }}</dd></div>
+        {% if page.documents %}<div><dt>Documents</dt><dd>{% for d in page.documents %}<a href="#{% if d.id %}{{ d.id }}{% else %}doc-{{ forloop.index }}{% endif %}">{{ d.title }}</a>{% unless forloop.last %}<span class="sep" aria-hidden="true"> · </span>{% endunless %}{% endfor %}</dd></div>{% endif %}
+      </dl>
+      {% endif %}
     </header>
-    {% if page.image and page.image_show_on_page != false %}<figure class="doc-hero"><img src="{{ page.image | relative_url }}" alt=""></figure>{% endif %}
+    {% if show_hero %}<figure class="doc-hero"><img src="{{ page.image | relative_url }}" alt=""></figure>{% endif %}
     <div class="prose">
       {{ content }}
     </div>
+    {% include doc-viewer.html %}
   </article>
 </main>
 {% include sheet-foot.html %}
+{% if page.documents %}<script src="{{ '/assets/js/docs.js' | relative_url }}" defer></script>{% endif %}
 </body>
 </html>
