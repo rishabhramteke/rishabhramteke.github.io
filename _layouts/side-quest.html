@@ -39,7 +39,7 @@
       <h2 id="sq-quest"></h2>
       <p id="sq-flavour"></p>
       <button id="sq-reroll" type="button">Roll a new quest</button>
-      <p class="sq-more">Need a first line? <a href="{{ '/icebreaker/' | relative_url }}">Try the Icebreaker cards</a>.</p>
+      <p class="sq-more">Want to say hello to someone new? That lives in the <a href="{{ '/icebreaker/' | relative_url }}">Icebreaker cards</a>.</p>
     </section>
   </div>
 </main>
@@ -47,8 +47,6 @@
 <script>
 var QUESTS = [
   // ── Social / tiny risks ──────────────────────────────────────────────────
-  { emoji:'💬', cat:'Social', diff:1, quest:'Compliment a stranger on something specific — their jacket, their dog, their laugh.', flavour:'Make it genuine, not generic. "Nice shoes" is fine. "That colour looks great on you" lands differently.' },
-  { emoji:'🙋', cat:'Social', diff:1, quest:'Strike up a conversation with someone waiting in the same queue as you.', flavour:'Comment on the wait, the weather, anything. You only need one sentence to get it started.' },
   { emoji:'☕', cat:'Social', diff:1, quest:'Ask the barista how their day is actually going — and listen to the answer.', flavour:'They\'re trained to ask you. Flip it. Most people light up when someone asks them first.' },
   { emoji:'📞', cat:'Social', diff:1, quest:'Call (not text) someone you haven\'t spoken to in over a year.', flavour:'No agenda. Just "hey, I was thinking about you." That\'s the whole script.' },
   { emoji:'😄', cat:'Social', diff:1, quest:'Make eye contact and smile at five strangers today. Count them.', flavour:'It\'s small, it\'s free, and it shifts the whole energy of your day.' },
@@ -57,7 +55,6 @@ var QUESTS = [
   { emoji:'🎂', cat:'Social', diff:1, quest:'Text someone "thinking of you" today — no reason, no context, just that.', flavour:'It takes 5 seconds to send and will probably make their whole afternoon.' },
   { emoji:'🫂', cat:'Social', diff:2, quest:'Tell someone in your life something you appreciate about them — out loud, not over text.', flavour:'Pick one thing, be specific. "I really appreciate how you always..." is a full sentence.' },
   { emoji:'👥', cat:'Social', diff:2, quest:'Invite yourself to something. Ask a friend what they\'re doing this weekend and just join.', flavour:'People rarely say no when you ask directly. The awkward part only exists in your head.' },
-  { emoji:'🗣️', cat:'Social', diff:2, quest:'Start a conversation with someone at a café, gym, or park who\'s alone and looks approachable.', flavour:'One line is all you need. The rest follows if it\'s meant to.' },
   { emoji:'🧑‍🍳', cat:'Social', diff:2, quest:'Cook something and drop it off for a friend or colleague unexpectedly.', flavour:'Food is one of the oldest ways humans say "I care about you." Use it.' },
   { emoji:'💌', cat:'Social', diff:1, quest:'Write a genuine thank-you message to someone who helped you this year — even for something small.', flavour:'People do things and never hear back. Close that loop.' },
   { emoji:'🎤', cat:'Social', diff:3, quest:'Share an opinion you\'d normally keep to yourself in a group conversation.', flavour:'Not aggressively — just honestly. Saying what you actually think is a skill that needs practice.' },
@@ -110,10 +107,8 @@ var QUESTS = [
   { emoji:"🎭", cat:'Courage', diff:3, quest:"Take a beginners' class where everyone is new (improv, dance, pottery) and do every exercise fully, even the silly ones.", flavour:"Everyone in the room is as nervous as you are. Commit, and the awkwardness turns into laughter." },
   { emoji:"🥫", cat:'Courage', diff:2, quest:"Volunteer for a shift with other people: a food bank, a park clean-up, a charity race.", flavour:"A shared task takes the pressure off talking. Conversation happens sideways." },
   { emoji:"📝", cat:'Courage', diff:1, quest:"After a social event, write down three things that went fine before you let yourself replay anything that didn't.", flavour:"Anxiety only keeps the awkward bits. Give your memory a fairer edit." },
-  { emoji:"📚", cat:'Courage', diff:2, quest:"Ask a stranger what they are reading, listening to or drawing.", flavour:"People like being asked about what they chose. You only need the first question." },
   { emoji:"🥂", cat:'Courage', diff:3, quest:"Say a few words or raise a short toast at the next dinner or gathering.", flavour:"Three sentences is a toast. Thank the host, say one true thing, raise your glass." },
   { emoji:"🧢", cat:'Courage', diff:1, quest:"Wear something a little bolder than usual, a bright colour or a hat, for a whole day.", flavour:"You will notice people noticing. Then you will notice how quickly they stop." },
-  { emoji:"🗺️", cat:'Courage', diff:2, quest:"Ask a local for their favourite place nearby, then go there and tell them about it next time you see them.", flavour:"A recommendation is an easy opener, and coming back with a report turns it into a connection." },
 ];
 
 var current = null;
