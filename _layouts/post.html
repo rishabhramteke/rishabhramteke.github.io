@@ -5,7 +5,7 @@
 {% include sheet-bar.html %}
 <main id="content" class="doc{% if page.documents %} doc-docs{% endif %}">
   <article>
-    {% assign is_project = false %}{% if page.category == 'project' %}{% assign is_project = true %}{% endif %}
+    {% assign is_project = false %}{% if page.category == 'project' or page.category == 'acad' %}{% assign is_project = true %}{% endif %}
     {% assign body_text = content | strip_html | strip %}
     {% assign show_hero = false %}
     {% if page.image %}{% if page.image_show_on_page != false %}{% assign show_hero = true %}{% elsif is_project and body_text == "" and page.documents == nil %}{% unless content contains '<img' or content contains '<iframe' %}{% assign show_hero = true %}{% endunless %}{% endif %}{% endif %}
