@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Gridding the planet: hexagons, squares and curves"
-description: "An honest comparison of the main ways to cut the Earth into indexed cells: lat/lon boxes, web map tiles, geohash, S2, H3, HEALPix and a few others."
+description: "An honest comparison of the main ways to cut the Earth into indexed cells: lat/lon boxes, web map tiles, geohash, S2, H3, HEALPix and a few others, with their pros and cons and when to use which."
 image_show_on_page: false
 category: blog
 permalink: geo-grids
@@ -360,15 +360,67 @@ print(round(a7, 2))                      # 5.16
 
 </div>
 
-## Which one would I pick for what
+## Pros and cons
 
-- **Counting things and looking at neighbourhoods**, such as points, trips, detections or model features: H3. Equal neighbours and `grid_disk` rings make smoothing and context features easy. I accept that rolling up by parent is approximate.
-- **Indexing shapes and testing containment exactly**: S2. Exact nesting and Hilbert-ordered ids turn polygon queries into range scans.
-- **Lining up with a web map or imagery**: XYZ tiles. If training chips are cut along tiles, I do not want a second grid in between.
-- **A quick key in a system with no geo support**: geohash, with explicit neighbour lookups for "nearby", because of the edge cases.
-- **Equal-area statistics**, such as global densities: HEALPix near astronomy tooling, ISEA3H or rHEALPix otherwise.
-- **Telling a person where to go**: MGRS. It is meant to be read aloud.
-- **Spatial train/test splits**: almost any of them. Keep whole coarse cells on one side of the split.
+**Lat/lon boxes**
+- *Good:* nothing to install, and it is the native layout of climate and weather data, so there is no resampling. A cell is just two array indices.
+- *Weak:* area shrinks with latitude. A 1° box at 80° N covers a sixth of the ground of one on the equator, so every density needs an area weight. The poles degenerate, and the eight neighbours sit at two different distances.
+
+**XYZ tiles and quadkeys**
+- *Good:* every web map, tile server and imagery pipeline already speaks it. A tile is an image, so it drops straight into a CNN. Nesting is exact, and the parent is one digit away.
+- *Weak:* Mercator. A tile in Amsterdam covers 37% of the ground of one on the equator, and nothing exists past 85.05°. Fine for pictures, poor for statistics.
+
+**Geohash**
+- *Good:* a plain string that any database can index. A prefix is the containing cell, so a prefix or range scan finds everything inside it. The whole encoder is the short function above, and Redis stores its GEO positions as geohash integers.
+- *Weak:* it inherits the lat/lon distortion, and cell shape alternates between square-ish and 2:1 as the hash grows. Each character is a 32× jump in area. Close points can share no prefix, at the Greenwich line and the antimeridian among other places, so "nearby" always means also checking the eight neighbours.
+
+**S2**
+- *Good:* an exact hierarchy over the whole sphere with no pole problem. 31 levels in 4× steps, so you can pick a size closely. Any polygon becomes a small covering of mixed-level cells, and containment becomes an integer range check. Hilbert order keeps nearby cells close in an index. BigQuery exposes S2 functions, and CockroachDB builds its spatial index on S2.
+- *Weak:* cells are distorted quadrilaterals that vary up to about 2× in area at one level. Neighbours sit at two distances, and three cells meet at the cube corners. The ids are opaque 64-bit numbers, and outside BigQuery you mostly bring the library yourself.
+
+**H3**
+- *Good:* six neighbours at nearly the same distance, so rings, smoothing, flows and spread models are clean. Cells are close in size and shape almost everywhere. It has the widest support in data tools: built-in functions in Databricks and Snowflake, the h3-pg extension for PostGIS, CARTO's toolbox for BigQuery, and bindings for Python, Java and JavaScript.
+- *Weak:* children do not tile the parent, so roll-ups and compacted sets are approximate at the edges. Filling a polygon picks cells by their centre, so the cover is not exact. There are 12 pentagons that grid-walking code must handle, a 7× jump between resolutions, and areas still vary about 2×, so densities need `cell_area`.
+
+**HEALPix**
+- *Good:* exactly equal area with an exact hierarchy, and pixel centres on rings of constant latitude make spherical harmonics fast. Mature tools such as healpy.
+- *Weak:* built for the sky. Little support in GIS and data tools, and cell shapes change from the equator to the poles.
+
+**rHEALPix**
+- *Good:* equal area, exact nesting, and cells that are squares in the projected plane.
+- *Weak:* niche, with few libraries, and a 9× jump between levels.
+
+**ISEA3H and other ISEA grids**
+- *Good:* equal-area hexagons, so the neighbour properties of H3 without the area correction. DGGRID can generate many variants, and the OGC describes the family.
+- *Weak:* no exact nesting, 12 pentagons, and tooling that lives mostly in DGGRID and research code rather than in databases.
+
+**MGRS / UTM**
+- *Good:* readable over a radio and on a paper map. Metre squares that nest exactly inside a zone.
+- *Weak:* 60 zones with seams, so cells either side of a zone edge do not line up, and the poles need a separate system. Strings that are awkward to join on globally.
+
+## Head to head
+
+The choices people actually agonise over are usually between two of these.
+
+- **H3 or S2.** H3 when you aggregate and look around: heatmaps, flows, smoothing, ML features built from rings. S2 when you index shapes and need exact answers: point-in-polygon at scale, coverings, mixed-resolution sets, range scans. If you need both, it is fine to use both: S2 to find what is inside a polygon, H3 to summarise it.
+- **H3 or geohash.** H3 when your stack has H3 functions and you want cells you can compare anywhere on Earth. Geohash when all you have is a string column and prefix scans, or the data stays inside one mid-latitude region where the distortion is constant.
+- **S2 or geohash.** Both order cells along a curve. S2 when correctness matters everywhere, including the poles and the antimeridian, and you want better locality in the index. Geohash when every tool and every colleague has to be able to read the key.
+- **Hexagons or squares.** Hexagons when distance and adjacency matter, as in movement, spread or catchments, because one ring is one step in every direction. Squares when the data are images or rasters, since CNNs want square pixels, or when the hierarchy has to nest exactly.
+- **H3 or an equal-area grid.** H3 when you want the ecosystem and are happy to divide by `cell_area`. ISEA3H or rHEALPix when the numbers will be published as densities or compared across continents and must be equal by construction.
+- **XYZ tiles or anything else.** Tiles when the output is a map or the input is imagery. Anything else when the cell is a statistical unit, because tiles are not equal area.
+- **MGRS or anything else.** MGRS when a person has to read the cell out loud. Anything else when a computer has to join on it.
+
+## Which one to use
+
+A few questions, in this order, settle most cases.
+
+1. **What will read the cells?** A web map or an imagery pipeline: XYZ tiles. If training chips are cut along tiles, I do not want a second grid in between. Climate or weather model output: keep its lat/lon grid and weight by the cosine of latitude. A person in the field: MGRS.
+2. **Do you need exact containment?** Indexing shapes, testing points against polygons, rolling up without slivers: S2.
+3. **Do you need equal area by construction?** Global densities for publication: ISEA3H or rHEALPix, or HEALPix next to astronomy tooling.
+4. **Otherwise: counting things and looking at neighbourhoods**, such as points, trips, detections or model features: H3. Equal neighbours and `grid_disk` rings make smoothing and context features easy, and I accept that rolling up by parent is approximate.
+5. **No geo support at all?** Geohash as a quick key, with explicit neighbour lookups for "nearby" because of the edge cases.
+
+For spatial train/test splits almost any of them works. Keep whole coarse cells on one side of the split.
 
 None of these is the correct grid. Each is a set of compromises about shape, area and nesting, and the useful thing is to know which compromise you are making.
 
@@ -381,3 +433,4 @@ None of these is the correct grid. Each is a set of compromises about shape, are
 - G. M. Morton, [A computer oriented geodetic data base and a new technique in file sequencing](https://search.worldcat.org/title/A-computer-oriented-geodetic-data-base-and-a-new-technique-in-file-sequencing/oclc/52181262), IBM, Ottawa, 1966
 - K. M. Górski et al., [HEALPix: a framework for high-resolution discretization and fast analysis of data distributed on the sphere](https://doi.org/10.1086/427976), The Astrophysical Journal 622, 759 to 771, 2005 ([arXiv](https://arxiv.org/abs/astro-ph/0409513))
 - K. Sahr, D. White and A. J. Kimerling, [Geodesic discrete global grid systems](https://doi.org/10.1559/152304003100011090), Cartography and Geographic Information Science 30(2), 2003
+- Tool support: [Redis GEOADD](https://redis.io/docs/latest/commands/geoadd/) (geohash), [BigQuery geography functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/geography_functions) (S2), [CockroachDB spatial indexes](https://www.cockroachlabs.com/docs/stable/spatial-indexes) (S2), [Databricks H3 functions](https://docs.databricks.com/en/sql/language-manual/sql-ref-h3-geospatial-functions.html), [Snowflake H3 functions](https://docs.snowflake.com/en/sql-reference/functions/h3_latlng_to_cell) and [h3-pg for PostGIS](https://github.com/zachasme/h3-pg)
