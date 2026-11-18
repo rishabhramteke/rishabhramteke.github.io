@@ -36,4 +36,4 @@ pulgins:
   'jekyll-watch'
 
 # not published
-exclude: [PRODUCT.md, DESIGN.md, Gemfile, Gemfile.lock, node_modules, vendor, forty_jekyll_theme.gemspec, tools]
+exclude: [PRODUCT.md, DESIGN.md, Gemfile, Gemfile.lock, node_modules, vendor, tools]
