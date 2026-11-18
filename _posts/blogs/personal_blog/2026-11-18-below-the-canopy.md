@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Below the canopy: possible lost sites under forest"
-description: "Nine places where lidar shows built structures under forest that I could not find in any record: farmsteads, a field system and an oval enclosure in the Forêt de Châtillon, and tar pits near Raahe."
+description: "Ten places where lidar shows built structures under forest that I could not find in any record: farmsteads, a field system and an oval enclosure in the Forêt de Châtillon, a walled enclosure near Châteauvillain, and tar pits near Raahe."
 image: assets/images/blog/below-the-canopy/FR1_lidar.jpg
 image_show_on_page: false
 category: blog
@@ -106,6 +106,23 @@ On the wooded plateau above Voulaines-les-Templiers, a village named after its T
 <span class="btc-line"></span><span class="btc-knob"></span>
 </div>
 <figcaption>The oval is left of centre. About 625 m across, north up.</figcaption>
+</figure>
+
+## South of Châteauvillain, Haute-Marne
+
+### A walled rectangle on a forested spur
+
+On a spur in the forest about 2.5 km south of Châteauvillain, a narrow, continuous bank with square corners, most likely a collapsed wall, encloses about 137 × 121 m. The west side has gaps with small mounds beside them, which may be an entrance, and an irregular hollow just outside the north side, near the north-east corner, may be where the stone came from. In the aerial photo the inside is older broadleaf forest, while the planted rows round it stop at the wall. It could be a Gallo-Roman or medieval enclosure, or a 19th-century nursery or stock pen.
+
+<figure class="btc">
+<div class="btc-compare">
+<img class="btc-aerial" src="{{ '/assets/images/blog/below-the-canopy/FR7_aerial.jpg' | relative_url }}" alt="Aerial photo: a patch of irregular broadleaf canopy surrounded by planted rows of trees." loading="lazy">
+<img class="btc-lidar" src="{{ '/assets/images/blog/below-the-canopy/FR7_lidar.jpg' | relative_url }}" alt="Lidar relief: a crisp rectangular bank with square corners just left of centre, with gaps on its west side." loading="lazy">
+<span class="btc-tag btc-tag-l">Lidar</span><span class="btc-tag btc-tag-r">Aerial</span>
+<input type="range" min="0" max="100" value="50" aria-label="Slide between lidar and aerial photo">
+<span class="btc-line"></span><span class="btc-knob"></span>
+</div>
+<figcaption>The enclosure is just left of centre. About 320 m across, north up.</figcaption>
 </figure>
 
 ## South of Raahe, Finland
