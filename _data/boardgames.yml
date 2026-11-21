@@ -41,3 +41,24 @@ games:
     players: "1–4"
     plays: a lot
     size: medium
+  - title: Compile
+    status: played
+    year: 2024
+    designer: Michael Yang
+    players: "2"
+    review: "I love the design. Each card has its own rules and each category of card has cool effects, but it is still an annoying game: too much random stuff happens, and it felt a little boring. You need to think a lot, which is not bad, but every turn something comes out of nowhere."
+    size: small
+  - title: Schotten Totten
+    status: played
+    year: 1999
+    designer: Reiner Knizia
+    players: "2"
+    review: "Love the art. The game is very fast and cute, but super luck-based. Still fun, because it is quick and chill."
+    size: small
+  - title: Duel for Cardia
+    status: played
+    year: 2025
+    designer: Mathieu Rivero, Faouzi Boughida
+    players: "2"
+    review: "Random abilities. Fun and quick, but it can get boring after multiple plays."
+    size: small
