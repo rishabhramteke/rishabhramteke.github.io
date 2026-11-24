@@ -10,6 +10,65 @@
 # When a paper is published, move it to _posts/publications and delete it here.
 updated: 2026-11-24
 papers:
+  - title: "PANDORA-COVID: A 2020–2022 Reddit Personality Graph and Leakage Protocol"
+    question: >-
+      An open Reddit interaction graph for personality research from the pandemic years, with a
+      protocol that keeps personality labels from leaking into what a model sees.
+    field: Datasets · social media · personality
+    status: under-review
+    route:
+      - venue: ACM Web Conference 2027 (TheWebConf), long papers
+        place: Dublin, May 2027
+        kind: Conference, full paper
+        role: submitted
+        deadline: 2026-10-25
+        note: Decision date not recorded yet.
+
+  - title: What BOLD Adds to Whole-Night fMRI Sleep Staging
+    question: >-
+      What does the fMRI signal add when the brain is scanned through a whole night and each
+      stretch of sleep has to be staged?
+    field: Neuroimaging · sleep · machine learning
+    status: under-review
+    route:
+      - venue: IEEE International Symposium on Biomedical Imaging (ISBI 2027)
+        place: Lausanne, 25–28 May 2027
+        kind: Conference, 4-page paper
+        role: submitted
+        deadline: 2026-11-02
+        decision: 2027-01-12
+      - venue: IEEE Engineering in Medicine and Biology Conference (EMBC 2027)
+        kind: Conference
+        role: fallback
+
+  - title: Multimodal MRI and the Big Five Across Held-Out Studies
+    question: >-
+      Can brain MRI predict the Big Five personality traits in studies a model has never seen,
+      and which kind of scan carries the signal?
+    field: Neuroimaging · personality · machine learning
+    status: drafting
+    route:
+      - venue: AAAI Conference on Artificial Intelligence (AAAI-27)
+        kind: Conference, full paper
+        role: past
+        outcome: rejected
+      - venue: IEEE International Symposium on Biomedical Imaging (ISBI 2027)
+        kind: Conference, 4-page paper
+        role: past
+        outcome: rejected
+      - venue: European Symposium on Artificial Neural Networks (ESANN 2027)
+        place: Bruges, 21–23 April 2027
+        kind: Conference, 6-page paper
+        role: target
+        deadline: 2026-11-25
+        decision: 2027-01-22
+        url: https://www.esann.org/
+      - venue: European Signal Processing Conference (EUSIPCO 2027)
+        place: Darmstadt, 30 August – 3 September 2027
+        kind: Conference, 5-page paper
+        role: fallback
+        deadline: 2027-02-06
+
   - title: Do Shops Follow the Sun or the Clock?
     question: >-
       The posted opening hours of about two million businesses in OpenStreetMap, compared across
@@ -58,3 +117,47 @@ papers:
         kind: Journal
         role: fallback
         note: Open submission.
+
+  - title: Self-Declared Membership as a Shortcut in Personality Graphs
+    question: >-
+      When personality is inferred from who people interact with online, how much comes from
+      the groups they declare themselves members of?
+    field: NLP · social networks · personality
+    status: drafting
+    route:
+      - venue: ACM Conference on Information and Knowledge Management (CIKM 2026)
+        kind: Conference, full paper
+        role: past
+        outcome: rejected
+      - venue: ACL Rolling Review, October 2026
+        kind: Review cycle
+        role: past
+        outcome: rejected
+        note: Desk-rejected for an administrative reason, before review.
+      - venue: ACL Rolling Review, January 2027 (for ACL 2027)
+        kind: Review cycle, long paper
+        role: target
+        deadline: 2027-01-04
+        url: https://aclrollingreview.org/
+
+  - title: "Strong-Lensing Subhalo Detectors Flag Lenses That Have No Subhalo: A Known-Truth Stress Test"
+    question: >-
+      Do the methods used to find dark-matter subhalos in strong gravitational lenses report
+      subhalos that are not there, when tested on simulations where the truth is known?
+    field: Astrophysics · dark matter · strong lensing
+    status: drafting
+    route:
+      - venue: Astronomy & Astrophysics
+        kind: Journal
+        role: past
+        outcome: rejected
+      - venue: The Astrophysical Journal
+        kind: Journal
+        role: target
+        note: Open submission.
+      - venue: Monthly Notices of the Royal Astronomical Society
+        kind: Journal
+        role: fallback
+      - venue: The Open Journal of Astrophysics
+        kind: Journal
+        role: fallback
