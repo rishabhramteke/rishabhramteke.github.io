@@ -41,12 +41,12 @@ papers:
         kind: Conference
         role: fallback
 
-  - title: Multimodal MRI and the Big Five Across Held-Out Studies
+  - title: "Predicting the Big Five from MRI: Leave-One-Study-Out and Frozen External Tests"
     question: >-
       Can brain MRI predict the Big Five personality traits in studies a model has never seen,
       and which kind of scan carries the signal?
     field: Neuroimaging · personality · machine learning
-    status: drafting
+    status: under-review
     route:
       - venue: AAAI Conference on Artificial Intelligence (AAAI-27)
         kind: Conference, full paper
@@ -59,8 +59,9 @@ papers:
       - venue: European Symposium on Artificial Neural Networks (ESANN 2027)
         place: Bruges, 21–23 April 2027
         kind: Conference, 6-page paper
-        role: target
+        role: submitted
         deadline: 2026-11-25
+        note: "Special session: Knowledge Discovery and Human-AI Collaboration in Biomedical Data Science."
         decision: 2027-01-22
         url: https://www.esann.org/
       - venue: European Signal Processing Conference (EUSIPCO 2027)
