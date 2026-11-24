@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-11-13T14:37:52.506Z",
         "reason": "agent: false positive; the detector cannot resolve the Liquid-templated stylesheet links in this Jekyll layout and reads default 16px; the built page (_site/index.html, h1 up to 4.4rem, h2 up to 3.4rem) shows no flat-hierarchy finding"
+      },
+      {
+        "rule": "all-caps-body",
+        "value": "*",
+        "files": [
+          "_layouts/papers.html"
+        ],
+        "createdAt": "2026-11-24T12:56:12.003Z",
+        "reason": "Claude: uppercase is used only for short labels (topic kicker, table headers, venue chips, mobile field names), none near 80 characters"
       }
     ]
   }

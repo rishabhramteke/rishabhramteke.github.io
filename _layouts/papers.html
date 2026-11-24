@@ -13,7 +13,7 @@
 
   /* stage track: where the paper is on the road to publication */
   .track { list-style: none; margin: 1.3rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); counter-reset: st; }
-  .track li { position: relative; padding-top: 1.3rem; font: 600 .86rem/1.25 var(--cond); letter-spacing: .05em; color: var(--ink-2); }
+  .track li { position: relative; padding-top: 1.3rem; font: 600 .86rem/1.35 var(--cond); letter-spacing: .05em; color: var(--ink-2); }
   .track li::before { content: ""; position: absolute; top: .32rem; left: 0; width: .78rem; height: .78rem; border-radius: 50%; border: 1.5px solid var(--rule); background: var(--paper); z-index: 1; }
   .track li::after { content: ""; position: absolute; top: .7rem; left: .78rem; right: 0; height: 1.5px; background: var(--rule-soft); }
   .track li:last-child::after { display: none; }
@@ -34,12 +34,12 @@
   .r-venue a:hover { text-decoration: underline; }
   .r-sub { display: block; margin-top: .15rem; font: 400 .88rem/1.35 var(--sans); color: var(--ink-2); }
   .r-note { display: block; margin-top: .25rem; font: italic 400 .9rem/1.35 var(--serif); color: var(--ink-2); }
-  .role { display: inline-block; font: 600 .78rem/1 var(--cond); letter-spacing: .1em; text-transform: uppercase; padding: .32rem .5rem; border: 1.5px solid var(--wine-deep); color: var(--wine-deep); white-space: nowrap; }
+  .role { display: inline-block; font: 600 .78rem/1.3 var(--cond); letter-spacing: .1em; text-transform: uppercase; padding: .2rem .5rem; border: 1.5px solid var(--wine-deep); color: var(--wine-deep); white-space: nowrap; }
   .role-target, .role-submitted { background: var(--wine-deep); color: var(--paper); }
   .role-fallback, .role-past { border-style: dashed; border-color: var(--rule-soft); color: var(--ink-2); }
   .r-date { font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .r-left { display: block; margin-top: .15rem; font: 600 .82rem/1.2 var(--cond); letter-spacing: .06em; color: var(--wine); }
-  .outcome { font: 600 .9rem/1.2 var(--cond); letter-spacing: .05em; }
+  .r-left { display: block; margin-top: .15rem; font: 600 .82rem/1.35 var(--cond); letter-spacing: .06em; color: var(--wine); }
+  .outcome { font: 600 .9rem/1.35 var(--cond); letter-spacing: .05em; }
   .outcome-accepted { color: var(--wine-deep); }
   .outcome-rejected, .outcome-withdrawn { color: var(--ink-2); text-decoration: line-through; }
   .pp-updated { margin-top: 2.4rem; font: italic 400 .95rem/1.4 var(--serif); color: var(--ink-2); }
