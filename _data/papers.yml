@@ -1,0 +1,60 @@
+# Papers in progress, shown at /papers-in-progress. One block per paper, newest first.
+#
+# status: drafting | submitted | under-review | revision | accepted | published | shelved
+#   (the stage track on the page lights up to this stage)
+# route: every venue the paper has been sent to or is planned for, in order.
+#   role: target (the next submission) | submitted | companion (a non-archival abstract
+#         alongside the paper) | fallback (where it goes if the target says no) | past
+#   deadline / decision: YYYY-MM-DD, or leave out when not announced (note says why)
+#   outcome: accepted | rejected | withdrawn | revise (leave out while pending)
+# When a paper is published, move it to _posts/publications and delete it here.
+updated: 2026-11-24
+papers:
+  - title: Do Shops Follow the Sun or the Clock?
+    question: >-
+      The posted opening hours of about two million businesses in OpenStreetMap, compared across
+      time zone lines and national borders: do shops keep to the clock, to the sun, or to their
+      country's habits?
+    field: Computational social science · time use · OpenStreetMap
+    status: drafting
+    route:
+      - venue: ACM Web Science Conference 2027 (WebSci '27)
+        place: Singapore, 25–28 May 2027
+        kind: Conference, full paper
+        role: target
+        deadline: 2026-12-15
+        decision: 2027-02-18
+        url: https://websci27.webscience.org/
+      - venue: International Conference on Computational Social Science (IC2S2 2027)
+        place: Milan, 2027
+        kind: Abstract, non-archival
+        role: companion
+        note: Call not out yet; earlier editions closed in late February.
+      - venue: EPJ Data Science
+        kind: Journal
+        role: fallback
+        note: Open submission.
+
+  - title: Do Homes Face the Sun?
+    question: >-
+      Which way do millions of homes mapped in OpenStreetMap face, and is it climate, building
+      culture or sunlight rules that turn them toward the sun?
+    field: GIScience · urban form · OpenStreetMap
+    status: drafting
+    route:
+      - venue: 14th International Conference on Geographic Information Science (GIScience 2027)
+        place: Shanghai, 18–22 October 2027
+        kind: Conference, full paper
+        role: target
+        deadline: 2027-01-29
+        note: Decision date not announced yet.
+        url: https://geods.github.io/GIScience2027
+      - venue: International Conference on Computational Social Science (IC2S2 2027)
+        place: Milan, 2027
+        kind: Abstract, non-archival
+        role: companion
+        note: Call not out yet; earlier editions closed in late February.
+      - venue: Computers, Environment and Urban Systems
+        kind: Journal
+        role: fallback
+        note: Open submission.
