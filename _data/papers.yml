@@ -22,7 +22,8 @@ papers:
         kind: Conference, full paper
         role: submitted
         deadline: 2026-10-25
-        note: Decision date not recorded yet.
+        decision: 2027-01-04
+        note: Reviews and rebuttal 15–20 December 2026.
 
   - title: What BOLD Adds to Whole-Night fMRI Sleep Staging
     question: >-
@@ -136,6 +137,7 @@ papers:
         outcome: rejected
         note: Desk-rejected for an administrative reason, before review.
       - venue: ACL Rolling Review, January 2027 (for ACL 2027)
+        place: Kyoto, August 2027
         kind: Review cycle, long paper
         role: target
         deadline: 2027-01-04
