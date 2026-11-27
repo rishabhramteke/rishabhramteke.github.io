@@ -62,6 +62,9 @@ journal:
   - title: My blog
     url: /blog
     note: "Writing about engineering, data, travel and the occasional random thought."
+  - title: LeetCode & system design
+    url: https://github.com/rishabhramteke/leetcode_solutions
+    note: "My solutions to coding problems and notes on system design."
 route:
   - { name: Mumbai, years: "2017–2021", lat: 19.1334, lng: 72.9133, h3: "87608b543ffffff", spot: "IIT Bombay" }
   - { name: Melbourne, years: "2019", lat: -37.8183, lng: 144.9416, h3: "87be6356effffff", spot: "Docklands" }

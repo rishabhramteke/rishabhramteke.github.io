@@ -39,7 +39,6 @@
           <a class="act" href="{{ site.linkedin_url }}" rel="me">LinkedIn</a>
           <a class="act" href="{{ site.scholar_url }}" rel="me">Scholar</a>
           <a class="act" href="{{ site.github_url }}" rel="me">GitHub</a>
-          <a class="act" href="{{ site.github_url }}/leetcode_solutions">LeetCode &amp; system design</a>
           <a class="act" href="#imprint">Contact</a>
         </nav>
       </header>
@@ -85,7 +84,7 @@
         <p class="jr-lede">For friends and readers: the stories, side quests and notes from along the way.</p>
         <ol class="stops">
           {% for j in sh.journal %}
-          <li><a href="{{ j.url | relative_url }}"><svg class="sym" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2 L14 8 L8 14 L2 8 Z"/></svg><span class="stop-t">{{ j.title }}</span><span class="stop-n">{{ j.note }}</span></a></li>
+          <li><a href="{% if j.url contains '://' %}{{ j.url }}{% else %}{{ j.url | relative_url }}{% endif %}"><svg class="sym" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2 L14 8 L8 14 L2 8 Z"/></svg><span class="stop-t">{{ j.title }}</span><span class="stop-n">{{ j.note }}</span></a></li>
           {% endfor %}
         </ol>
       </div>
@@ -127,7 +126,8 @@
   </footer>
 </main>
 
-<script>window.SHEET = { dem: "{{ '/assets/sheet/dem.json' | relative_url }}", route: {{ sh.route | jsonify }}, exit: {{ sh.exit | jsonify }} };</script>
+<script>window.SHEET = { dem: "{{ '/assets/sheet/dem.json' | relative_url }}", route: {{ sh.route | jsonify }}, exit: {{ sh.exit | jsonify }},
+  vendor: { three: "{{ '/assets/vendor/three-0.160.0.min.js' | relative_url }}", topojson: "{{ '/assets/vendor/topojson-client-3.1.0.min.js' | relative_url }}", land: "{{ '/assets/vendor/land-110m.json' | relative_url }}" } };</script>
 <script src="{{ '/assets/js/sheet.js' | relative_url }}" defer></script>
 </body>
 </html>

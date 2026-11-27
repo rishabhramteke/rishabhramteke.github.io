@@ -136,19 +136,23 @@
 
   /* ---------- Sheet 2 globe: wine-ink graticule, coastlines, the route and a plane flying it ---------- */
   var canvas = document.getElementById('globe');
-  if (!canvas || !('IntersectionObserver' in window)) return;
+  if (!canvas) return;
+  function noGlobe() { canvas.closest('figure').classList.add('no-globe'); }  /* CSS shows the drawn picture instead */
+  if (!('IntersectionObserver' in window)) { noGlobe(); return; }
   var io = new IntersectionObserver(function (es) {
     if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); loadGlobe(); }
   }, { rootMargin: '300px' });
   io.observe(canvas);
 
   function script(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+  /* Served from this site (assets/vendor), not from CDNs that some networks and browser extensions block. */
   function loadGlobe() {
+    var V = window.SHEET.vendor;
     Promise.all([
-      script('https://unpkg.com/three@0.160.0/build/three.min.js'),
-      script('https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js'),
-      fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/land-110m.json').then(function (r) { return r.json(); })
-    ]).then(function (res) { drawGlobe(res[2]); }).catch(function () { canvas.closest('figure').classList.add('no-globe'); });
+      script(V.three),
+      script(V.topojson),
+      fetch(V.land).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    ]).then(function (res) { drawGlobe(res[2]); }).catch(noGlobe);
   }
 
   function drawGlobe(topo) {
