@@ -152,7 +152,7 @@ h1, h2 { font-family: var(--cond); font-weight: 600; color: var(--wine-deep); le
 #globe { width: 100%; height: auto; aspect-ratio: 1; display: block; cursor: grab; touch-action: pan-y; }
 #globe:active { cursor: grabbing; }
 /* Drawn picture of the globe when the live one cannot run (no WebGL, scripts blocked or off) */
-.globe-wrap.no-globe, html:not(.js) .globe-wrap { background: url('../sheet/globe.png') center / contain no-repeat; }
+.globe-wrap.no-globe, html:not(.js) .globe-wrap { background: url('../sheet/globe.png') center / 82.5% no-repeat;  /* same size as the live sphere in its canvas */ }
 .globe-wrap.no-globe #globe, html:not(.js) #globe { visibility: hidden; }
 .tb2 { grid-area: tb; position: static; width: auto; max-width: 30rem; align-self: start; }
 .tb-proj { margin: 0 0 .7rem; font: italic 400 .9rem/1.4 var(--serif); color: var(--ink-2); }
